@@ -1,0 +1,115 @@
+﻿<Page x:Class="Diplom.Pages.Login.ForgotPass"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Diplom.Pages.Login"
+      xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      mc:Ignorable="d" 
+      d:DesignHeight="720" d:DesignWidth="1080"
+      Title="ForgotPass">
+    <Border Background="#ffffff">
+        <Grid>
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Восстановление пароля" HorizontalAlignment="Center" FontSize="25"
+                           FontFamily="inherit" Margin="0 0 0 20"/>
+
+                <!-- Поле для ввода email -->
+                <Grid Width="250" Margin="0 5 0 5" Visibility="{Binding EmailStepVisibility}">
+                    <TextBox x:Name="TxtEmail" VerticalAlignment="Center"
+                             Style="{StaticResource Login}"
+                             Margin="8 0 0 0"
+                             GotFocus="TxtEmail_GotFocus"
+                             LostFocus="TxtEmail_LostFocus"
+                             TextChanged="TxtEmail_TextChanged"/>
+                    <TextBlock x:Name="EmailPlaceholder"
+                               Text="Введите email: "
+                               FontSize="15"
+                               Foreground="#6f7582"
+                               IsHitTestVisible="False"
+                               VerticalAlignment="Center"
+                               Margin="30 0 10 0" Visibility="Visible"/>
+                    <Icon:PackIconMaterialDesign Kind="Email" Width="15"
+                                                 Margin="5" VerticalAlignment="Center"
+                                                 Foreground="#6f7582"/>
+                </Grid>
+
+                <!-- Кнопка отправки кода -->
+                <Button Content="Отправить код" FontSize="14" Name="BtnSendCode"
+                        Click="BtnSendCode_Click" Margin="0 5 0 5" Style="{StaticResource Enter}"
+                        Visibility="{Binding EmailStepVisibility}"/>
+
+                <!-- Поле для ввода кода -->
+                <Grid Width="250" Margin="0 5 0 5" Visibility="{Binding CodeStepVisibility}">
+                    <TextBox x:Name="TxtCode" VerticalAlignment="Center"
+                             Style="{StaticResource Login}"
+                             Margin="8 0 0 0"
+                             GotFocus="TxtCode_GotFocus"
+                             LostFocus="TxtCode_LostFocus"
+                             TextChanged="TxtCode_TextChanged"/>
+                    <TextBlock x:Name="CodePlaceholder"
+                               Text="Введите код: "
+                               FontSize="15"
+                               Foreground="#6f7582"
+                               IsHitTestVisible="False"
+                               VerticalAlignment="Center"
+                               Margin="30 0 10 0" Visibility="Visible"/>
+                    <Icon:PackIconMaterialDesign Kind="Code" Width="15"
+                                                 Margin="5" VerticalAlignment="Center"
+                                                 Foreground="#6f7582"/>
+                </Grid>
+
+                <!-- Кнопка подтверждения кода -->
+                <Button Content="Подтвердить код" FontSize="14" Name="BtnVerifyCode"
+                        Click="BtnVerifyCode_Click" Margin="0 5 0 5" Style="{StaticResource Enter}"
+                        Visibility="{Binding CodeStepVisibility}"/>
+
+                <!-- Поля для нового пароля -->
+                <Grid Width="250" Margin="0 5 0 5" Visibility="{Binding PasswordStepVisibility}">
+                    <PasswordBox x:Name="TxtNewPassword" VerticalAlignment="Center"
+                                 Style="{StaticResource Pass}"
+                                 Margin="8 0 0 0"
+                                 GotFocus="TxtNewPassword_GotFocus"
+                                 LostFocus="TxtNewPassword_LostFocus"
+                                 PasswordChanged="TxtNewPassword_PasswordChanged"/>
+                    <TextBlock x:Name="NewPasswordPlaceholder"
+                               Text="Введите новый пароль: "
+                               FontSize="15"
+                               Foreground="#6f7582"
+                               IsHitTestVisible="False"
+                               VerticalAlignment="Center"
+                               Margin="30 0 10 0" Visibility="Visible"/>
+                    <Icon:PackIconMaterialDesign Kind="Password" Width="15"
+                                                 Margin="5" VerticalAlignment="Center"
+                                                 Foreground="#6f7582"/>
+                </Grid>
+
+                <!-- Поле для подтверждения пароля -->
+                <Grid Width="250" Margin="0 5 0 5" Visibility="{Binding PasswordStepVisibility}">
+                    <PasswordBox x:Name="TxtConfirmPassword" VerticalAlignment="Center"
+                                 Style="{StaticResource Pass}"
+                                 Margin="8 0 0 0"
+                                 GotFocus="TxtConfirmPassword_GotFocus"
+                                 LostFocus="TxtConfirmPassword_LostFocus"
+                                 PasswordChanged="TxtConfirmPassword_PasswordChanged"/>
+                    <TextBlock x:Name="ConfirmPasswordPlaceholder"
+                               Text="Подтвердите пароль: "
+                               FontSize="15"
+                               Foreground="#6f7582"
+                               IsHitTestVisible="False"
+                               VerticalAlignment="Center"
+                               Margin="30 0 10 0" Visibility="Visible"/>
+                    <Icon:PackIconMaterialDesign Kind="Password" Width="15"
+                                                 Margin="5" VerticalAlignment="Center"
+                                                 Foreground="#6f7582"/>
+                </Grid>
+
+                <!-- Кнопка сохранения нового пароля -->
+                <Button Content="Сохранить пароль" FontSize="14" Name="BtnSavePassword"
+                        Click="BtnSavePassword_Click" Margin="0 5 0 5" Style="{StaticResource Enter}"
+                        Visibility="{Binding PasswordStepVisibility}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Page>

@@ -1,0 +1,99 @@
+﻿<Page x:Class="Diplom.Pages.MainPage.EmployeeProfilePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:local="clr-namespace:Diplom.Pages.MainPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="800" d:DesignWidth="1280"
+      Title="EmployeeProfilePage">
+
+    <Grid Background="#E0E0E0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Grid.Row="0" Text="Профиль сотрудника" FontSize="32" FontWeight="Bold" 
+                   HorizontalAlignment="Center" Margin="0 40 0 30" Foreground="#37474F"/>
+
+        <!-- Карточка с информацией -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Border Width="450" 
+                    Margin="20" Padding="30" 
+                    Background="White" CornerRadius="10" 
+                    BorderBrush="#B0BEC5" BorderThickness="1">
+                <StackPanel>
+                    <!-- Иконка профиля -->
+                    <Border Width="120" Height="120" CornerRadius="60" Background="#B0BEC5" 
+                            HorizontalAlignment="Center" Margin="0 0 0 30">
+                        <Icon:PackIconMaterial Kind="AccountCircle" Width="100" Height="100" 
+                                               Foreground="White" HorizontalAlignment="Center" 
+                                               VerticalAlignment="Center"/>
+                    </Border>
+
+                    <!-- Полное имя -->
+                    <TextBlock Text="Полное имя:" FontSize="18" FontWeight="Bold" 
+                               Foreground="#37474F" Margin="0 15 0 5"/>
+                    <TextBox x:Name="FullNameTextBox" Style="{StaticResource CustomTextBoxStyle}" 
+                             FontSize="16"/>
+
+                    <!-- Email -->
+                    <TextBlock Text="Email:" FontSize="18" FontWeight="Bold" 
+                               Foreground="#37474F" Margin="0 15 0 5"/>
+                    <TextBox x:Name="EmailTextBox" Style="{StaticResource CustomTextBoxStyle}" 
+                             FontSize="16"/>
+
+                    <!-- Роль -->
+                    <TextBlock Text="Роль:" FontSize="18" FontWeight="Bold" 
+                               Foreground="#37474F" Margin="0 15 0 5"/>
+                    <TextBox x:Name="RoleTextBox" Style="{StaticResource CustomTextBoxStyle}" 
+                             FontSize="16"/>
+
+                    <!-- Текущий пароль (скрыт) -->
+                    <TextBlock Text="Текущий пароль:" FontSize="18" FontWeight="Bold" 
+                               Foreground="#37474F" Margin="0 15 0 5"/>
+                    <TextBlock x:Name="PasswordPlaceholder" Text="••••••••" FontSize="16" 
+                               Foreground="#78909C" Margin="0 0 0 15"/>
+
+                    <!-- Кнопка "Поменять пароль" -->
+                    <Button x:Name="ChangePasswordButton" Content="Поменять пароль" 
+                            Style="{StaticResource CustomButtonStyle}" Background="#2196F3" 
+                            Click="ChangePasswordButton_Click" Width="200" Height="50" FontSize="16"
+                            HorizontalAlignment="Center" Margin="0 10 0 0"/>
+
+                    <!-- Панель для ввода нового пароля (скрыта по умолчанию) -->
+                    <StackPanel x:Name="PasswordChangePanel" Visibility="Collapsed">
+                        <!-- Новый пароль -->
+                        <TextBlock Text="Новый пароль:" FontSize="18" FontWeight="Bold" 
+                                   Foreground="#37474F" Margin="0 15 0 5"/>
+                        <PasswordBox x:Name="NewPasswordBox" Style="{StaticResource CustomPasswordBoxStyle}" 
+                                     FontSize="16"/>
+
+                        <!-- Подтверждение нового пароля -->
+                        <TextBlock Text="Подтвердите новый пароль:" FontSize="18" FontWeight="Bold" 
+                                   Foreground="#37474F" Margin="0 15 0 5"/>
+                        <PasswordBox x:Name="ConfirmPasswordBox" Style="{StaticResource CustomPasswordBoxStyle}" 
+                                     FontSize="16"/>
+
+                        <!-- Кнопка "Сохранить" -->
+                        <Button x:Name="SavePasswordButton" Content="Сохранить" 
+                                Style="{StaticResource CustomButtonStyle}" Background="#4CAF50" 
+                                Click="SavePasswordButton_Click" Width="200" Height="50" FontSize="16"
+                                HorizontalAlignment="Center" Margin="0 20 0 0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+
+        <!-- Кнопка "Назад" -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
+            <Button x:Name="BackButton" Content="Назад" 
+                    Style="{StaticResource CustomButtonStyle}" Background="#F44336" 
+                    Click="BackButton_Click" Width="200" Height="50" FontSize="16"/>
+        </StackPanel>
+    </Grid>
+</Page>

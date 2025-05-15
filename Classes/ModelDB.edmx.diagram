@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="7d6d0a1721e34409a519650b38c6654e" Name="Diagram1" ZoomLevel="64">
+        <EntityTypeShape EntityType="VSK_ArchiveModel.Clients" Width="1.5" PointX="5" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.ClientTypes" Width="1.5" PointX="3" PointY="4.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.Drivers" Width="1.5" PointX="5.625" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.Employees" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.HealthConditions" Width="1.5" PointX="9.75" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.LifeAndHealth" Width="1.5" PointX="12" PointY="8.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.Logs" Width="1.5" PointX="5.25" PointY="13" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.Policies" Width="1.5" PointX="8.125" PointY="8.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.PolicyStatuses" Width="1.5" PointX="8" PointY="4.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.PolicyTypes" Width="1.5" PointX="7.625" PointY="13.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.Properties" Width="1.5" PointX="12" PointY="4.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.PropertyTypes" Width="1.5" PointX="9.75" PointY="4.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.Roles" Width="1.5" PointX="0.75" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.VehicleMakes" Width="1.5" PointX="7.5" PointY="15.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.VehicleModels" Width="1.5" PointX="9.75" PointY="15.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.Vehicles" Width="1.5" PointX="12" PointY="12.125" IsExpanded="true" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Clients_Agent" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Clients_ClientType" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Drivers_Clients" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Employees_Manager" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Employees_Role" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Logs_Employees" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_LifeAndHealth_HealthCondition" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_LifeAndHealth_Policy" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Policies_PolicyType" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Policies_Status" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Properties_Policy" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Vehicles_Policy" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Properties_PropertyType" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_VehicleModels_Make" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_Vehicles_Model" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.ClientDrivers" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.PolicyClients" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_ArchiveModel.PolicyDrivers" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="VSK_ArchiveModel.DriverInsuranceHistory" Width="1.5" PointX="14.375" PointY="6" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_DriverInsuranceHistory_Driver" />
+        <AssociationConnector Association="VSK_ArchiveModel.FK_DriverInsuranceHistory_Policy" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

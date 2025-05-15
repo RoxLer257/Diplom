@@ -1,0 +1,1355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Хранилище VSK_ArchiveModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ClientDrivers">
+          <Key>
+            <PropertyRef Name="ClientID" />
+            <PropertyRef Name="DriverID" />
+          </Key>
+          <Property Name="ClientID" Type="int" Nullable="false" />
+          <Property Name="DriverID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Clients">
+          <Key>
+            <PropertyRef Name="ClientID" />
+          </Key>
+          <Property Name="ClientID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientTypeID" Type="int" Nullable="false" />
+          <Property Name="AgentID" Type="int" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="50" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="50" />
+          <Property Name="MiddleName" Type="nvarchar" MaxLength="50" />
+          <Property Name="CompanyName" Type="nvarchar" MaxLength="100" />
+          <Property Name="PassportNumber" Type="nvarchar" MaxLength="20" />
+          <Property Name="INN" Type="nvarchar" MaxLength="12" />
+          <Property Name="Phone" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ClientTypes">
+          <Key>
+            <PropertyRef Name="ClientTypeID" />
+          </Key>
+          <Property Name="ClientTypeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TypeName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="DriverInsuranceHistory">
+          <Key>
+            <PropertyRef Name="HistoryID" />
+          </Key>
+          <Property Name="HistoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DriverID" Type="int" Nullable="false" />
+          <Property Name="PolicyID" Type="int" Nullable="false" />
+          <Property Name="Year" Type="int" Nullable="false" />
+          <Property Name="HadAccident" Type="bit" Nullable="false" />
+          <Property Name="KBM" Type="decimal" Precision="4" Scale="2" Nullable="false" />
+          <Property Name="LastUpdated" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Drivers">
+          <Key>
+            <PropertyRef Name="DriverID" />
+          </Key>
+          <Property Name="DriverID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientID" Type="int" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="MiddleName" Type="nvarchar" MaxLength="50" />
+          <Property Name="DateOfBirth" Type="date" Nullable="false" />
+          <Property Name="LicenseNumber" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="DrivingExperience" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Employees">
+          <Key>
+            <PropertyRef Name="EmployeeID" />
+          </Key>
+          <Property Name="EmployeeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RoleID" Type="int" Nullable="false" />
+          <Property Name="ManagerID" Type="int" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="MiddleName" Type="nvarchar" MaxLength="50" />
+          <Property Name="Phone" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="HealthConditions">
+          <Key>
+            <PropertyRef Name="HealthConditionID" />
+          </Key>
+          <Property Name="HealthConditionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ConditionName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LifeAndHealth">
+          <Key>
+            <PropertyRef Name="LifeAndHealthID" />
+          </Key>
+          <Property Name="LifeAndHealthID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyID" Type="int" Nullable="false" />
+          <Property Name="Age" Type="int" Nullable="false" />
+          <Property Name="Gender" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="HealthConditionID" Type="int" Nullable="false" />
+          <Property Name="Occupation" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Logs">
+          <Key>
+            <PropertyRef Name="LogID" />
+          </Key>
+          <Property Name="LogID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TableName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Action" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ChangedData" Type="nvarchar(max)" />
+          <Property Name="ChangeDate" Type="datetime" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="50" />
+          <Property Name="EmployeeID" Type="int" />
+        </EntityType>
+        <EntityType Name="Policies">
+          <Key>
+            <PropertyRef Name="PolicyID" />
+          </Key>
+          <Property Name="PolicyID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyTypeID" Type="int" Nullable="false" />
+          <Property Name="StatusID" Type="int" Nullable="false" />
+          <Property Name="InsuranceAmount" Type="decimal" Precision="15" Scale="2" Nullable="false" />
+          <Property Name="StartDate" Type="date" Nullable="false" />
+          <Property Name="EndDate" Type="date" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PolicyClients">
+          <Key>
+            <PropertyRef Name="PolicyID" />
+            <PropertyRef Name="ClientID" />
+          </Key>
+          <Property Name="PolicyID" Type="int" Nullable="false" />
+          <Property Name="ClientID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PolicyDrivers">
+          <Key>
+            <PropertyRef Name="PolicyID" />
+            <PropertyRef Name="DriverID" />
+          </Key>
+          <Property Name="PolicyID" Type="int" Nullable="false" />
+          <Property Name="DriverID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PolicyStatuses">
+          <Key>
+            <PropertyRef Name="StatusID" />
+          </Key>
+          <Property Name="StatusID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StatusName" Type="nvarchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PolicyTypes">
+          <Key>
+            <PropertyRef Name="PolicyTypeID" />
+          </Key>
+          <Property Name="PolicyTypeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TypeName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Properties">
+          <Key>
+            <PropertyRef Name="PropertyID" />
+          </Key>
+          <Property Name="PropertyID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyID" Type="int" Nullable="false" />
+          <Property Name="PropertyTypeID" Type="int" Nullable="false" />
+          <Property Name="Address" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="Area" Type="decimal" Precision="10" Scale="2" Nullable="false" />
+          <Property Name="Value" Type="decimal" Precision="15" Scale="2" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PropertyTypes">
+          <Key>
+            <PropertyRef Name="PropertyTypeID" />
+          </Key>
+          <Property Name="PropertyTypeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TypeName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="RoleID" />
+          </Key>
+          <Property Name="RoleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RoleName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="VehicleMakes">
+          <Key>
+            <PropertyRef Name="MakeID" />
+          </Key>
+          <Property Name="MakeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MakeName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="VehicleModels">
+          <Key>
+            <PropertyRef Name="ModelID" />
+          </Key>
+          <Property Name="ModelID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MakeID" Type="int" Nullable="false" />
+          <Property Name="ModelName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Vehicles">
+          <Key>
+            <PropertyRef Name="VehicleID" />
+          </Key>
+          <Property Name="VehicleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PolicyID" Type="int" Nullable="false" />
+          <Property Name="ModelID" Type="int" Nullable="false" />
+          <Property Name="VIN" Type="nvarchar" MaxLength="17" Nullable="false" />
+          <Property Name="Year" Type="int" Nullable="false" />
+          <Property Name="LicensePlate" Type="nvarchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_ClientDrivers_Client">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
+          <End Role="ClientDrivers" Type="Self.ClientDrivers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="ClientDrivers">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ClientDrivers_Driver">
+          <End Role="Drivers" Type="Self.Drivers" Multiplicity="1" />
+          <End Role="ClientDrivers" Type="Self.ClientDrivers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Drivers">
+              <PropertyRef Name="DriverID" />
+            </Principal>
+            <Dependent Role="ClientDrivers">
+              <PropertyRef Name="DriverID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Clients_Agent">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="Clients" Type="Self.Clients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="Clients">
+              <PropertyRef Name="AgentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Clients_ClientType">
+          <End Role="ClientTypes" Type="Self.ClientTypes" Multiplicity="1" />
+          <End Role="Clients" Type="Self.Clients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientTypes">
+              <PropertyRef Name="ClientTypeID" />
+            </Principal>
+            <Dependent Role="Clients">
+              <PropertyRef Name="ClientTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DriverInsuranceHistory_Driver">
+          <End Role="Drivers" Type="Self.Drivers" Multiplicity="1" />
+          <End Role="DriverInsuranceHistory" Type="Self.DriverInsuranceHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Drivers">
+              <PropertyRef Name="DriverID" />
+            </Principal>
+            <Dependent Role="DriverInsuranceHistory">
+              <PropertyRef Name="DriverID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DriverInsuranceHistory_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="DriverInsuranceHistory" Type="Self.DriverInsuranceHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="DriverInsuranceHistory">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Drivers_Clients">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="0..1" />
+          <End Role="Drivers" Type="Self.Drivers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="Drivers">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employees_Manager">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="Employees1" Type="Self.Employees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="Employees1">
+              <PropertyRef Name="ManagerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employees_Role">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="Employees" Type="Self.Employees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="Employees">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LifeAndHealth_HealthCondition">
+          <End Role="HealthConditions" Type="Self.HealthConditions" Multiplicity="1" />
+          <End Role="LifeAndHealth" Type="Self.LifeAndHealth" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="HealthConditions">
+              <PropertyRef Name="HealthConditionID" />
+            </Principal>
+            <Dependent Role="LifeAndHealth">
+              <PropertyRef Name="HealthConditionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LifeAndHealth_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="LifeAndHealth" Type="Self.LifeAndHealth" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="LifeAndHealth">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Logs_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="Logs" Type="Self.Logs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="Logs">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Policies_PolicyType">
+          <End Role="PolicyTypes" Type="Self.PolicyTypes" Multiplicity="1" />
+          <End Role="Policies" Type="Self.Policies" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PolicyTypes">
+              <PropertyRef Name="PolicyTypeID" />
+            </Principal>
+            <Dependent Role="Policies">
+              <PropertyRef Name="PolicyTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Policies_Status">
+          <End Role="PolicyStatuses" Type="Self.PolicyStatuses" Multiplicity="1" />
+          <End Role="Policies" Type="Self.Policies" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PolicyStatuses">
+              <PropertyRef Name="StatusID" />
+            </Principal>
+            <Dependent Role="Policies">
+              <PropertyRef Name="StatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PolicyClients_Client">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
+          <End Role="PolicyClients" Type="Self.PolicyClients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="PolicyClients">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PolicyClients_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="PolicyClients" Type="Self.PolicyClients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="PolicyClients">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PolicyDrivers_Drivers">
+          <End Role="Drivers" Type="Self.Drivers" Multiplicity="1" />
+          <End Role="PolicyDrivers" Type="Self.PolicyDrivers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Drivers">
+              <PropertyRef Name="DriverID" />
+            </Principal>
+            <Dependent Role="PolicyDrivers">
+              <PropertyRef Name="DriverID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PolicyDrivers_Policies">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="PolicyDrivers" Type="Self.PolicyDrivers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="PolicyDrivers">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Properties_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="Properties" Type="Self.Properties" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="Properties">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Properties_PropertyType">
+          <End Role="PropertyTypes" Type="Self.PropertyTypes" Multiplicity="1" />
+          <End Role="Properties" Type="Self.Properties" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PropertyTypes">
+              <PropertyRef Name="PropertyTypeID" />
+            </Principal>
+            <Dependent Role="Properties">
+              <PropertyRef Name="PropertyTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_VehicleModels_Make">
+          <End Role="VehicleMakes" Type="Self.VehicleMakes" Multiplicity="1" />
+          <End Role="VehicleModels" Type="Self.VehicleModels" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VehicleMakes">
+              <PropertyRef Name="MakeID" />
+            </Principal>
+            <Dependent Role="VehicleModels">
+              <PropertyRef Name="MakeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Vehicles_Model">
+          <End Role="VehicleModels" Type="Self.VehicleModels" Multiplicity="1" />
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VehicleModels">
+              <PropertyRef Name="ModelID" />
+            </Principal>
+            <Dependent Role="Vehicles">
+              <PropertyRef Name="ModelID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Vehicles_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="Vehicles">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Хранилище VSK_ArchiveModelContainer">
+          <EntitySet Name="ClientDrivers" EntityType="Self.ClientDrivers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Clients" EntityType="Self.Clients" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ClientTypes" EntityType="Self.ClientTypes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DriverInsuranceHistory" EntityType="Self.DriverInsuranceHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Drivers" EntityType="Self.Drivers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Employees" EntityType="Self.Employees" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="HealthConditions" EntityType="Self.HealthConditions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LifeAndHealth" EntityType="Self.LifeAndHealth" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Logs" EntityType="Self.Logs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Policies" EntityType="Self.Policies" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PolicyClients" EntityType="Self.PolicyClients" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PolicyDrivers" EntityType="Self.PolicyDrivers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PolicyStatuses" EntityType="Self.PolicyStatuses" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PolicyTypes" EntityType="Self.PolicyTypes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Properties" EntityType="Self.Properties" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PropertyTypes" EntityType="Self.PropertyTypes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VehicleMakes" EntityType="Self.VehicleMakes" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VehicleModels" EntityType="Self.VehicleModels" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Vehicles" EntityType="Self.Vehicles" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ClientDrivers_Client" Association="Self.FK_ClientDrivers_Client">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="ClientDrivers" EntitySet="ClientDrivers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ClientDrivers_Driver" Association="Self.FK_ClientDrivers_Driver">
+            <End Role="Drivers" EntitySet="Drivers" />
+            <End Role="ClientDrivers" EntitySet="ClientDrivers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Clients_Agent" Association="Self.FK_Clients_Agent">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Clients" EntitySet="Clients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Clients_ClientType" Association="Self.FK_Clients_ClientType">
+            <End Role="ClientTypes" EntitySet="ClientTypes" />
+            <End Role="Clients" EntitySet="Clients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DriverInsuranceHistory_Driver" Association="Self.FK_DriverInsuranceHistory_Driver">
+            <End Role="Drivers" EntitySet="Drivers" />
+            <End Role="DriverInsuranceHistory" EntitySet="DriverInsuranceHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DriverInsuranceHistory_Policy" Association="Self.FK_DriverInsuranceHistory_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="DriverInsuranceHistory" EntitySet="DriverInsuranceHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Drivers_Clients" Association="Self.FK_Drivers_Clients">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="Drivers" EntitySet="Drivers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employees_Manager" Association="Self.FK_Employees_Manager">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Employees1" EntitySet="Employees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employees_Role" Association="Self.FK_Employees_Role">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Employees" EntitySet="Employees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LifeAndHealth_HealthCondition" Association="Self.FK_LifeAndHealth_HealthCondition">
+            <End Role="HealthConditions" EntitySet="HealthConditions" />
+            <End Role="LifeAndHealth" EntitySet="LifeAndHealth" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LifeAndHealth_Policy" Association="Self.FK_LifeAndHealth_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="LifeAndHealth" EntitySet="LifeAndHealth" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Logs_Employees" Association="Self.FK_Logs_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Logs" EntitySet="Logs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Policies_PolicyType" Association="Self.FK_Policies_PolicyType">
+            <End Role="PolicyTypes" EntitySet="PolicyTypes" />
+            <End Role="Policies" EntitySet="Policies" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Policies_Status" Association="Self.FK_Policies_Status">
+            <End Role="PolicyStatuses" EntitySet="PolicyStatuses" />
+            <End Role="Policies" EntitySet="Policies" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PolicyClients_Client" Association="Self.FK_PolicyClients_Client">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="PolicyClients" EntitySet="PolicyClients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PolicyClients_Policy" Association="Self.FK_PolicyClients_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="PolicyClients" EntitySet="PolicyClients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PolicyDrivers_Drivers" Association="Self.FK_PolicyDrivers_Drivers">
+            <End Role="Drivers" EntitySet="Drivers" />
+            <End Role="PolicyDrivers" EntitySet="PolicyDrivers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PolicyDrivers_Policies" Association="Self.FK_PolicyDrivers_Policies">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="PolicyDrivers" EntitySet="PolicyDrivers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Properties_Policy" Association="Self.FK_Properties_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="Properties" EntitySet="Properties" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Properties_PropertyType" Association="Self.FK_Properties_PropertyType">
+            <End Role="PropertyTypes" EntitySet="PropertyTypes" />
+            <End Role="Properties" EntitySet="Properties" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VehicleModels_Make" Association="Self.FK_VehicleModels_Make">
+            <End Role="VehicleMakes" EntitySet="VehicleMakes" />
+            <End Role="VehicleModels" EntitySet="VehicleModels" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Vehicles_Model" Association="Self.FK_Vehicles_Model">
+            <End Role="VehicleModels" EntitySet="VehicleModels" />
+            <End Role="Vehicles" EntitySet="Vehicles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Vehicles_Policy" Association="Self.FK_Vehicles_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="Vehicles" EntitySet="Vehicles" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="VSK_ArchiveModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Clients">
+          <Key>
+            <PropertyRef Name="ClientID" />
+          </Key>
+          <Property Name="ClientID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientTypeID" Type="Int32" Nullable="false" />
+          <Property Name="AgentID" Type="Int32" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MiddleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CompanyName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="PassportNumber" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="INN" Type="String" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="Phone" Type="String" MaxLength="15" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK_Clients_Agent" FromRole="Clients" ToRole="Employees" />
+          <NavigationProperty Name="ClientTypes" Relationship="Self.FK_Clients_ClientType" FromRole="Clients" ToRole="ClientTypes" />
+          <NavigationProperty Name="Drivers" Relationship="Self.FK_Drivers_Clients" FromRole="Clients" ToRole="Drivers" />
+          <NavigationProperty Name="Drivers1" Relationship="Self.ClientDrivers" FromRole="Clients" ToRole="Drivers" />
+          <NavigationProperty Name="Policies" Relationship="Self.PolicyClients" FromRole="Clients" ToRole="Policies" />
+        </EntityType>
+        <EntityType Name="ClientTypes">
+          <Key>
+            <PropertyRef Name="ClientTypeID" />
+          </Key>
+          <Property Name="ClientTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TypeName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Clients" Relationship="Self.FK_Clients_ClientType" FromRole="ClientTypes" ToRole="Clients" />
+        </EntityType>
+        <EntityType Name="Drivers">
+          <Key>
+            <PropertyRef Name="DriverID" />
+          </Key>
+          <Property Name="DriverID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientID" Type="Int32" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="MiddleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DateOfBirth" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="LicenseNumber" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="DrivingExperience" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Clients" Relationship="Self.FK_Drivers_Clients" FromRole="Drivers" ToRole="Clients" />
+          <NavigationProperty Name="Clients1" Relationship="Self.ClientDrivers" FromRole="Drivers" ToRole="Clients" />
+          <NavigationProperty Name="Policies" Relationship="Self.PolicyDrivers" FromRole="Drivers" ToRole="Policies" />
+          <NavigationProperty Name="DriverInsuranceHistory" Relationship="VSK_ArchiveModel.FK_DriverInsuranceHistory_Driver" FromRole="Drivers" ToRole="DriverInsuranceHistory" />
+        </EntityType>
+        <EntityType Name="Employees">
+          <Key>
+            <PropertyRef Name="EmployeeID" />
+          </Key>
+          <Property Name="EmployeeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RoleID" Type="Int32" Nullable="false" />
+          <Property Name="ManagerID" Type="Int32" />
+          <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="MiddleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Phone" Type="String" MaxLength="15" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Clients" Relationship="Self.FK_Clients_Agent" FromRole="Employees" ToRole="Clients" />
+          <NavigationProperty Name="Employees1" Relationship="Self.FK_Employees_Manager" FromRole="Employees" ToRole="Employees1" />
+          <NavigationProperty Name="Employees2" Relationship="Self.FK_Employees_Manager" FromRole="Employees1" ToRole="Employees" />
+          <NavigationProperty Name="Roles" Relationship="Self.FK_Employees_Role" FromRole="Employees" ToRole="Roles" />
+          <NavigationProperty Name="Logs" Relationship="Self.FK_Logs_Employees" FromRole="Employees" ToRole="Logs" />
+        </EntityType>
+        <EntityType Name="HealthConditions">
+          <Key>
+            <PropertyRef Name="HealthConditionID" />
+          </Key>
+          <Property Name="HealthConditionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ConditionName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="LifeAndHealth" Relationship="Self.FK_LifeAndHealth_HealthCondition" FromRole="HealthConditions" ToRole="LifeAndHealth" />
+        </EntityType>
+        <EntityType Name="LifeAndHealth">
+          <Key>
+            <PropertyRef Name="LifeAndHealthID" />
+          </Key>
+          <Property Name="LifeAndHealthID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyID" Type="Int32" Nullable="false" />
+          <Property Name="Age" Type="Int32" Nullable="false" />
+          <Property Name="Gender" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="HealthConditionID" Type="Int32" Nullable="false" />
+          <Property Name="Occupation" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="HealthConditions" Relationship="Self.FK_LifeAndHealth_HealthCondition" FromRole="LifeAndHealth" ToRole="HealthConditions" />
+          <NavigationProperty Name="Policies" Relationship="Self.FK_LifeAndHealth_Policy" FromRole="LifeAndHealth" ToRole="Policies" />
+        </EntityType>
+        <EntityType Name="Logs">
+          <Key>
+            <PropertyRef Name="LogID" />
+          </Key>
+          <Property Name="LogID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TableName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Action" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ChangedData" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ChangeDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UserName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="EmployeeID" Type="Int32" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK_Logs_Employees" FromRole="Logs" ToRole="Employees" />
+        </EntityType>
+        <EntityType Name="Policies">
+          <Key>
+            <PropertyRef Name="PolicyID" />
+          </Key>
+          <Property Name="PolicyID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyTypeID" Type="Int32" Nullable="false" />
+          <Property Name="StatusID" Type="Int32" Nullable="false" />
+          <Property Name="InsuranceAmount" Type="Decimal" Precision="15" Scale="2" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="LifeAndHealth" Relationship="Self.FK_LifeAndHealth_Policy" FromRole="Policies" ToRole="LifeAndHealth" />
+          <NavigationProperty Name="PolicyTypes" Relationship="Self.FK_Policies_PolicyType" FromRole="Policies" ToRole="PolicyTypes" />
+          <NavigationProperty Name="PolicyStatuses" Relationship="Self.FK_Policies_Status" FromRole="Policies" ToRole="PolicyStatuses" />
+          <NavigationProperty Name="Properties" Relationship="Self.FK_Properties_Policy" FromRole="Policies" ToRole="Properties" />
+          <NavigationProperty Name="Vehicles" Relationship="Self.FK_Vehicles_Policy" FromRole="Policies" ToRole="Vehicles" />
+          <NavigationProperty Name="Clients" Relationship="Self.PolicyClients" FromRole="Policies" ToRole="Clients" />
+          <NavigationProperty Name="Drivers" Relationship="Self.PolicyDrivers" FromRole="Policies" ToRole="Drivers" />
+          <NavigationProperty Name="DriverInsuranceHistory" Relationship="VSK_ArchiveModel.FK_DriverInsuranceHistory_Policy" FromRole="Policies" ToRole="DriverInsuranceHistory" />
+        </EntityType>
+        <EntityType Name="PolicyStatuses">
+          <Key>
+            <PropertyRef Name="StatusID" />
+          </Key>
+          <Property Name="StatusID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StatusName" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Policies" Relationship="Self.FK_Policies_Status" FromRole="PolicyStatuses" ToRole="Policies" />
+        </EntityType>
+        <EntityType Name="PolicyTypes">
+          <Key>
+            <PropertyRef Name="PolicyTypeID" />
+          </Key>
+          <Property Name="PolicyTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TypeName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Policies" Relationship="Self.FK_Policies_PolicyType" FromRole="PolicyTypes" ToRole="Policies" />
+        </EntityType>
+        <EntityType Name="Properties">
+          <Key>
+            <PropertyRef Name="PropertyID" />
+          </Key>
+          <Property Name="PropertyID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyID" Type="Int32" Nullable="false" />
+          <Property Name="PropertyTypeID" Type="Int32" Nullable="false" />
+          <Property Name="Address" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Area" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
+          <Property Name="Value" Type="Decimal" Precision="15" Scale="2" Nullable="false" />
+          <NavigationProperty Name="Policies" Relationship="Self.FK_Properties_Policy" FromRole="Properties" ToRole="Policies" />
+          <NavigationProperty Name="PropertyTypes" Relationship="Self.FK_Properties_PropertyType" FromRole="Properties" ToRole="PropertyTypes" />
+        </EntityType>
+        <EntityType Name="PropertyTypes">
+          <Key>
+            <PropertyRef Name="PropertyTypeID" />
+          </Key>
+          <Property Name="PropertyTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TypeName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Properties" Relationship="Self.FK_Properties_PropertyType" FromRole="PropertyTypes" ToRole="Properties" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="RoleID" />
+          </Key>
+          <Property Name="RoleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RoleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK_Employees_Role" FromRole="Roles" ToRole="Employees" />
+        </EntityType>
+        <EntityType Name="VehicleMakes">
+          <Key>
+            <PropertyRef Name="MakeID" />
+          </Key>
+          <Property Name="MakeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MakeName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="VehicleModels" Relationship="Self.FK_VehicleModels_Make" FromRole="VehicleMakes" ToRole="VehicleModels" />
+        </EntityType>
+        <EntityType Name="VehicleModels">
+          <Key>
+            <PropertyRef Name="ModelID" />
+          </Key>
+          <Property Name="ModelID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MakeID" Type="Int32" Nullable="false" />
+          <Property Name="ModelName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="VehicleMakes" Relationship="Self.FK_VehicleModels_Make" FromRole="VehicleModels" ToRole="VehicleMakes" />
+          <NavigationProperty Name="Vehicles" Relationship="Self.FK_Vehicles_Model" FromRole="VehicleModels" ToRole="Vehicles" />
+        </EntityType>
+        <EntityType Name="Vehicles">
+          <Key>
+            <PropertyRef Name="VehicleID" />
+          </Key>
+          <Property Name="VehicleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PolicyID" Type="Int32" Nullable="false" />
+          <Property Name="ModelID" Type="Int32" Nullable="false" />
+          <Property Name="VIN" Type="String" MaxLength="17" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Year" Type="Int32" Nullable="false" />
+          <Property Name="LicensePlate" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Policies" Relationship="Self.FK_Vehicles_Policy" FromRole="Vehicles" ToRole="Policies" />
+          <NavigationProperty Name="VehicleModels" Relationship="Self.FK_Vehicles_Model" FromRole="Vehicles" ToRole="VehicleModels" />
+        </EntityType>
+        <Association Name="FK_Clients_Agent">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="Clients" Type="Self.Clients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="Clients">
+              <PropertyRef Name="AgentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Clients_ClientType">
+          <End Role="ClientTypes" Type="Self.ClientTypes" Multiplicity="1" />
+          <End Role="Clients" Type="Self.Clients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientTypes">
+              <PropertyRef Name="ClientTypeID" />
+            </Principal>
+            <Dependent Role="Clients">
+              <PropertyRef Name="ClientTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Drivers_Clients">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="0..1" />
+          <End Role="Drivers" Type="Self.Drivers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Clients">
+              <PropertyRef Name="ClientID" />
+            </Principal>
+            <Dependent Role="Drivers">
+              <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employees_Manager">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="Employees1" Type="Self.Employees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="Employees1">
+              <PropertyRef Name="ManagerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employees_Role">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="Employees" Type="Self.Employees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="Employees">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Logs_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="Logs" Type="Self.Logs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="Logs">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LifeAndHealth_HealthCondition">
+          <End Role="HealthConditions" Type="Self.HealthConditions" Multiplicity="1" />
+          <End Role="LifeAndHealth" Type="Self.LifeAndHealth" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="HealthConditions">
+              <PropertyRef Name="HealthConditionID" />
+            </Principal>
+            <Dependent Role="LifeAndHealth">
+              <PropertyRef Name="HealthConditionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LifeAndHealth_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="LifeAndHealth" Type="Self.LifeAndHealth" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="LifeAndHealth">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Policies_PolicyType">
+          <End Role="PolicyTypes" Type="Self.PolicyTypes" Multiplicity="1" />
+          <End Role="Policies" Type="Self.Policies" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PolicyTypes">
+              <PropertyRef Name="PolicyTypeID" />
+            </Principal>
+            <Dependent Role="Policies">
+              <PropertyRef Name="PolicyTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Policies_Status">
+          <End Role="PolicyStatuses" Type="Self.PolicyStatuses" Multiplicity="1" />
+          <End Role="Policies" Type="Self.Policies" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PolicyStatuses">
+              <PropertyRef Name="StatusID" />
+            </Principal>
+            <Dependent Role="Policies">
+              <PropertyRef Name="StatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Properties_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="Properties" Type="Self.Properties" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="Properties">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Vehicles_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="Vehicles">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Properties_PropertyType">
+          <End Role="PropertyTypes" Type="Self.PropertyTypes" Multiplicity="1" />
+          <End Role="Properties" Type="Self.Properties" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PropertyTypes">
+              <PropertyRef Name="PropertyTypeID" />
+            </Principal>
+            <Dependent Role="Properties">
+              <PropertyRef Name="PropertyTypeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_VehicleModels_Make">
+          <End Role="VehicleMakes" Type="Self.VehicleMakes" Multiplicity="1" />
+          <End Role="VehicleModels" Type="Self.VehicleModels" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VehicleMakes">
+              <PropertyRef Name="MakeID" />
+            </Principal>
+            <Dependent Role="VehicleModels">
+              <PropertyRef Name="MakeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Vehicles_Model">
+          <End Role="VehicleModels" Type="Self.VehicleModels" Multiplicity="1" />
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="VehicleModels">
+              <PropertyRef Name="ModelID" />
+            </Principal>
+            <Dependent Role="Vehicles">
+              <PropertyRef Name="ModelID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ClientDrivers">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="*" />
+          <End Role="Drivers" Type="Self.Drivers" Multiplicity="*" />
+        </Association>
+        <Association Name="PolicyClients">
+          <End Role="Clients" Type="Self.Clients" Multiplicity="*" />
+          <End Role="Policies" Type="Self.Policies" Multiplicity="*" />
+        </Association>
+        <Association Name="PolicyDrivers">
+          <End Role="Drivers" Type="Self.Drivers" Multiplicity="*" />
+          <End Role="Policies" Type="Self.Policies" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="VSK_DBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Clients" EntityType="Self.Clients" />
+          <EntitySet Name="ClientTypes" EntityType="Self.ClientTypes" />
+          <EntitySet Name="Drivers" EntityType="Self.Drivers" />
+          <EntitySet Name="Employees" EntityType="Self.Employees" />
+          <EntitySet Name="HealthConditions" EntityType="Self.HealthConditions" />
+          <EntitySet Name="LifeAndHealth" EntityType="Self.LifeAndHealth" />
+          <EntitySet Name="Logs" EntityType="Self.Logs" />
+          <EntitySet Name="Policies" EntityType="Self.Policies" />
+          <EntitySet Name="PolicyStatuses" EntityType="Self.PolicyStatuses" />
+          <EntitySet Name="PolicyTypes" EntityType="Self.PolicyTypes" />
+          <EntitySet Name="Properties" EntityType="Self.Properties" />
+          <EntitySet Name="PropertyTypes" EntityType="Self.PropertyTypes" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" />
+          <EntitySet Name="VehicleMakes" EntityType="Self.VehicleMakes" />
+          <EntitySet Name="VehicleModels" EntityType="Self.VehicleModels" />
+          <EntitySet Name="Vehicles" EntityType="Self.Vehicles" />
+          <AssociationSet Name="FK_Clients_Agent" Association="Self.FK_Clients_Agent">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Clients" EntitySet="Clients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Clients_ClientType" Association="Self.FK_Clients_ClientType">
+            <End Role="ClientTypes" EntitySet="ClientTypes" />
+            <End Role="Clients" EntitySet="Clients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Drivers_Clients" Association="Self.FK_Drivers_Clients">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="Drivers" EntitySet="Drivers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employees_Manager" Association="Self.FK_Employees_Manager">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Employees1" EntitySet="Employees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employees_Role" Association="Self.FK_Employees_Role">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Employees" EntitySet="Employees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Logs_Employees" Association="Self.FK_Logs_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Logs" EntitySet="Logs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LifeAndHealth_HealthCondition" Association="Self.FK_LifeAndHealth_HealthCondition">
+            <End Role="HealthConditions" EntitySet="HealthConditions" />
+            <End Role="LifeAndHealth" EntitySet="LifeAndHealth" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LifeAndHealth_Policy" Association="Self.FK_LifeAndHealth_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="LifeAndHealth" EntitySet="LifeAndHealth" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Policies_PolicyType" Association="Self.FK_Policies_PolicyType">
+            <End Role="PolicyTypes" EntitySet="PolicyTypes" />
+            <End Role="Policies" EntitySet="Policies" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Policies_Status" Association="Self.FK_Policies_Status">
+            <End Role="PolicyStatuses" EntitySet="PolicyStatuses" />
+            <End Role="Policies" EntitySet="Policies" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Properties_Policy" Association="Self.FK_Properties_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="Properties" EntitySet="Properties" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Vehicles_Policy" Association="Self.FK_Vehicles_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="Vehicles" EntitySet="Vehicles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Properties_PropertyType" Association="Self.FK_Properties_PropertyType">
+            <End Role="PropertyTypes" EntitySet="PropertyTypes" />
+            <End Role="Properties" EntitySet="Properties" />
+          </AssociationSet>
+          <AssociationSet Name="FK_VehicleModels_Make" Association="Self.FK_VehicleModels_Make">
+            <End Role="VehicleMakes" EntitySet="VehicleMakes" />
+            <End Role="VehicleModels" EntitySet="VehicleModels" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Vehicles_Model" Association="Self.FK_Vehicles_Model">
+            <End Role="VehicleModels" EntitySet="VehicleModels" />
+            <End Role="Vehicles" EntitySet="Vehicles" />
+          </AssociationSet>
+          <AssociationSet Name="ClientDrivers" Association="Self.ClientDrivers">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="Drivers" EntitySet="Drivers" />
+          </AssociationSet>
+          <AssociationSet Name="PolicyClients" Association="Self.PolicyClients">
+            <End Role="Clients" EntitySet="Clients" />
+            <End Role="Policies" EntitySet="Policies" />
+          </AssociationSet>
+          <AssociationSet Name="PolicyDrivers" Association="Self.PolicyDrivers">
+            <End Role="Drivers" EntitySet="Drivers" />
+            <End Role="Policies" EntitySet="Policies" />
+          </AssociationSet>
+          <EntitySet Name="DriverInsuranceHistory" EntityType="VSK_ArchiveModel.DriverInsuranceHistory" />
+          <AssociationSet Name="FK_DriverInsuranceHistory_Driver" Association="VSK_ArchiveModel.FK_DriverInsuranceHistory_Driver">
+            <End Role="Drivers" EntitySet="Drivers" />
+            <End Role="DriverInsuranceHistory" EntitySet="DriverInsuranceHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DriverInsuranceHistory_Policy" Association="VSK_ArchiveModel.FK_DriverInsuranceHistory_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="DriverInsuranceHistory" EntitySet="DriverInsuranceHistory" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="DriverInsuranceHistory">
+          <Key>
+            <PropertyRef Name="HistoryID" />
+          </Key>
+          <Property Name="HistoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DriverID" Type="Int32" Nullable="false" />
+          <Property Name="PolicyID" Type="Int32" Nullable="false" />
+          <Property Name="Year" Type="Int32" Nullable="false" />
+          <Property Name="HadAccident" Type="Boolean" Nullable="false" />
+          <Property Name="KBM" Type="Decimal" Nullable="false" Precision="4" Scale="2" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Drivers" Relationship="VSK_ArchiveModel.FK_DriverInsuranceHistory_Driver" FromRole="DriverInsuranceHistory" ToRole="Drivers" />
+          <NavigationProperty Name="Policies" Relationship="VSK_ArchiveModel.FK_DriverInsuranceHistory_Policy" FromRole="DriverInsuranceHistory" ToRole="Policies" />
+        </EntityType>
+        <Association Name="FK_DriverInsuranceHistory_Driver">
+          <End Type="VSK_ArchiveModel.Drivers" Role="Drivers" Multiplicity="1" />
+          <End Type="VSK_ArchiveModel.DriverInsuranceHistory" Role="DriverInsuranceHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Drivers">
+              <PropertyRef Name="DriverID" />
+            </Principal>
+            <Dependent Role="DriverInsuranceHistory">
+              <PropertyRef Name="DriverID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DriverInsuranceHistory_Policy">
+          <End Type="VSK_ArchiveModel.Policies" Role="Policies" Multiplicity="1" />
+          <End Type="VSK_ArchiveModel.DriverInsuranceHistory" Role="DriverInsuranceHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="DriverInsuranceHistory">
+              <PropertyRef Name="PolicyID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище VSK_ArchiveModelContainer" CdmEntityContainer="VSK_DBEntities">
+          <EntitySetMapping Name="Clients">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.Clients">
+              <MappingFragment StoreEntitySet="Clients">
+                <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+                <ScalarProperty Name="ClientTypeID" ColumnName="ClientTypeID" />
+                <ScalarProperty Name="AgentID" ColumnName="AgentID" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
+                <ScalarProperty Name="PassportNumber" ColumnName="PassportNumber" />
+                <ScalarProperty Name="INN" ColumnName="INN" />
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ClientTypes">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.ClientTypes">
+              <MappingFragment StoreEntitySet="ClientTypes">
+                <ScalarProperty Name="ClientTypeID" ColumnName="ClientTypeID" />
+                <ScalarProperty Name="TypeName" ColumnName="TypeName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Drivers">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.Drivers">
+              <MappingFragment StoreEntitySet="Drivers">
+                <ScalarProperty Name="DriverID" ColumnName="DriverID" />
+                <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="DateOfBirth" ColumnName="DateOfBirth" />
+                <ScalarProperty Name="LicenseNumber" ColumnName="LicenseNumber" />
+                <ScalarProperty Name="DrivingExperience" ColumnName="DrivingExperience" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Employees">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.Employees">
+              <MappingFragment StoreEntitySet="Employees">
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+                <ScalarProperty Name="ManagerID" ColumnName="ManagerID" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="HealthConditions">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.HealthConditions">
+              <MappingFragment StoreEntitySet="HealthConditions">
+                <ScalarProperty Name="HealthConditionID" ColumnName="HealthConditionID" />
+                <ScalarProperty Name="ConditionName" ColumnName="ConditionName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LifeAndHealth">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.LifeAndHealth">
+              <MappingFragment StoreEntitySet="LifeAndHealth">
+                <ScalarProperty Name="LifeAndHealthID" ColumnName="LifeAndHealthID" />
+                <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
+                <ScalarProperty Name="Age" ColumnName="Age" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="HealthConditionID" ColumnName="HealthConditionID" />
+                <ScalarProperty Name="Occupation" ColumnName="Occupation" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Logs">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.Logs">
+              <MappingFragment StoreEntitySet="Logs">
+                <ScalarProperty Name="LogID" ColumnName="LogID" />
+                <ScalarProperty Name="TableName" ColumnName="TableName" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="ChangedData" ColumnName="ChangedData" />
+                <ScalarProperty Name="ChangeDate" ColumnName="ChangeDate" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Policies">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.Policies">
+              <MappingFragment StoreEntitySet="Policies">
+                <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
+                <ScalarProperty Name="PolicyTypeID" ColumnName="PolicyTypeID" />
+                <ScalarProperty Name="StatusID" ColumnName="StatusID" />
+                <ScalarProperty Name="InsuranceAmount" ColumnName="InsuranceAmount" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PolicyStatuses">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.PolicyStatuses">
+              <MappingFragment StoreEntitySet="PolicyStatuses">
+                <ScalarProperty Name="StatusID" ColumnName="StatusID" />
+                <ScalarProperty Name="StatusName" ColumnName="StatusName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PolicyTypes">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.PolicyTypes">
+              <MappingFragment StoreEntitySet="PolicyTypes">
+                <ScalarProperty Name="PolicyTypeID" ColumnName="PolicyTypeID" />
+                <ScalarProperty Name="TypeName" ColumnName="TypeName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Properties">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.Properties">
+              <MappingFragment StoreEntitySet="Properties">
+                <ScalarProperty Name="PropertyID" ColumnName="PropertyID" />
+                <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
+                <ScalarProperty Name="PropertyTypeID" ColumnName="PropertyTypeID" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="Area" ColumnName="Area" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PropertyTypes">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.PropertyTypes">
+              <MappingFragment StoreEntitySet="PropertyTypes">
+                <ScalarProperty Name="PropertyTypeID" ColumnName="PropertyTypeID" />
+                <ScalarProperty Name="TypeName" ColumnName="TypeName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Roles">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.Roles">
+              <MappingFragment StoreEntitySet="Roles">
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+                <ScalarProperty Name="RoleName" ColumnName="RoleName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VehicleMakes">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.VehicleMakes">
+              <MappingFragment StoreEntitySet="VehicleMakes">
+                <ScalarProperty Name="MakeID" ColumnName="MakeID" />
+                <ScalarProperty Name="MakeName" ColumnName="MakeName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VehicleModels">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.VehicleModels">
+              <MappingFragment StoreEntitySet="VehicleModels">
+                <ScalarProperty Name="ModelID" ColumnName="ModelID" />
+                <ScalarProperty Name="MakeID" ColumnName="MakeID" />
+                <ScalarProperty Name="ModelName" ColumnName="ModelName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Vehicles">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.Vehicles">
+              <MappingFragment StoreEntitySet="Vehicles">
+                <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
+                <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
+                <ScalarProperty Name="ModelID" ColumnName="ModelID" />
+                <ScalarProperty Name="VIN" ColumnName="VIN" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="LicensePlate" ColumnName="LicensePlate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="ClientDrivers" TypeName="VSK_ArchiveModel.ClientDrivers" StoreEntitySet="ClientDrivers">
+            <EndProperty Name="Clients">
+              <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+            </EndProperty>
+            <EndProperty Name="Drivers">
+              <ScalarProperty Name="DriverID" ColumnName="DriverID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="PolicyClients" TypeName="VSK_ArchiveModel.PolicyClients" StoreEntitySet="PolicyClients">
+            <EndProperty Name="Clients">
+              <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+            </EndProperty>
+            <EndProperty Name="Policies">
+              <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="PolicyDrivers" TypeName="VSK_ArchiveModel.PolicyDrivers" StoreEntitySet="PolicyDrivers">
+            <EndProperty Name="Drivers">
+              <ScalarProperty Name="DriverID" ColumnName="DriverID" />
+            </EndProperty>
+            <EndProperty Name="Policies">
+              <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <EntitySetMapping Name="DriverInsuranceHistory">
+            <EntityTypeMapping TypeName="VSK_ArchiveModel.DriverInsuranceHistory">
+              <MappingFragment StoreEntitySet="DriverInsuranceHistory">
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+                <ScalarProperty Name="KBM" ColumnName="KBM" />
+                <ScalarProperty Name="HadAccident" ColumnName="HadAccident" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
+                <ScalarProperty Name="DriverID" ColumnName="DriverID" />
+                <ScalarProperty Name="HistoryID" ColumnName="HistoryID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
