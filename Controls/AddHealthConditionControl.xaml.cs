@@ -34,7 +34,7 @@ namespace Diplom.Controls
 
             if (!string.IsNullOrWhiteSpace(ConditionName))
             {
-                var db = VSK_DBEntities.GetContext();
+                var db = ClassFrame.ConnectDB;
                 var newHealthCondition = new HealthConditions { ConditionName = ConditionName };
                 db.HealthConditions.Add(newHealthCondition);
                 db.SaveChanges();

@@ -23,14 +23,14 @@ namespace Diplom.Pages
 
         private void Load()
         {
-            EmployeesGrid.ItemsSource =  VSK_DBEntities.GetContext().Employees.ToList();
-            ClientsGrid.ItemsSource =  VSK_DBEntities.GetContext().Clients.ToList();
-            PoliciesGrid.ItemsSource =  VSK_DBEntities.GetContext().Policies.ToList();
-            LogsGrid.ItemsSource =  VSK_DBEntities.GetContext().Logs.ToList();
-            BrandsGrid.ItemsSource =  VSK_DBEntities.GetContext().VehicleMakes.ToList();
-            ModelsGrid.ItemsSource =  VSK_DBEntities.GetContext().VehicleModels.ToList();
-            PropertyTypesGrid.ItemsSource =  VSK_DBEntities.GetContext().PropertyTypes.ToList();
-            HealthConditionsGrid.ItemsSource =  VSK_DBEntities.GetContext().HealthConditions.ToList();
+            EmployeesGrid.ItemsSource =  ClassFrame.ConnectDB.Employees.ToList();
+            ClientsGrid.ItemsSource = ClassFrame.ConnectDB.Clients.ToList();
+            PoliciesGrid.ItemsSource =  ClassFrame.ConnectDB.Policies.ToList();
+            LogsGrid.ItemsSource =  ClassFrame.ConnectDB.Logs.ToList();
+            BrandsGrid.ItemsSource =  ClassFrame.ConnectDB.VehicleMakes.ToList();
+            ModelsGrid.ItemsSource =  ClassFrame.ConnectDB.VehicleModels.ToList();
+            PropertyTypesGrid.ItemsSource =  ClassFrame.ConnectDB.PropertyTypes.ToList();
+            HealthConditionsGrid.ItemsSource =  ClassFrame.ConnectDB.HealthConditions.ToList();
         }
 
         // Метод для логирования действий
@@ -45,8 +45,8 @@ namespace Diplom.Pages
                 UserName = CurrentUser.Email ?? "System", // Имя текущего пользователя
                 EmployeeID = CurrentUser.EmployeeID// ID сотрудника
             };
-            VSK_DBEntities.GetContext().Logs.Add(log);
-            VSK_DBEntities.GetContext().SaveChanges();
+            ClassFrame.ConnectDB.Logs.Add(log);
+            ClassFrame.ConnectDB.SaveChanges();
         }
 
 
@@ -57,9 +57,10 @@ namespace Diplom.Pages
                 var control = new AddEmployeeControl();
                 control.EmployeeAdded += (s, args) =>
                 {
-                    EmployeesGrid.ItemsSource = VSK_DBEntities.GetContext().Employees.ToList();
+                    EmployeesGrid.ItemsSource = ClassFrame.ConnectDB.Employees.ToList();
                     RightPanel.Content = null; // Можно очистить панель после добавления
                     LogAction("Employees", "Добавление", $"Добавлен сотрудник: {args.Employee.FullName}");
+                    Load();
                 };
                 RightPanel.Content = control;
             }
@@ -72,9 +73,10 @@ namespace Diplom.Pages
                     var control = new AddBrandControl();
                     control.BrandAdded += (s, args) =>
                     {
-                        BrandsGrid.ItemsSource = VSK_DBEntities.GetContext().VehicleMakes.ToList();
+                        BrandsGrid.ItemsSource = ClassFrame.ConnectDB.VehicleMakes.ToList();
                         RightPanel.Content = null; // Можно очистить панель после добавления
                         LogAction("VehicleMakes", "Добавление", $"Добавлен бренд: {args.Brand.MakeName}");
+                        Load();
                     };
                     RightPanel.Content = control;
 
@@ -84,17 +86,18 @@ namespace Diplom.Pages
                     var control = new AddModelControl();
                     control.ModelAdded += (s, args) =>
                     {
-                        ModelsGrid.ItemsSource = VSK_DBEntities.GetContext().VehicleModels.ToList();
+                        ModelsGrid.ItemsSource = ClassFrame.ConnectDB.VehicleModels.ToList();
                         RightPanel.Content = null;
 
                         // Находим бренд по MakeID
-                        var brand = VSK_DBEntities.GetContext().VehicleMakes
+                        var brand = ClassFrame.ConnectDB.VehicleMakes
                             .FirstOrDefault(b => b.MakeID == args.Model.MakeID);
                         string brandName = brand != null ? brand.MakeName : "Неизвестный бренд";
 
                         // Обновляем строку лога
                         LogAction("VehicleModels", "Добавление",
                             $"Добавлена модель: {args.Model.ModelName} бренда {brandName}");
+                        Load();
                     };
                     RightPanel.Content = control;
                 }
@@ -104,9 +107,10 @@ namespace Diplom.Pages
                     var control = new AddPropertyTypeControl();
                     control.PropertyTypeAdded += (s, args) =>
                     {
-                        PropertyTypesGrid.ItemsSource = VSK_DBEntities.GetContext().PropertyTypes.ToList();
+                        PropertyTypesGrid.ItemsSource = ClassFrame.ConnectDB.PropertyTypes.ToList();
                         RightPanel.Content = null; // Можно очистить панель после добавления
                         LogAction("PropertyTypes", "Добавление", $"Добавлен тип имущества: {args.PropertyType.TypeName}");
+                        Load();
                     };
                     RightPanel.Content = control;
                 }
@@ -115,9 +119,10 @@ namespace Diplom.Pages
                     var control = new AddHealthConditionControl();
                     control.HealthConditionAdded += (s, args) =>
                     {
-                        HealthConditionsGrid.ItemsSource = VSK_DBEntities.GetContext().HealthConditions.ToList();
+                        HealthConditionsGrid.ItemsSource = ClassFrame.ConnectDB.HealthConditions.ToList();
                         RightPanel.Content = null; // Можно очистить панель после добавления
                         LogAction("HealthConditions", "Добавление", $"Добавлено состояние здоровья: {args.HealthCondition.ConditionName}");
+                        Load();
                     };
                     RightPanel.Content = control;
                 }
@@ -198,22 +203,22 @@ namespace Diplom.Pages
                     var deluser = selectedUser.Select(s => s.EmployeeID).Distinct().ToList();
                     foreach (var delete in selectedUser)
                     {
-                        var del = VSK_DBEntities.GetContext().Employees.FirstOrDefault(d => d.EmployeeID == delete.EmployeeID);
+                        var del = ClassFrame.ConnectDB.Employees.FirstOrDefault(d => d.EmployeeID == delete.EmployeeID);
                         if (del != null)
                         {
-                            VSK_DBEntities.GetContext().Employees.Remove(del);
+                            ClassFrame.ConnectDB.Employees.Remove(del);
                             // Логируем удаление каждого сотрудника
                             LogAction("Employees", "Удаление", $"Удалён сотрудник с ID: {del.EmployeeID}, ФИО: {del.LastName} {del.FirstName} {del.MiddleName}");
                         }
                     }
 
-                    VSK_DBEntities.GetContext().SaveChanges();
+                    ClassFrame.ConnectDB.SaveChanges();
                     // Логируем успешное завершение операции
                     LogAction("Employees", "Удаление (успешно)", $"Удалено {selectedUser.Count} сотрудника(ов) в {DateTime.Now}");
 
-                    VSK_DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(ent => ent.Reload());
+                    ClassFrame.ConnectDB.ChangeTracker.Entries().ToList().ForEach(ent => ent.Reload());
 
-                    EmployeesGrid.ItemsSource = VSK_DBEntities.GetContext().Employees.ToList();
+                    EmployeesGrid.ItemsSource = ClassFrame.ConnectDB.Employees.ToList();
 
                     MessageBox.Show("Данные удалены");
                     Load();
@@ -247,7 +252,7 @@ namespace Diplom.Pages
                     // Проверка зависимостей
                     foreach (var brand in selectedBrands)
                     {
-                        var dependentModels = VSK_DBEntities.GetContext().VehicleModels
+                        var dependentModels = ClassFrame.ConnectDB.VehicleModels
                             .Any(m => m.MakeID == brand.MakeID);
                         if (dependentModels)
                         {
@@ -262,14 +267,14 @@ namespace Diplom.Pages
 
                     foreach (var brand in selectedBrands)
                     {
-                        var entity = VSK_DBEntities.GetContext().VehicleMakes.FirstOrDefault(b => b.MakeID == brand.MakeID);
+                        var entity = ClassFrame.ConnectDB.VehicleMakes.FirstOrDefault(b => b.MakeID == brand.MakeID);
                         if (entity != null)
                         {
-                            VSK_DBEntities.GetContext().VehicleMakes.Remove(entity);
+                            ClassFrame.ConnectDB.VehicleMakes.Remove(entity);
                             LogAction("VehicleMakes", "Удаление", $"Удалён бренд: ID={entity.MakeID}, Название={entity.MakeName}");
                         }
                     }
-                    VSK_DBEntities.GetContext().SaveChanges();
+                    ClassFrame.ConnectDB.SaveChanges();
                     LogAction("VehicleMakes", "Удаление (успешно)", $"Удалено {selectedBrands.Count} бренда(ов) в {DateTime.Now}");
                     Load();
                 }
@@ -286,7 +291,7 @@ namespace Diplom.Pages
                     // Проверка зависимостей
                     foreach (var model in selectedModels)
                     {
-                        var dependentVehicles = VSK_DBEntities.GetContext().Vehicles
+                        var dependentVehicles = ClassFrame.ConnectDB.Vehicles
                             .Any(v => v.ModelID == model.ModelID);
                         if (dependentVehicles)
                         {
@@ -301,14 +306,14 @@ namespace Diplom.Pages
 
                     foreach (var model in selectedModels)
                     {
-                        var entity = VSK_DBEntities.GetContext().VehicleModels.FirstOrDefault(m => m.ModelID == model.ModelID);
+                        var entity = ClassFrame.ConnectDB.VehicleModels.FirstOrDefault(m => m.ModelID == model.ModelID);
                         if (entity != null)
                         {
-                            VSK_DBEntities.GetContext().VehicleModels.Remove(entity);
+                            ClassFrame.ConnectDB.VehicleModels.Remove(entity);
                             LogAction("VehicleModels", "Удаление", $"Удалена модель: ID={entity.ModelID}, Название={entity.ModelName}, Бренд={entity.VehicleMakes?.MakeName}");
                         }
                     }
-                    VSK_DBEntities.GetContext().SaveChanges();
+                    ClassFrame.ConnectDB.SaveChanges();
                     LogAction("VehicleModels", "Удаление (успешно)", $"Удалено {selectedModels.Count} модели(ей) в {DateTime.Now}");
                     Load();
                 }
@@ -325,7 +330,7 @@ namespace Diplom.Pages
                     // Проверка зависимостей
                     foreach (var propertyType in selectedPropertyTypes)
                     {
-                        var dependentProperties = VSK_DBEntities.GetContext().Properties
+                        var dependentProperties = ClassFrame.ConnectDB.Properties
                             .Any(p => p.PropertyTypeID == propertyType.PropertyTypeID);
                         if (dependentProperties)
                         {
@@ -340,14 +345,14 @@ namespace Diplom.Pages
 
                     foreach (var propertyType in selectedPropertyTypes)
                     {
-                        var entity = VSK_DBEntities.GetContext().PropertyTypes.FirstOrDefault(p => p.PropertyTypeID == propertyType.PropertyTypeID);
+                        var entity = ClassFrame.ConnectDB.PropertyTypes.FirstOrDefault(p => p.PropertyTypeID == propertyType.PropertyTypeID);
                         if (entity != null)
                         {
-                            VSK_DBEntities.GetContext().PropertyTypes.Remove(entity);
+                            ClassFrame.ConnectDB.PropertyTypes.Remove(entity);
                             LogAction("PropertyTypes", "Удаление", $"Удалён тип недвижимости: ID={entity.PropertyTypeID}, Название={entity.TypeName}");
                         }
                     }
-                    VSK_DBEntities.GetContext().SaveChanges();
+                    ClassFrame.ConnectDB.SaveChanges();
                     LogAction("PropertyTypes", "Удаление (успешно)", $"Удалено {selectedPropertyTypes.Count} типа(ов) недвижимости в {DateTime.Now}");
                     Load();
                 }
@@ -364,7 +369,7 @@ namespace Diplom.Pages
                     // Проверка зависимостей
                     foreach (var healthCondition in selectedHealthConditions)
                     {
-                        var dependentRecords = VSK_DBEntities.GetContext().LifeAndHealth
+                        var dependentRecords = ClassFrame.ConnectDB.LifeAndHealth
                             .Any(lh => lh.HealthConditionID == healthCondition.HealthConditionID);
                         if (dependentRecords)
                         {
@@ -379,14 +384,14 @@ namespace Diplom.Pages
 
                     foreach (var healthCondition in selectedHealthConditions)
                     {
-                        var entity = VSK_DBEntities.GetContext().HealthConditions.FirstOrDefault(h => h.HealthConditionID == healthCondition.HealthConditionID);
+                        var entity = ClassFrame.ConnectDB.HealthConditions.FirstOrDefault(h => h.HealthConditionID == healthCondition.HealthConditionID);
                         if (entity != null)
                         {
-                            VSK_DBEntities.GetContext().HealthConditions.Remove(entity);
+                            ClassFrame.ConnectDB.HealthConditions.Remove(entity);
                             LogAction("HealthConditions", "Удаление", $"Удалено состояние здоровья: ID={entity.HealthConditionID}, Название={entity.ConditionName}");
                         }
                     }
-                    VSK_DBEntities.GetContext().SaveChanges();
+                    ClassFrame.ConnectDB.SaveChanges();
                     LogAction("HealthConditions", "Удаление (успешно)", $"Удалено {selectedHealthConditions.Count} состояния(ий) здоровья в {DateTime.Now}");
                     Load();
                 }

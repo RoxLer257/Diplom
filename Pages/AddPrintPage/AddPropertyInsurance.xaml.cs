@@ -28,7 +28,7 @@ namespace Diplom.Pages.AddPrintPage
         public AddPropertyInsurance()
         {
             InitializeComponent();
-            _context = VSK_DBEntities.GetContext();
+            _context = ClassFrame.ConnectDB;
             SelectedProperties = new ObservableCollection<Diplom.Classes.Properties>();
             _selectedClients = new List<Clients>(); // Инициализируем список клиентов
 
@@ -163,6 +163,7 @@ namespace Diplom.Pages.AddPrintPage
             UpdateComboBoxPlaceholder(ClientTypeComboBox, ClientTypePlaceholder);
             //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
             UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
+            UpdateComboBoxPlaceholder(PropertyTypeComboBox, PropertyTypePlaceholder);
         }
 
         private void UpdateComboBoxPlaceholder(ComboBox comboBox, TextBlock placeholder)
@@ -450,6 +451,7 @@ namespace Diplom.Pages.AddPrintPage
 
                     // Очищаем форму после сохранения
                     ClearForm();
+                    Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
                 }
                 catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
                 {

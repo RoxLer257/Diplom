@@ -17,7 +17,7 @@ namespace Diplom.Pages.AddPrintPage
         {
             InitializeComponent();
 
-            _context = VSK_DBEntities.GetContext();
+            _context = ClassFrame.ConnectDB;
             _selectedClients = new List<Clients>(); // Инициализируем список клиентов
 
             LoadData();
@@ -145,6 +145,8 @@ namespace Diplom.Pages.AddPrintPage
             UpdateComboBoxPlaceholder(ClientTypeComboBox, ClientTypePlaceholder);
             //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
             UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
+            UpdateComboBoxPlaceholder(GenderComboBox, GenderPlaceholder);
+            UpdateComboBoxPlaceholder(HealthConditionComboBox, HealthConditionPlaceholder);
         }
 
         private void UpdateComboBoxPlaceholder(ComboBox comboBox, TextBlock placeholder)
@@ -459,6 +461,7 @@ namespace Diplom.Pages.AddPrintPage
 
                     // Очищаем форму после сохранения
                     ClearForm();
+                    Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
                 }
                 catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
                 {

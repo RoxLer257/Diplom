@@ -37,8 +37,8 @@ namespace Diplom.Pages.MainPage
 
         public void UpdateTables()
         {
-            DtgClients.ItemsSource = VSK_DBEntities.GetContext().Clients.ToList();
-            DtgContracts.ItemsSource = VSK_DBEntities.GetContext().Policies.ToList();
+            DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList();
+            DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
         }
 
         private void ExitAcc_Click(object sender, RoutedEventArgs e)

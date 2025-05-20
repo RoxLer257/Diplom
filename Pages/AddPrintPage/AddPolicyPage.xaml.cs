@@ -29,7 +29,7 @@ namespace Diplom.Pages
         {
             InitializeComponent();
 
-            _context = VSK_DBEntities.GetContext();
+            _context = ClassFrame.ConnectDB;
             _calculator = new InsuranceCalculator(_context);
             SelectedDrivers = new ObservableCollection<Drivers>();
             _selectedClients = new List<Clients>(); // Инициализируем список клиентов

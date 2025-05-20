@@ -75,9 +75,8 @@
                                 <ComboBox x:Name="PolicyTypeComboBox" 
                                           DisplayMemberPath="TypeName" 
                                           SelectedValuePath="PolicyTypeID" 
-                                          MinWidth="150"
+                                          MinWidth="150" IsEnabled="False"
                                           Margin="25,0,0,0"
-                                          Tag="{Binding ElementName=PolicyTypePlaceholder}"
                                           SelectionChanged="ComboBox_SelectionChanged"
                                           ToolTip="Выберите тип автострахования">
                                 </ComboBox>

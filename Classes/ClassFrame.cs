@@ -6,5 +6,6 @@ namespace Diplom.Classes
     {
         public static Frame frmObj;
         public static int RoleID;
+        public static VSK_DBEntities ConnectDB = new VSK_DBEntities();
     }
 }

@@ -35,7 +35,7 @@ namespace Diplom.Controls
         }
         private void LoadCmb()
         {
-            var roles = VSK_DBEntities.GetContext().Roles.ToList();
+            var roles = ClassFrame.ConnectDB.Roles.ToList();
             RoleIdCmb.ItemsSource = roles;
             RoleIdCmb.DisplayMemberPath = "RoleName";
             RoleIdCmb.SelectedValuePath = "RoleID";
@@ -71,7 +71,7 @@ namespace Diplom.Controls
                 !string.IsNullOrEmpty(EmpPhone) &&
                 RoleIdCmb.SelectedItem is Roles selectedRoleId)
             {
-                var db = VSK_DBEntities.GetContext();
+                var db = ClassFrame.ConnectDB;
                 Employees employee; // Объявляем переменную employee
 
                 if (_editingEmployee == null)

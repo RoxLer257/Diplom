@@ -32,7 +32,7 @@ namespace Diplom.Controls
 
         private void LoadCmb()
         {
-            var brandbox = VSK_DBEntities.GetContext().VehicleMakes.ToList();
+            var brandbox = ClassFrame.ConnectDB.VehicleMakes.ToList();
             BrandIdBox.ItemsSource = brandbox;
         }
 
@@ -42,7 +42,7 @@ namespace Diplom.Controls
 
             if (!string.IsNullOrWhiteSpace(Modelname) && BrandIdBox.SelectedItem is VehicleMakes selectedBrandId)
             {
-                var db = VSK_DBEntities.GetContext();
+                var db = ClassFrame.ConnectDB;
                 var newModel = new VehicleModels
                 {
                     ModelName = Modelname,

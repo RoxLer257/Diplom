@@ -35,7 +35,7 @@ namespace Diplom.Controls
 
             if (!string.IsNullOrWhiteSpace(TypeName))
             {
-                var db = VSK_DBEntities.GetContext();
+                var db = ClassFrame.ConnectDB;
                 var newPropertyType = new PropertyTypes { TypeName = TypeName };
                 db.PropertyTypes.Add(newPropertyType);
                 db.SaveChanges();

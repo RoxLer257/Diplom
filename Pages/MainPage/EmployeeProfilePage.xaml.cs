@@ -15,7 +15,7 @@ namespace Diplom.Pages.MainPage
         {
             InitializeComponent();
 
-            _context = VSK_DBEntities.GetContext();
+            _context = ClassFrame.ConnectDB;
             LoadEmployeeData();
         }
 

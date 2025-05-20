@@ -28,7 +28,7 @@ namespace Diplom.Controls
 
             if (!string.IsNullOrWhiteSpace(brandName))
             {
-                var db = VSK_DBEntities.GetContext();
+                var db = ClassFrame.ConnectDB;
                 var newBrand = new VehicleMakes { MakeName = brandName };
                 db.VehicleMakes.Add(newBrand);
                 db.SaveChanges();
