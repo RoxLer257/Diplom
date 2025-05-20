@@ -6,6 +6,7 @@ using System.Data.Entity;
 using Diplom.Controls;
 using System;
 using System.Diagnostics;
+using Diplom.Classes.Helper;
 
 namespace Diplom.Pages
 {
@@ -59,7 +60,8 @@ namespace Diplom.Pages
                 {
                     EmployeesGrid.ItemsSource = ClassFrame.ConnectDB.Employees.ToList();
                     RightPanel.Content = null; // Можно очистить панель после добавления
-                    LogAction("Employees", "Добавление", $"Добавлен сотрудник: {args.Employee.FullName}");
+                    string fullName = DisplayHelper.GetFullName(args.Employee.LastName, args.Employee.FirstName, args.Employee.MiddleName);
+                    LogAction("Employees", "Добавление", $"Добавлен сотрудник: {fullName}");
                     Load();
                 };
                 RightPanel.Content = control;

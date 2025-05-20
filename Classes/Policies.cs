@@ -32,13 +32,6 @@ namespace Diplom.Classes
         public decimal InsuranceAmount { get; set; }
         public System.DateTime StartDate { get; set; }
         public System.DateTime EndDate { get; set; }
-        public string ClientFullName
-        {
-            get
-            {
-                return Clients.FirstOrDefault()?.DisplayName ?? "Нет данных";
-            }
-        }
 
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

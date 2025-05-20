@@ -131,6 +131,11 @@
     <Compile Include="Classes\HealthConditions.cs">
       <DependentUpon>ModelDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Helper\Clients.partial.cs" />
+    <Compile Include="Classes\Helper\DisplayHelper.cs" />
+    <Compile Include="Classes\Helper\Drivers.partial.cs" />
+    <Compile Include="Classes\Helper\Employees.partial.cs" />
+    <Compile Include="Classes\Helper\Policies.partial.cs" />
     <Compile Include="Classes\LifeAndHealth.cs">
       <DependentUpon>ModelDB.tt</DependentUpon>
     </Compile>

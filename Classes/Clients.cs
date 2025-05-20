@@ -34,22 +34,6 @@ namespace Diplom.Classes
         public string Phone { get; set; }
         public string Email { get; set; }
 
-        public string DisplayName
-        {
-            get
-            {
-                // Предположим, что ID типа клиента 1 - это физическое лицо, а 2 - юрлицо.
-                if (ClientTypeID == 1) // Физическое лицо
-                {
-                    return $"{LastName} {FirstName} {MiddleName}".Trim();
-                }
-                else if (ClientTypeID == 2) // Юридическое лицо
-                {
-                    return CompanyName ?? "Не указано";
-                }
-                return "Неизвестный тип";
-            }
-        }
 
 
         public virtual Employees Employees { get; set; }
