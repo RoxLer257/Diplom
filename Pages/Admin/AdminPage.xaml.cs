@@ -15,8 +15,6 @@ namespace Diplom.Pages
     public partial class AdminPage : Page
     {
 
-        // РЕАЛИЗОВАТЬ ФУНКЦИЮ РЕДАКТИРОВАНИЯ, ЧТОБЫ ПО НАЖАТИЮ НА СТРОКУ ВЫВОДИЛИСЬ ДАННЫЕ В СТАК ПАНЕЛЕ!
-
         public AdminPage()
         {
             InitializeComponent();
@@ -186,7 +184,7 @@ namespace Diplom.Pages
         {
             var selectedUser = EmployeesGrid.SelectedItems.Cast<Employees>().ToList();
 
-            if(selectedUser.Count == 0)
+            if (selectedUser.Count == 0)
             {
                 MessageBox.Show("Пожалуйста, выберите сотрудников!", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -198,27 +196,212 @@ namespace Diplom.Pages
                 try
                 {
                     var deluser = selectedUser.Select(s => s.EmployeeID).Distinct().ToList();
-                    foreach( var delete in selectedUser)
+                    foreach (var delete in selectedUser)
                     {
                         var del = VSK_DBEntities.GetContext().Employees.FirstOrDefault(d => d.EmployeeID == delete.EmployeeID);
-                        if(del != null)
+                        if (del != null)
                         {
                             VSK_DBEntities.GetContext().Employees.Remove(del);
+                            // Логируем удаление каждого сотрудника
+                            LogAction("Employees", "Удаление", $"Удалён сотрудник с ID: {del.EmployeeID}, ФИО: {del.LastName} {del.FirstName} {del.MiddleName}");
                         }
                     }
 
                     VSK_DBEntities.GetContext().SaveChanges();
+                    // Логируем успешное завершение операции
+                    LogAction("Employees", "Удаление (успешно)", $"Удалено {selectedUser.Count} сотрудника(ов) в {DateTime.Now}");
 
                     VSK_DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(ent => ent.Reload());
 
                     EmployeesGrid.ItemsSource = VSK_DBEntities.GetContext().Employees.ToList();
 
                     MessageBox.Show("Данные удалены");
+                    Load();
                 }
                 catch (Exception ex)
                 {
+                    // Логируем ошибку
+                    LogAction("Employees", "Ошибка удаления", $"Ошибка при удалении сотрудников: {ex.Message}");
                     MessageBox.Show("Ошибка: " + ex.Message);
                 }
+            }
+        }
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Определяем текущую вкладку
+                var selectedTab = InfoTabControl.SelectedItem as TabItem;
+                if (selectedTab == null) return;
+
+                if (selectedTab == BrandsTab)
+                {
+                    // Удаление брендов авто
+                    var selectedBrands = BrandsGrid.SelectedItems.Cast<VehicleMakes>().ToList();
+                    if (selectedBrands.Count == 0)
+                    {
+                        MessageBox.Show("Пожалуйста, выберите бренды для удаления!", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Проверка зависимостей
+                    foreach (var brand in selectedBrands)
+                    {
+                        var dependentModels = VSK_DBEntities.GetContext().VehicleModels
+                            .Any(m => m.MakeID == brand.MakeID);
+                        if (dependentModels)
+                        {
+                            MessageBox.Show($"Нельзя удалить бренд '{brand.MakeName}', так как он используется в моделях автомобилей.",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+
+                    if (MessageBox.Show($"Удалить {selectedBrands.Count} бренда(ов)?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                        return;
+
+                    foreach (var brand in selectedBrands)
+                    {
+                        var entity = VSK_DBEntities.GetContext().VehicleMakes.FirstOrDefault(b => b.MakeID == brand.MakeID);
+                        if (entity != null)
+                        {
+                            VSK_DBEntities.GetContext().VehicleMakes.Remove(entity);
+                            LogAction("VehicleMakes", "Удаление", $"Удалён бренд: ID={entity.MakeID}, Название={entity.MakeName}");
+                        }
+                    }
+                    VSK_DBEntities.GetContext().SaveChanges();
+                    LogAction("VehicleMakes", "Удаление (успешно)", $"Удалено {selectedBrands.Count} бренда(ов) в {DateTime.Now}");
+                    Load();
+                }
+                else if (selectedTab == ModelsTab)
+                {
+                    // Удаление моделей авто
+                    var selectedModels = ModelsGrid.SelectedItems.Cast<VehicleModels>().ToList();
+                    if (selectedModels.Count == 0)
+                    {
+                        MessageBox.Show("Пожалуйста, выберите модели для удаления!", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Проверка зависимостей
+                    foreach (var model in selectedModels)
+                    {
+                        var dependentVehicles = VSK_DBEntities.GetContext().Vehicles
+                            .Any(v => v.ModelID == model.ModelID);
+                        if (dependentVehicles)
+                        {
+                            MessageBox.Show($"Нельзя удалить модель '{model.ModelName}', так как она используется в записях об автомобилях.",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+
+                    if (MessageBox.Show($"Удалить {selectedModels.Count} модели(ей)?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                        return;
+
+                    foreach (var model in selectedModels)
+                    {
+                        var entity = VSK_DBEntities.GetContext().VehicleModels.FirstOrDefault(m => m.ModelID == model.ModelID);
+                        if (entity != null)
+                        {
+                            VSK_DBEntities.GetContext().VehicleModels.Remove(entity);
+                            LogAction("VehicleModels", "Удаление", $"Удалена модель: ID={entity.ModelID}, Название={entity.ModelName}, Бренд={entity.VehicleMakes?.MakeName}");
+                        }
+                    }
+                    VSK_DBEntities.GetContext().SaveChanges();
+                    LogAction("VehicleModels", "Удаление (успешно)", $"Удалено {selectedModels.Count} модели(ей) в {DateTime.Now}");
+                    Load();
+                }
+                else if (selectedTab == PropertyTabs)
+                {
+                    // Удаление типов недвижимости
+                    var selectedPropertyTypes = PropertyTypesGrid.SelectedItems.Cast<PropertyTypes>().ToList();
+                    if (selectedPropertyTypes.Count == 0)
+                    {
+                        MessageBox.Show("Пожалуйста, выберите типы недвижимости для удаления!", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Проверка зависимостей
+                    foreach (var propertyType in selectedPropertyTypes)
+                    {
+                        var dependentProperties = VSK_DBEntities.GetContext().Properties
+                            .Any(p => p.PropertyTypeID == propertyType.PropertyTypeID);
+                        if (dependentProperties)
+                        {
+                            MessageBox.Show($"Нельзя удалить тип недвижимости '{propertyType.TypeName}', так как он используется в записях о недвижимости.",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+
+                    if (MessageBox.Show($"Удалить {selectedPropertyTypes.Count} типа(ов) недвижимости?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                        return;
+
+                    foreach (var propertyType in selectedPropertyTypes)
+                    {
+                        var entity = VSK_DBEntities.GetContext().PropertyTypes.FirstOrDefault(p => p.PropertyTypeID == propertyType.PropertyTypeID);
+                        if (entity != null)
+                        {
+                            VSK_DBEntities.GetContext().PropertyTypes.Remove(entity);
+                            LogAction("PropertyTypes", "Удаление", $"Удалён тип недвижимости: ID={entity.PropertyTypeID}, Название={entity.TypeName}");
+                        }
+                    }
+                    VSK_DBEntities.GetContext().SaveChanges();
+                    LogAction("PropertyTypes", "Удаление (успешно)", $"Удалено {selectedPropertyTypes.Count} типа(ов) недвижимости в {DateTime.Now}");
+                    Load();
+                }
+                else if (selectedTab == HelthTab)
+                {
+                    // Удаление состояний здоровья
+                    var selectedHealthConditions = HealthConditionsGrid.SelectedItems.Cast<HealthConditions>().ToList();
+                    if (selectedHealthConditions.Count == 0)
+                    {
+                        MessageBox.Show("Пожалуйста, выберите состояния здоровья для удаления!", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    // Проверка зависимостей
+                    foreach (var healthCondition in selectedHealthConditions)
+                    {
+                        var dependentRecords = VSK_DBEntities.GetContext().LifeAndHealth
+                            .Any(lh => lh.HealthConditionID == healthCondition.HealthConditionID);
+                        if (dependentRecords)
+                        {
+                            MessageBox.Show($"Нельзя удалить состояние здоровья '{healthCondition.ConditionName}', так как оно используется в записях о страховании жизни и здоровья.",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+
+                    if (MessageBox.Show($"Удалить {selectedHealthConditions.Count} состояния(ий) здоровья?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                        return;
+
+                    foreach (var healthCondition in selectedHealthConditions)
+                    {
+                        var entity = VSK_DBEntities.GetContext().HealthConditions.FirstOrDefault(h => h.HealthConditionID == healthCondition.HealthConditionID);
+                        if (entity != null)
+                        {
+                            VSK_DBEntities.GetContext().HealthConditions.Remove(entity);
+                            LogAction("HealthConditions", "Удаление", $"Удалено состояние здоровья: ID={entity.HealthConditionID}, Название={entity.ConditionName}");
+                        }
+                    }
+                    VSK_DBEntities.GetContext().SaveChanges();
+                    LogAction("HealthConditions", "Удаление (успешно)", $"Удалено {selectedHealthConditions.Count} состояния(ий) здоровья в {DateTime.Now}");
+                    Load();
+                }
+
+                MessageBox.Show("Данные удалены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                // Логируем ошибку
+                var selectedTab = InfoTabControl.SelectedItem as TabItem;
+                string tableName = selectedTab == BrandsTab ? "VehicleMakes" :
+                                   selectedTab == ModelsTab ? "VehicleModels" :
+                                   selectedTab == PropertyTabs ? "PropertyTypes" : "HealthConditions";
+                LogAction(tableName, "Ошибка удаления", $"Ошибка при удалении: {ex.Message}");
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

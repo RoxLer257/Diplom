@@ -64,12 +64,12 @@
                                           AlternatingRowBackground="#F5F5F5" IsReadOnly="False"
                                           RowHeaderWidth="0" ColumnWidth="*" Grid.ColumnSpan="2" SelectionChanged="EmployeesGrid_SelectionChanged">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="EmployeeID"  Binding="{Binding EmployeeID}" Width="50"/>
-                                        <DataGridTextColumn Header="LastName" Binding="{Binding LastName}" Width="150"/>
-                                        <DataGridTextColumn Header="FirstName" Binding="{Binding FirstName}" Width="150"/>
-                                        <DataGridTextColumn Header="MiddleName" Binding="{Binding MiddleName}" Width="150"/>
+                                        <DataGridTextColumn Header="ID"  Binding="{Binding EmployeeID}" Width="50"/>
+                                        <DataGridTextColumn Header="Фамилия" Binding="{Binding LastName}" Width="150"/>
+                                        <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="150"/>
+                                        <DataGridTextColumn Header="Отчество" Binding="{Binding MiddleName}" Width="150"/>
                                         <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
-                                        <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="120"/>
+                                        <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="120"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
 
@@ -87,12 +87,12 @@
                                           AlternatingRowBackground="#F5F5F5" IsReadOnly="True" AutoGenerateColumns="False"
                                           RowHeaderWidth="0" ColumnWidth="*">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="ClientID" Width="50" Binding="{Binding ClientID}"/>
-                                    <DataGridTextColumn Header="TypeName" Binding="{Binding ClientTypes.TypeName}"/>
-                                    <DataGridTextColumn Header="LastName" Binding="{Binding LastName}"/>
-                                    <DataGridTextColumn Header="FirstName" Binding="{Binding FirstName}"/>
-                                    <DataGridTextColumn Header="MiddleName" Binding="{Binding MiddleName}" />
-                                    <DataGridTextColumn Header="CompanyName" Binding="{Binding CompanyName}" />
+                                    <DataGridTextColumn Header="ID" Width="50" Binding="{Binding ClientID}"/>
+                                    <DataGridTextColumn Header="Тип клиента" Binding="{Binding ClientTypes.TypeName}"/>
+                                    <DataGridTextColumn Header="Фамилия" Binding="{Binding LastName}"/>
+                                    <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}"/>
+                                    <DataGridTextColumn Header="Отчество" Binding="{Binding MiddleName}" />
+                                    <DataGridTextColumn Header="Название компании" Binding="{Binding CompanyName}" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
@@ -104,11 +104,11 @@
                                           AlternatingRowBackground="#F5F5F5" IsReadOnly="True" AutoGenerateColumns="False"
                                           RowHeaderWidth="0" ColumnWidth="*">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="PolicyID" Width="50" Binding="{Binding PolicyID}"/>
-                                    <DataGridTextColumn Header="TypeName" Binding="{Binding PolicyTypes.TypeName}"/>
-                                    <DataGridTextColumn Header="StatusName" Binding="{Binding PolicyStatuses.StatusName}"/>
-                                    <DataGridTextColumn Header="Client" Binding="{Binding ClientFullName}"/>
-                                    <DataGridTextColumn Header="InsuranceAmount" Binding="{Binding InsuranceAmount}"/>
+                                    <DataGridTextColumn Header="ID" Width="50" Binding="{Binding PolicyID}"/>
+                                    <DataGridTextColumn Header="Тип полиса" Binding="{Binding PolicyTypes.TypeName}"/>
+                                    <DataGridTextColumn Header="Статус" Binding="{Binding PolicyStatuses.StatusName}"/>
+                                    <DataGridTextColumn Header="ФИО клиента" Binding="{Binding ClientFullName}"/>
+                                    <DataGridTextColumn Header="Стоимость полиса" Binding="{Binding InsuranceAmount}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
@@ -120,12 +120,12 @@
                                           AlternatingRowBackground="#F5F5F5" IsReadOnly="True" AutoGenerateColumns="False"
                                           RowHeaderWidth="0" ColumnWidth="*">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="LogID" Width="50" Binding="{Binding LogID}"/>
-                                    <DataGridTextColumn Header="TableName" Binding="{Binding TableName}"/>
-                                    <DataGridTextColumn Header="Action" Binding="{Binding Action}"/>
-                                    <DataGridTextColumn Header="ChangedData" Binding="{Binding ChangedData}"/>
-                                    <DataGridTextColumn Header="ChangeDate" Binding="{Binding ChangeDate}"/>
-                                    <DataGridTextColumn Header="UserName" Binding="{Binding UserName}"/>
+                                    <DataGridTextColumn Header="ID" Width="50" Binding="{Binding LogID}"/>
+                                    <DataGridTextColumn Header="Таблица" Binding="{Binding TableName}"/>
+                                    <DataGridTextColumn Header="Действие" Binding="{Binding Action}"/>
+                                    <DataGridTextColumn Header="Измененные данные" Binding="{Binding ChangedData}"/>
+                                    <DataGridTextColumn Header="Дата изменения" Binding="{Binding ChangeDate}"/>
+                                    <DataGridTextColumn Header="Сотрудник" Binding="{Binding UserName}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </TabItem>
@@ -146,13 +146,13 @@
                                           AlternatingRowBackground="#F5F5F5" IsReadOnly="True" AutoGenerateColumns="False"
                                           RowHeaderWidth="0" ColumnWidth="*">
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="MakeID" Width="50" Binding="{Binding MakeID}"/>
-                                                <DataGridTextColumn Header="MakeName" Binding="{Binding MakeName}"/>
+                                                <DataGridTextColumn Header="ID бренда" Width="50" Binding="{Binding MakeID}"/>
+                                                <DataGridTextColumn Header="Название бренда" Binding="{Binding MakeName}"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
                                             <Button Content="Добавить" Width="120" Height="35" Margin="5" FontSize="16" Click="AddButton_Click"/>
-                                            
+                                            <Button Content="Удалить" Width="120" Height="35" Margin="5" FontSize="16" Click="DeleteButton_Click"/>
                                         </StackPanel>
                                     </Grid>
                                 </TabItem>
@@ -170,19 +170,20 @@
                                           AlternatingRowBackground="#F5F5F5" IsReadOnly="True" AutoGenerateColumns="False"
                                           RowHeaderWidth="0" ColumnWidth="*">
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="ModelID" Width="50" Binding="{Binding ModelID}"/>
-                                                <DataGridTextColumn Header="MakeName" Binding="{Binding VehicleMakes.MakeName}"/>
-                                                <DataGridTextColumn Header="ModelName" Binding="{Binding ModelName}"/>
+                                                <DataGridTextColumn Header="ID модели" Width="50" Binding="{Binding ModelID}"/>
+                                                <DataGridTextColumn Header="Название бренда" Binding="{Binding VehicleMakes.MakeName}"/>
+                                                <DataGridTextColumn Header="Название модели" Binding="{Binding ModelName}"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
                                             <Button Content="Добавить" Width="120" Height="35" Margin="5" Click="AddButton_Click"/>
+                                            <Button Content="Удалить" Width="120" Height="35" Margin="5" FontSize="16" Click="DeleteButton_Click"/>
                                         </StackPanel>
                                     </Grid>
                                 </TabItem>
 
                                 <!-- PropertyTypes -->
-                                <TabItem Header="Property Types" x:Name="PropertyTabs">
+                                <TabItem Header="Тип недвижимости" x:Name="PropertyTabs">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*"/>
@@ -194,18 +195,19 @@
                                           AlternatingRowBackground="#F5F5F5" IsReadOnly="True" AutoGenerateColumns="False"
                                           RowHeaderWidth="0" ColumnWidth="*">
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="PropertyTypeID" Width="50" Binding="{Binding PropertyTypeID}"/>
-                                                <DataGridTextColumn Header="TypeName" Binding="{Binding TypeName}"/>
+                                                <DataGridTextColumn Header="ID" Width="50" Binding="{Binding PropertyTypeID}"/>
+                                                <DataGridTextColumn Header="Название типа недвижимости" Binding="{Binding TypeName}"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
                                             <Button Content="Добавить" Width="120" Height="35" Margin="5" Click="AddButton_Click"/>
+                                            <Button Content="Удалить" Width="120" Height="35" Margin="5" FontSize="16" Click="DeleteButton_Click"/>
                                         </StackPanel>
                                     </Grid>
                                 </TabItem>
 
                                 <!-- HealthConditions -->
-                                <TabItem Header="Health Conditions" x:Name="HelthTab">
+                                <TabItem Header="Состояние здоровья" x:Name="HelthTab">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*"/>
@@ -217,12 +219,13 @@
                                           AlternatingRowBackground="#F5F5F5" IsReadOnly="True" AutoGenerateColumns="False"
                                           RowHeaderWidth="0" ColumnWidth="*">
                                             <DataGrid.Columns>
-                                                <DataGridTextColumn Header="HealthConditionID" Binding="{Binding HealthConditionID}" Width="50"/>
-                                                <DataGridTextColumn Header="ConditionName" Binding="{Binding ConditionName}"/>
+                                                <DataGridTextColumn Header="ID" Binding="{Binding HealthConditionID}" Width="50"/>
+                                                <DataGridTextColumn Header="Название состояния здоровья" Binding="{Binding ConditionName}"/>
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
                                             <Button Content="Добавить" Width="120" Height="35" Margin="5" Click="AddButton_Click"/>
+                                            <Button Content="Удалить" Width="120" Height="35" Margin="5" FontSize="16" Click="DeleteButton_Click"/>
                                         </StackPanel>
                                     </Grid>
                                 </TabItem>
