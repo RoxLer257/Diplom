@@ -80,14 +80,7 @@
                                           SelectionChanged="ComboBox_SelectionChanged"
                                           ToolTip="Выберите тип страхования имущества">
                                 </ComboBox>
-                                <!--<TextBlock x:Name="PolicyTypePlaceholder" 
-                                           Text="Тип страхования" 
-                                           FontSize="14" 
-                                           Foreground="#6f7582" 
-                                           IsHitTestVisible="False" 
-                                           VerticalAlignment="Center" 
-                                           Margin="30,0,0,0" 
-                                           Visibility="Visible"/>-->
+
                                 <Icon:PackIconMaterial Kind="FileDocument" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
                             </Grid>
 

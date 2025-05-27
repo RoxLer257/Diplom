@@ -9,7 +9,6 @@
       d:DesignHeight="800" d:DesignWidth="1280"
       Title="MainPage">
     
-    <!--ПОИСК СДЕЛАТЬ ЗАВТРА ПО ФИО И № ПОЛИСА-->
 
     <Border>
         <Grid>

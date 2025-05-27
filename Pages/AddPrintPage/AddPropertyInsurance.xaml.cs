@@ -4,18 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Data.Entity;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Diplom.Pages.AddPrintPage
 {
@@ -147,14 +139,6 @@ namespace Diplom.Pages.AddPrintPage
                 placeholder.Visibility = string.IsNullOrWhiteSpace(textBox.Text) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
-        //ВОЗМОЖНО ОН ВЛИЯЕТ НА УСТАНОВКУ КОМБОБОКСА - ПРОВЕРИТЬ!!!
-        //private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (sender is ComboBox comboBox)
-        //    {
-        //        UpdateComboBoxPlaceholder(comboBox, comboBox.Tag as TextBlock);
-        //    }
-        //}
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (sender == ClientTypeComboBox)
@@ -178,7 +162,6 @@ namespace Diplom.Pages.AddPrintPage
                 }
             }
             UpdateComboBoxPlaceholder(ClientTypeComboBox, ClientTypePlaceholder);
-            //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
             UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
             UpdateComboBoxPlaceholder(PropertyTypeComboBox, PropertyTypePlaceholder);
         }
@@ -640,59 +623,6 @@ namespace Diplom.Pages.AddPrintPage
             {
                 MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        private bool ValidateInput()
-        {
-            if (PolicyTypeComboBox.SelectedItem == null)
-            {
-                MessageBox.Show("Пожалуйста, выберите тип полиса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (StatusComboBox.SelectedItem == null)
-            {
-                MessageBox.Show("Пожалуйста, выберите статус полиса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(InsuranceAmountTextBox.Text) || !decimal.TryParse(InsuranceAmountTextBox.Text, out decimal amount) || amount <= 0)
-            {
-                MessageBox.Show("Пожалуйста, введите корректную сумму страхования", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (!StartDatePicker.SelectedDate.HasValue)
-            {
-                MessageBox.Show("Пожалуйста, выберите дату начала действия полиса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (!EndDatePicker.SelectedDate.HasValue)
-            {
-                MessageBox.Show("Пожалуйста, выберите дату окончания действия полиса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (StartDatePicker.SelectedDate.Value >= EndDatePicker.SelectedDate.Value)
-            {
-                MessageBox.Show("Дата начала действия полиса должна быть раньше даты окончания", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (!_selectedClients.Any())
-            {
-                MessageBox.Show("Пожалуйста, выберите хотя бы одного клиента", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            if (!SelectedProperties.Any())
-            {
-                MessageBox.Show("Пожалуйста, добавьте хотя бы один объект имущества", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            return true;
         }
 
         private void ClearForm()

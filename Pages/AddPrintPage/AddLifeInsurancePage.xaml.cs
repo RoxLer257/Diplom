@@ -74,7 +74,6 @@ namespace Diplom.Pages.AddPrintPage
 
         private void InitializePlaceholders()
         {
-            //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
             UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
             UpdateComboBoxPlaceholder(GenderComboBox, GenderPlaceholder);
             UpdateComboBoxPlaceholder(HealthConditionComboBox, HealthConditionPlaceholder);
@@ -158,7 +157,7 @@ namespace Diplom.Pages.AddPrintPage
                 }
             }
             UpdateComboBoxPlaceholder(ClientTypeComboBox, ClientTypePlaceholder);
-            //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
+           
             UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
             UpdateComboBoxPlaceholder(GenderComboBox, GenderPlaceholder);
             UpdateComboBoxPlaceholder(HealthConditionComboBox, HealthConditionPlaceholder);
@@ -273,7 +272,7 @@ namespace Diplom.Pages.AddPrintPage
             GrdCompany.Visibility = Visibility.Collapsed;
 
             // Сбрасываем выбор или задаём тип клиента по умолчанию
-            ClientTypeComboBox.SelectedIndex = -1; // Или установи ClientTypeComboBox.SelectedValue = 1 для "Физическое лицо"
+            ClientTypeComboBox.SelectedIndex = -1; 
         }
         private void CreateClientButton_Click(object sender, RoutedEventArgs e)
         {
@@ -518,7 +517,6 @@ namespace Diplom.Pages.AddPrintPage
                 // Загрузка и установка типа полиса
                 var policyType = _context.PolicyTypes.FirstOrDefault(pt => pt.PolicyTypeID == policy.PolicyTypeID);
                 PolicyTypeComboBox.SelectedItem = policyType;
-                //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
 
                 // Загрузка и установка статуса
                 var status = _context.PolicyStatuses.FirstOrDefault(ps => ps.StatusID == policy.StatusID);

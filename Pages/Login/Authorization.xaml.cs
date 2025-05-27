@@ -1,20 +1,11 @@
 ﻿using Diplom.Classes;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Net.Mail;
 
 namespace Diplom.Pages.Login
 {
@@ -178,8 +169,6 @@ namespace Diplom.Pages.Login
                         ClassFrame.frmObj.Navigate(new MainPage.MainPage());
                     }
 
-                    //// Навигация на следующую страницу
-                    //ClassFrame.frmObj.Navigate(new MainPage.MainPage());
                 }
             }
             catch (Exception ex)
