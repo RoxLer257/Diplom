@@ -175,6 +175,7 @@
     <Compile Include="Classes\Roles.cs">
       <DependentUpon>ModelDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Validator\Validator.cs" />
     <Compile Include="Classes\VehicleMakes.cs">
       <DependentUpon>ModelDB.tt</DependentUpon>
     </Compile>

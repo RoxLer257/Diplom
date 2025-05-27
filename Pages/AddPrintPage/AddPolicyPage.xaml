@@ -90,26 +90,6 @@
                                 <Icon:PackIconMaterial Kind="FileDocument" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
                             </Grid>
 
-                            <!--<Grid Margin="0,0,0,15">
-                                <TextBox x:Name="InsuranceAmountTextBox" 
-                                         MinWidth="150" 
-                                         VerticalAlignment="Center" 
-                                         Margin="25,0,0,0"
-                                         Tag="{Binding ElementName=InsuranceAmountPlaceholder}"
-                                         GotFocus="TextBox_GotFocus" 
-                                         LostFocus="TextBox_LostFocus" 
-                                         TextChanged="TextBox_TextChanged"/>
-                                <TextBlock x:Name="InsuranceAmountPlaceholder" 
-                                           Text="Сумма страхования" 
-                                           FontSize="14" 
-                                           Foreground="#6f7582" 
-                                           IsHitTestVisible="False" 
-                                           VerticalAlignment="Center" 
-                                           Margin="30,0,0,0" 
-                                           Visibility="Visible"/>
-                                <Icon:PackIconMaterial Kind="CurrencyRub" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            </Grid>-->
-                            
                             <Grid Margin="0,0,0,15">
 
                                 <DatePicker x:Name="StartDatePicker" 

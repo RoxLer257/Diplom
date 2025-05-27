@@ -8,6 +8,8 @@
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1280"
       Title="MainPage">
+    
+    <!--ПОИСК СДЕЛАТЬ ЗАВТРА ПО ФИО И № ПОЛИСА-->
 
     <Border>
         <Grid>
@@ -52,18 +54,6 @@
                                     <TextBlock Text="Каталог продуктов" Foreground="Black" Margin="10,0,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <!--<Button Name="OsagoButton" Click="OsagoButton_Click" Style="{StaticResource MenuButtonStyle}" Visibility="Collapsed">
-                                <StackPanel Orientation="Horizontal" Margin="10,5">
-                                    <Icon:PackIconMaterial Kind="Car" Foreground="#003087" Width="20" Height="20" VerticalAlignment="Center"/>
-                                    <TextBlock Text="ОСАГО" Foreground="Black" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>
-                            <Button Name="KaskoButton" Click="KaskoButton_Click" Style="{StaticResource MenuButtonStyle}" Visibility="Collapsed">
-                                <StackPanel Orientation="Horizontal" Margin="10,5">
-                                    <Icon:PackIconMaterial Kind="Car" Foreground="#003087" Width="20" Height="20" VerticalAlignment="Center"/>
-                                    <TextBlock Text="КАСКО" Foreground="Black" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>-->
                         </StackPanel>
                         <TextBlock Text="Страховой портфель" Foreground="#003087" FontSize="16" Margin="10,10,0,10"/>
                         <StackPanel Margin="0,0,0,10">
@@ -85,6 +75,44 @@
                                     <TextBlock Text="Поддержка" Foreground="Black" Margin="10,0,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
+                            <Grid Margin="10 0 5 5" Visibility="Collapsed" x:Name="FIOSearchGrid">
+                                <TextBox x:Name="FIOSearchTxtBox"
+                                     VerticalAlignment="Center" 
+                                     Margin="25 0 0 0"
+                                     Tag="{Binding ElementName=FIOSearchTxtBlock}"
+                                     GotFocus="TextBox_GotFocus" 
+                                     LostFocus="TextBox_LostFocus" 
+                                     TextChanged="TextBox_TextChanged"/>
+                                <Icon:PackIconMaterial Kind="Magnify" Width="20" Height="20" 
+                                                       Foreground="#003087" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="FIOSearchTxtBlock" 
+                                       Text="Поиск по ФИО" 
+                                       FontSize="14" 
+                                       Foreground="#6f7582" 
+                                       IsHitTestVisible="False" 
+                                       VerticalAlignment="Center" 
+                                       Margin="30,0,0,0" 
+                                       Visibility="Visible"/>
+                            </Grid>
+                            <Grid Margin="10 0 5 5" Visibility="Collapsed" x:Name="PolicySearchGrid">
+                                <TextBox x:Name="PolicySearchTxtBox"
+                                     VerticalAlignment="Center" 
+                                     Margin="25 0 0 0"
+                                     Tag="{Binding ElementName=PolicySearchTxtBlock}"
+                                     GotFocus="TextBox_GotFocus" 
+                                     LostFocus="TextBox_LostFocus" 
+                                     TextChanged="PolicyNumberSearch_TextChanged"/>
+                                <Icon:PackIconMaterial Kind="Magnify" Width="20" Height="20" 
+                                                       Foreground="#003087" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="PolicySearchTxtBlock" 
+                                       Text="Поиск по № полиса" 
+                                       FontSize="14" 
+                                       Foreground="#6f7582" 
+                                       IsHitTestVisible="False" 
+                                       VerticalAlignment="Center" 
+                                       Margin="30,0,0,0" 
+                                       Visibility="Visible"/>
+                            </Grid>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -97,8 +125,6 @@
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                                 <Button Content="Страхование автомобилей" Width="175" Height="40" Background="#003087" Foreground="White" Margin="5"
                                         Name="BtnOsago" Click="BtnOsago_Click"/>
-                                <!--<Button Content="КАСКО" Width="100" Height="40" Background="#003087" Foreground="White" Margin="5"
-                                        Name="BtnKasko" Click="BtnKasko_Click" />-->
                                 <Button Content="Страхование жизни" Width="150" Height="40" Background="#003087" Foreground="White" Margin="5"
                                         Name="BtnLifeInsurance" Click="BtnLifeInsurance_Click" />
                                 <Button Content="Страхование имущества" Width="150" Height="40" Background="#003087" Foreground="White" Margin="5"
@@ -121,10 +147,8 @@
                             <DataGrid.RowDetailsTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <Button Content="Пролонгировать полис"/>
-                                        <Button Content="Печать"/>
-                                        <Button Content="Скачать шаблон"/>
-                                        <Button Content="Отменить полис"/>
+                                        <Button Content="Пролонгировать полис" Width="150" Height="25" Background="#003087" Foreground="White" 
+                                                Margin="5" Name="Prolongpolicy" Click="Prolongpolicy_Click"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGrid.RowDetailsTemplate>

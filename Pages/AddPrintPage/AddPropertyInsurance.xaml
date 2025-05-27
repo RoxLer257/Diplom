@@ -166,224 +166,7 @@
                             </Button>
 
                             <!-- Добавление нового клиента -->
-                            <!--<StackPanel x:Name="NewClientPanel" Visibility="Collapsed" Margin="0,0,0,15">
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                                    <Icon:PackIconMaterial Kind="AccountPlus" Width="20" Height="20" Foreground="#003087" Margin="0,0,5,0"/>
-                                    <TextBlock Text="Добавление нового клиента" FontSize="16" Foreground="#003087"/>
-                                </StackPanel>
-
-                                <Grid Margin="0,0,0,15">
-                                    <ComboBox x:Name="ClientTypeComboBox" 
-                                              DisplayMemberPath="TypeName" 
-                                              SelectedValuePath="ClientTypeID" 
-                                              MinWidth="150" 
-                                              Margin="25,0,0,0"
-                                              Tag="{Binding ElementName=ClientTypePlaceholder}"
-                                              SelectionChanged="ComboBox_SelectionChanged"/>
-                                    <TextBlock x:Name="ClientTypePlaceholder" 
-                                               Text="Тип клиента" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="AccountGroup" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,15">
-                                    <TextBox x:Name="LastNameTextBox" 
-                                             MinWidth="150" 
-                                             VerticalAlignment="Center" 
-                                             Margin="25,0,0,0"
-                                             Tag="{Binding ElementName=LastNamePlaceholder}"
-                                             GotFocus="TextBox_GotFocus" 
-                                             LostFocus="TextBox_LostFocus" 
-                                             TextChanged="TextBox_TextChanged"/>
-                                    <TextBlock x:Name="LastNamePlaceholder" 
-                                               Text="Фамилия" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="Account" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,15">
-                                    <TextBox x:Name="FirstNameTextBox" 
-                                             MinWidth="150" 
-                                             VerticalAlignment="Center" 
-                                             Margin="25,0,0,0"
-                                             Tag="{Binding ElementName=FirstNamePlaceholder}"
-                                             GotFocus="TextBox_GotFocus" 
-                                             LostFocus="TextBox_LostFocus" 
-                                             TextChanged="TextBox_TextChanged"/>
-                                    <TextBlock x:Name="FirstNamePlaceholder" 
-                                               Text="Имя" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="Account" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,15">
-                                    <TextBox x:Name="MiddleNameTextBox" 
-                                             MinWidth="150" 
-                                             VerticalAlignment="Center" 
-                                             Margin="25,0,0,0"
-                                             Tag="{Binding ElementName=MiddleNamePlaceholder}"
-                                             GotFocus="TextBox_GotFocus" 
-                                             LostFocus="TextBox_LostFocus" 
-                                             TextChanged="TextBox_TextChanged"/>
-                                    <TextBlock x:Name="MiddleNamePlaceholder" 
-                                               Text="Отчество" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="Account" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,15">
-                                    <TextBox x:Name="CompanyNameTextBox" 
-                                             MinWidth="150" 
-                                             VerticalAlignment="Center" 
-                                             Margin="25,0,0,0"
-                                             Tag="{Binding ElementName=CompanyNamePlaceholder}"
-                                             GotFocus="TextBox_GotFocus" 
-                                             LostFocus="TextBox_LostFocus" 
-                                             TextChanged="TextBox_TextChanged"/>
-                                    <TextBlock x:Name="CompanyNamePlaceholder" 
-                                               Text="Название компании" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="OfficeBuilding" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,15">
-                                    <TextBox x:Name="PassportNumberTextBox" 
-                                             MinWidth="150" 
-                                             VerticalAlignment="Center" 
-                                             Margin="25,0,0,0"
-                                             Tag="{Binding ElementName=PassportNumberPlaceholder}"
-                                             GotFocus="TextBox_GotFocus" 
-                                             LostFocus="TextBox_LostFocus" 
-                                             TextChanged="TextBox_TextChanged"/>
-                                    <TextBlock x:Name="PassportNumberPlaceholder" 
-                                               Text="Номер паспорта" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="Passport" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,15">
-                                    <TextBox x:Name="INNTextBox" 
-                                             MinWidth="150" 
-                                             VerticalAlignment="Center" 
-                                             Margin="25,0,0,0"
-                                             Tag="{Binding ElementName=INNPlaceholder}"
-                                             GotFocus="TextBox_GotFocus" 
-                                             LostFocus="TextBox_LostFocus" 
-                                             TextChanged="TextBox_TextChanged"/>
-                                    <TextBlock x:Name="INNPlaceholder" 
-                                               Text="ИНН" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="FileDocument" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,15">
-                                    <TextBox x:Name="PhoneTextBox" 
-                                             MinWidth="150" 
-                                             VerticalAlignment="Center" 
-                                             Margin="25,0,0,0"
-                                             Tag="{Binding ElementName=PhonePlaceholder}"
-                                             GotFocus="TextBox_GotFocus" 
-                                             LostFocus="TextBox_LostFocus" 
-                                             TextChanged="TextBox_TextChanged"/>
-                                    <TextBlock x:Name="PhonePlaceholder" 
-                                               Text="Телефон" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="Phone" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,15">
-                                    <TextBox x:Name="EmailTextBox" 
-                                             MinWidth="150" 
-                                             VerticalAlignment="Center" 
-                                             Margin="25,0,0,0"
-                                             Tag="{Binding ElementName=EmailPlaceholder}"
-                                             GotFocus="TextBox_GotFocus" 
-                                             LostFocus="TextBox_LostFocus" 
-                                             TextChanged="TextBox_TextChanged"/>
-                                    <TextBlock x:Name="EmailPlaceholder" 
-                                               Text="Email" 
-                                               FontSize="14" 
-                                               Foreground="#6f7582" 
-                                               IsHitTestVisible="False" 
-                                               VerticalAlignment="Center" 
-                                               Margin="30,0,0,0" 
-                                               Visibility="Visible"/>
-                                    <Icon:PackIconMaterial Kind="Email" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                </Grid>
-
-                                <Button Content="Добавить клиента" 
-                                        Width="150" 
-                                        Height="30" 
-                                        Background="#003087" 
-                                        Foreground="White" 
-                                        Margin="25,0,0,0"
-                                        Click="CreateClientButton_Click">
-                                    <Button.ContentTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Icon:PackIconMaterial Kind="AccountPlus" Width="20" Height="20" Margin="0,0,5,0"/>
-                                                <TextBlock Text="Добавить клиента"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </Button.ContentTemplate>
-                                </Button>
-                                <Button Content="Скрыть" 
-                                        Width="150" 
-                                        Height="30" 
-                                        Background="#E0E0E0" 
-                                        Foreground="Black" 
-                                        Margin="25,10,0,0"
-                                        Click="HideNewClientPanelButton_Click">
-                                    <Button.ContentTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Icon:PackIconMaterial Kind="Close" Width="20" Height="20" Margin="0,0,5,0"/>
-                                                <TextBlock Text="Скрыть"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </Button.ContentTemplate>
-                                </Button>
-                            </StackPanel>-->
+                            
                             <StackPanel x:Name="NewClientPanel" Visibility="Collapsed" Margin="0,0,0,15">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
                                     <Icon:PackIconMaterial Kind="AccountPlus" Width="20" Height="20" Foreground="#003087" Margin="0,0,5,0"/>
@@ -607,6 +390,7 @@ Click="HideNewClientPanelButton_Click">
                 </Border>
 
                 <Border Grid.Column="1" BorderBrush="#003087" BorderThickness="1" Padding="15">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
                             <Icon:PackIconMaterial Kind="HomeOutline" Width="20" Height="20" Foreground="#003087" Margin="0,0,5,0"/>
@@ -615,97 +399,153 @@ Click="HideNewClientPanelButton_Click">
 
                         <StackPanel Margin="0,0,0,15">
                             <TextBlock Text="Добавленное имущество:" Margin="0,0,0,5"/>
-                            <ListBox x:Name="PropertiesListBox" 
-                                     Height="100" 
-                                     DisplayMemberPath="Address" 
-                                     SelectionMode="Multiple" 
-                                     ToolTip="Список добавленного имущества"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ListBox x:Name="PropertiesListBox" 
+                                         Height="100" 
+                                         DisplayMemberPath="Address" 
+                                         SelectionMode="Single"
+                                         SelectionChanged="PropertiesListBox_SelectionChanged"
+                                         ToolTip="Список добавленного имущества"/>
+                                <Button Grid.Column="1" 
+                                        x:Name="RemovePropertyButton" 
+                                        Width="30" 
+                                        Height="30" 
+                                        Margin="5,0,5,0"
+                                        Background="DarkRed" 
+                                        Foreground="White" 
+                                        Click="RemovePropertyButton_Click"
+                                        ToolTip="Удалить выбранное имущество"
+                                        Visibility="Collapsed">
+                                    <Icon:PackIconMaterial Kind="Delete" Width="20" Height="20"/>
+                                </Button>
+                            </Grid>
                         </StackPanel>
 
-                        <StackPanel x:Name="NewPropertyPanel" Margin="0,0,0,15">
-                            <TextBlock Text="Новое имущество:" Margin="0,0,0,5"/>
-                            <Grid Margin="0,0,0,10">
-                                <ComboBox x:Name="PropertyTypeComboBox" 
-                                          DisplayMemberPath="TypeName" 
-                                          SelectedValuePath="PropertyTypeID" 
-                                          MinWidth="150" 
-                                          Margin="25,0,0,0"
-                                          Tag="{Binding ElementName=PropertyTypePlaceholder}"
-                                          SelectionChanged="ComboBox_SelectionChanged"
-                                          ToolTip="Выберите тип имущества"/>
-                                <TextBlock x:Name="PropertyTypePlaceholder" 
-                                           Text="Тип имущества" 
-                                           FontSize="14" 
-                                           Foreground="#6f7582" 
-                                           IsHitTestVisible="False" 
-                                           VerticalAlignment="Center" 
-                                           Margin="30,0,0,0" 
-                                           Visibility="Visible"/>
-                                <Icon:PackIconMaterial Kind="HomeVariant" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,10">
-                                <TextBox x:Name="AddressTextBox" 
-                                         MinWidth="150" 
-                                         VerticalAlignment="Center" 
-                                         Margin="25,0,0,0"
-                                         Tag="{Binding ElementName=AddressPlaceholder}"
-                                         GotFocus="TextBox_GotFocus" 
-                                         LostFocus="TextBox_LostFocus" 
-                                         TextChanged="TextBox_TextChanged"/>
-                                <TextBlock x:Name="AddressPlaceholder" 
-                                           Text="Адрес" 
-                                           FontSize="14" 
-                                           Foreground="#6f7582" 
-                                           IsHitTestVisible="False" 
-                                           VerticalAlignment="Center" 
-                                           Margin="30,0,0,0" 
-                                           Visibility="Visible"/>
-                                <Icon:PackIconMaterial Kind="MapMarker" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,10">
-                                <TextBox x:Name="AreaTextBox" 
-                                         MinWidth="150" 
-                                         VerticalAlignment="Center" 
-                                         Margin="25,0,0,0"
-                                         Tag="{Binding ElementName=AreaPlaceholder}"
-                                         GotFocus="TextBox_GotFocus" 
-                                         LostFocus="TextBox_LostFocus" 
-                                         TextChanged="TextBox_TextChanged"/>
-                                <TextBlock x:Name="AreaPlaceholder" 
-                                           Text="Площадь (м²)" 
-                                           FontSize="14" 
-                                           Foreground="#6f7582" 
-                                           IsHitTestVisible="False" 
-                                           VerticalAlignment="Center" 
-                                           Margin="30,0,0,0" 
-                                           Visibility="Visible"/>
-                                <Icon:PackIconMaterial Kind="RulerSquare" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,10">
-                                <TextBox x:Name="ValueTextBox" 
-                                         MinWidth="150" 
-                                         VerticalAlignment="Center" 
-                                         Margin="25,0,0,0"
-                                         Tag="{Binding ElementName=ValuePlaceholder}"
-                                         GotFocus="TextBox_GotFocus" 
-                                         LostFocus="TextBox_LostFocus" 
-                                         TextChanged="TextBox_TextChanged"/>
-                                <TextBlock x:Name="ValuePlaceholder" 
-                                           Text="Стоимость" 
-                                           FontSize="14" 
-                                           Foreground="#6f7582" 
-                                           IsHitTestVisible="False" 
-                                           VerticalAlignment="Center" 
-                                           Margin="30,0,0,0" 
-                                           Visibility="Visible"/>
-                                <Icon:PackIconMaterial Kind="CurrencyRub" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            </Grid>
-                            <Button Content="Добавить" 
-                                    Width="100" 
-                                    Height="30" 
-                                    Click="AddNewPropertyButton_Click"/>
+                        <!-- Кнопка "Добавить имущество" -->
+                        <Button x:Name="AddPropertyButton"
+                                Content="Добавить имущество" 
+                                Width="150" 
+                                Height="30" 
+                                Background="#003087" 
+                                Foreground="White" 
+                                Margin="0,0,0,15"
+                                Click="ShowNewPropertyPanelButton_Click">
+                            <Button.ContentTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Icon:PackIconMaterial Kind="HomePlus" Width="20" Height="20" Margin="0,0,5,0"/>
+                                        <TextBlock Text="Добавить имущество"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Button.ContentTemplate>
+                        </Button>
+
+                        <!-- Панель добавления имущества -->
+                            <StackPanel x:Name="NewPropertyPanel" Visibility="Collapsed">
+                                <TextBlock Text="Новое имущество:" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,10">
+                                    <ComboBox x:Name="PropertyTypeComboBox" 
+                                              DisplayMemberPath="TypeName" 
+                                              SelectedValuePath="PropertyTypeID" 
+                                              MinWidth="150" 
+                                              Margin="25,0,0,0"
+                                              Tag="{Binding ElementName=PropertyTypePlaceholder}"
+                                              SelectionChanged="ComboBox_SelectionChanged"
+                                              ToolTip="Выберите тип имущества"/>
+                                    <TextBlock x:Name="PropertyTypePlaceholder" 
+                                               Text="Тип имущества" 
+                                               FontSize="14" 
+                                               Foreground="#6f7582" 
+                                               IsHitTestVisible="False" 
+                                               VerticalAlignment="Center" 
+                                               Margin="30,0,0,0" 
+                                               Visibility="Visible"/>
+                                    <Icon:PackIconMaterial Kind="HomeVariant" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,10">
+                                    <TextBox x:Name="AddressTextBox" 
+                                             MinWidth="150" 
+                                             VerticalAlignment="Center" 
+                                             Margin="25,0,0,0"
+                                             Tag="{Binding ElementName=AddressPlaceholder}"
+                                             GotFocus="TextBox_GotFocus" 
+                                             LostFocus="TextBox_LostFocus" 
+                                             TextChanged="TextBox_TextChanged"/>
+                                    <TextBlock x:Name="AddressPlaceholder" 
+                                               Text="Адрес" 
+                                               FontSize="14" 
+                                               Foreground="#6f7582" 
+                                               IsHitTestVisible="False" 
+                                               VerticalAlignment="Center" 
+                                               Margin="30,0,0,0" 
+                                               Visibility="Visible"/>
+                                    <Icon:PackIconMaterial Kind="MapMarker" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,10">
+                                    <TextBox x:Name="AreaTextBox" 
+                                             MinWidth="150" 
+                                             VerticalAlignment="Center" 
+                                             Margin="25,0,0,0"
+                                             Tag="{Binding ElementName=AreaPlaceholder}"
+                                             GotFocus="TextBox_GotFocus" 
+                                             LostFocus="TextBox_LostFocus" 
+                                             TextChanged="TextBox_TextChanged"/>
+                                    <TextBlock x:Name="AreaPlaceholder" 
+                                               Text="Площадь (м²)" 
+                                               FontSize="14" 
+                                               Foreground="#6f7582" 
+                                               IsHitTestVisible="False" 
+                                               VerticalAlignment="Center" 
+                                               Margin="30,0,0,0" 
+                                               Visibility="Visible"/>
+                                    <Icon:PackIconMaterial Kind="RulerSquare" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,10">
+                                    <TextBox x:Name="ValueTextBox" 
+                                             MinWidth="150" 
+                                             VerticalAlignment="Center" 
+                                             Margin="25,0,0,0"
+                                             Tag="{Binding ElementName=ValuePlaceholder}"
+                                             GotFocus="TextBox_GotFocus" 
+                                             LostFocus="TextBox_LostFocus" 
+                                             TextChanged="TextBox_TextChanged"/>
+                                    <TextBlock x:Name="ValuePlaceholder" 
+                                               Text="Стоимость" 
+                                               FontSize="14" 
+                                               Foreground="#6f7582" 
+                                               IsHitTestVisible="False" 
+                                               VerticalAlignment="Center" 
+                                               Margin="30,0,0,0" 
+                                               Visibility="Visible"/>
+                                    <Icon:PackIconMaterial Kind="CurrencyRub" Width="20" Height="20" Foreground="#003087" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                </Grid>
+                                <Button Content="Добавить" 
+                                        Width="100" 
+                                        Height="30" 
+                                        Click="AddNewPropertyButton_Click"/>
+                                <Button Content="Скрыть" 
+                                        Width="100" 
+                                        Height="30" 
+                                        Background="#E0E0E0" 
+                                        Foreground="Black" 
+                                        Margin="0,10,0,0"
+                                        Click="HideNewPropertyPanelButton_Click">
+                                    <Button.ContentTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Icon:PackIconMaterial Kind="Close" Width="20" Height="20" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Скрыть"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </Button.ContentTemplate>
+                                </Button>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
+                    </ScrollViewer>
                 </Border>
             </Grid>
 

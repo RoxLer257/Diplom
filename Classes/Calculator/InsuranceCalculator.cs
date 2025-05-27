@@ -156,64 +156,6 @@ namespace Diplom.Classes.Calculator
             }
         }
 
-        //public double CalculateKBM(Drivers driver)
-        //{
-        //    try
-        //    {
-        //        var history = _context.DriverInsuranceHistory
-        //            .Where(h => h.DriverID == driver.DriverID)
-        //            .OrderByDescending(h => h.LastUpdated)
-        //            .ToList();
-
-        //        if (!history.Any())
-        //        {
-        //            var newHistory = new DriverInsuranceHistory
-        //            {
-        //                DriverID = driver.DriverID,
-        //                PolicyID = 0,
-        //                Year = DateTime.Now.Year,
-        //                HadAccident = false,
-        //                KBM = 1.0m,
-        //                LastUpdated = DateTime.Now
-        //            };
-        //            _context.DriverInsuranceHistory.Add(newHistory);
-        //            _context.SaveChanges();
-        //            return 1.0;
-        //        }
-
-        //        var latestRecord = history.First();
-        //        double currentKBM = (double)latestRecord.KBM;
-        //        int currentClass = GetClassFromKBM(currentKBM);
-
-        //        if (latestRecord.LastUpdated.Year < DateTime.Now.Year)
-        //        {
-        //            int newClass = currentClass + 1;
-        //            if (newClass > 13) newClass = 13;
-        //            double newKBM = GetKBMFromClass(newClass);
-
-        //            var newHistory = new DriverInsuranceHistory
-        //            {
-        //                DriverID = driver.DriverID,
-        //                PolicyID = latestRecord.PolicyID,
-        //                Year = DateTime.Now.Year,
-        //                HadAccident = false,
-        //                KBM = (decimal)newKBM,
-        //                LastUpdated = DateTime.Now
-        //            };
-        //            _context.DriverInsuranceHistory.Add(newHistory);
-        //            _context.SaveChanges();
-
-        //            return newKBM;
-        //        }
-
-        //        return currentKBM;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception($"Ошибка при расчете КБМ для водителя {driver.DriverID}: {ex.Message}", ex);
-        //    }
-        //}
-
         public int GetClassFromKBM(double kbm)
         {
             switch (kbm)

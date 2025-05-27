@@ -61,7 +61,7 @@
 
                     <!-- Кнопка "Поменять пароль" -->
                     <Button x:Name="ChangePasswordButton" Content="Поменять пароль" 
-                            Style="{StaticResource CustomButtonStyle}" Background="#2196F3" 
+                            Style="{StaticResource CustomButtonStyle}" Background="#003087" 
                             Click="ChangePasswordButton_Click" Width="200" Height="50" FontSize="16"
                             HorizontalAlignment="Center" Margin="0 10 0 0"/>
 

@@ -1,4 +1,5 @@
 ﻿using Diplom.Classes;
+using Diplom.Classes.Validator;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,12 +26,17 @@ namespace Diplom.Pages.AddPrintPage
         private readonly VSK_DBEntities _context;
         private ObservableCollection<Diplom.Classes.Properties> SelectedProperties { get; set; }
         private List<Clients> _selectedClients; // Список выбранных клиентов
+        private readonly PropertyInsuranceValidator _propertyInsuranceValidator;
+        private readonly ClientValidator _clientValidator;
+
         public AddPropertyInsurance()
         {
             InitializeComponent();
             _context = ClassFrame.ConnectDB;
             SelectedProperties = new ObservableCollection<Diplom.Classes.Properties>();
             _selectedClients = new List<Clients>(); // Инициализируем список клиентов
+            _propertyInsuranceValidator = new PropertyInsuranceValidator(_context);
+            _clientValidator = new ClientValidator(_context);
 
             LoadData();
             InitializePlaceholders();
@@ -263,52 +269,63 @@ namespace Diplom.Pages.AddPrintPage
         }
         private void CreateClientButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ClientTypeComboBox.SelectedItem is ClientTypes selectedClientType &&
-                !string.IsNullOrWhiteSpace(PhoneTextBox.Text) &&
-                !string.IsNullOrWhiteSpace(EmailTextBox.Text))
+            var validationResult = _clientValidator.ValidateClient(
+                ClientTypeComboBox.SelectedItem as ClientTypes,
+                LastNameTextBox.Text,
+                FirstNameTextBox.Text,
+                MiddleNameTextBox.Text,
+                CompanyNameTextBox.Text,
+                PassportNumberTextBox.Text,
+                INNTextBox.Text,
+                PhoneTextBox.Text,
+                EmailTextBox.Text);
+
+            if (!validationResult.IsValid)
             {
-                try
-                {
-                    var newClient = new Clients
-                    {
-                        ClientTypeID = selectedClientType.ClientTypeID,
-                        AgentID = CurrentUser.EmployeeID, // Используем EmployeeID из CurrentUser
-                        LastName = LastNameTextBox.Text,
-                        FirstName = FirstNameTextBox.Text,
-                        MiddleName = MiddleNameTextBox.Text,
-                        CompanyName = CompanyNameTextBox.Text,
-                        PassportNumber = PassportNumberTextBox.Text,
-                        INN = INNTextBox.Text,
-                        Phone = PhoneTextBox.Text,
-                        Email = EmailTextBox.Text
-                    };
-
-                    _context.Clients.Add(newClient);
-                    _context.SaveChanges();
-
-                    // Логирование добавления клиента
-                    LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
-
-                    // Добавляем нового клиента в список выбранных
-                    if (!_selectedClients.Any(c => c.ClientID == newClient.ClientID))
-                    {
-                        _selectedClients.Add(newClient);
-                        ClientsListBox.ItemsSource = null;
-                        ClientsListBox.ItemsSource = _selectedClients;
-                    }
-
-                    // Очищаем поля для создания клиента и скрываем панель
-                    ClearClientForm();
-                    NewClientPanel.Visibility = Visibility.Collapsed;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                MessageBox.Show(validationResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            else
+
+            try
             {
-                MessageBox.Show("Пожалуйста, заполните все обязательные поля (тип клиента, телефон, email).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                var newClient = new Clients
+                {
+                    ClientTypeID = (ClientTypeComboBox.SelectedItem as ClientTypes).ClientTypeID,
+                    AgentID = CurrentUser.EmployeeID,
+                    LastName = LastNameTextBox.Text,
+                    FirstName = FirstNameTextBox.Text,
+                    MiddleName = MiddleNameTextBox.Text,
+                    CompanyName = CompanyNameTextBox.Text,
+                    PassportNumber = PassportNumberTextBox.Text,
+                    INN = INNTextBox.Text,
+                    Phone = PhoneTextBox.Text,
+                    Email = EmailTextBox.Text
+                };
+
+                _context.Clients.Add(newClient);
+                _context.SaveChanges();
+
+                LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
+
+                if (!_selectedClients.Any())
+                {
+                    _selectedClients.Add(newClient);
+                    ClientsListBox.ItemsSource = null;
+                    ClientsListBox.ItemsSource = _selectedClients;
+                    AddClientButton.Visibility = Visibility.Collapsed;
+                    RemoveClientButton.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    MessageBox.Show("Клиент успешно создан, но в полис можно добавить только одного клиента.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                ClearClientForm();
+                NewClientPanel.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -343,133 +360,231 @@ namespace Diplom.Pages.AddPrintPage
 
         private void AddNewPropertyButton_Click(object sender, RoutedEventArgs e)
         {
-            if (PropertyTypeComboBox.SelectedItem is PropertyTypes selectedPropertyType &&
-                !string.IsNullOrWhiteSpace(AddressTextBox.Text) &&
-                decimal.TryParse(AreaTextBox.Text, out decimal area) &&
-                decimal.TryParse(ValueTextBox.Text, out decimal value))
+            // Проверяем тип имущества
+            if (PropertyTypeComboBox.SelectedItem == null)
             {
-                if (area <= 0 || value <= 0)
+                MessageBox.Show("Выберите тип имущества", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            decimal? area = null;
+            decimal? value = null;
+            if (decimal.TryParse(AreaTextBox.Text, out decimal parsedArea))
+            {
+                area = parsedArea;
+            }
+            if (decimal.TryParse(ValueTextBox.Text, out decimal parsedValue))
+            {
+                value = parsedValue;
+            }
+
+            // Проверяем только данные имущества
+            var propertyTypeResult = _propertyInsuranceValidator.ValidatePropertyType(PropertyTypeComboBox.SelectedItem as PropertyTypes);
+            if (!propertyTypeResult.IsValid)
+            {
+                MessageBox.Show(propertyTypeResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var addressResult = _propertyInsuranceValidator.ValidateAddress(AddressTextBox.Text);
+            if (!addressResult.IsValid)
+            {
+                MessageBox.Show(addressResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var areaResult = _propertyInsuranceValidator.ValidateArea(area);
+            if (!areaResult.IsValid)
+            {
+                MessageBox.Show(areaResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var valueResult = _propertyInsuranceValidator.ValidateValue(value);
+            if (!valueResult.IsValid)
+            {
+                MessageBox.Show(valueResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                var newProperty = new Diplom.Classes.Properties
                 {
-                    MessageBox.Show("Площадь и стоимость должны быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
+                    PropertyTypeID = (PropertyTypeComboBox.SelectedItem as PropertyTypes).PropertyTypeID,
+                    Address = AddressTextBox.Text,
+                    Area = area.Value,
+                    Value = value.Value
+                };
 
-                try
+                SelectedProperties.Add(newProperty);
+                PropertiesListBox.ItemsSource = null;
+                PropertiesListBox.ItemsSource = SelectedProperties;
+
+                // Скрываем кнопку добавления имущества
+                AddPropertyButton.Visibility = Visibility.Collapsed;
+
+                // Очищаем поля
+                PropertyTypeComboBox.SelectedItem = null;
+                AddressTextBox.Text = string.Empty;
+                AreaTextBox.Text = string.Empty;
+                ValueTextBox.Text = string.Empty;
+
+                UpdateComboBoxPlaceholder(PropertyTypeComboBox, PropertyTypePlaceholder);
+                UpdateTextBoxPlaceholder(AddressTextBox, AddressPlaceholder);
+                UpdateTextBoxPlaceholder(AreaTextBox, AreaPlaceholder);
+                UpdateTextBoxPlaceholder(ValueTextBox, ValuePlaceholder);
+
+                // Скрываем панель добавления имущества
+                NewPropertyPanel.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при добавлении имущества: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void PropertiesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RemovePropertyButton.Visibility = PropertiesListBox.SelectedItem != null ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void RemovePropertyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (PropertiesListBox.SelectedItem is Diplom.Classes.Properties selectedProperty)
+            {
+                SelectedProperties.Remove(selectedProperty);
+                PropertiesListBox.ItemsSource = null;
+                PropertiesListBox.ItemsSource = SelectedProperties;
+                RemovePropertyButton.Visibility = Visibility.Collapsed;
+                
+                // Показываем кнопку добавления имущества, если список пуст
+                if (!SelectedProperties.Any())
                 {
-                    var newProperty = new Diplom.Classes.Properties
-                    {
-                        PropertyTypeID = selectedPropertyType.PropertyTypeID,
-                        Address = AddressTextBox.Text,
-                        Area = area,
-                        Value = value
-                    };
-
-                    SelectedProperties.Add(newProperty);
-
-                    // Очищаем поля
-                    PropertyTypeComboBox.SelectedItem = null;
-                    AddressTextBox.Text = string.Empty;
-                    AreaTextBox.Text = string.Empty;
-                    ValueTextBox.Text = string.Empty;
-
-                    UpdateComboBoxPlaceholder(PropertyTypeComboBox, PropertyTypePlaceholder);
-                    UpdateTextBoxPlaceholder(AddressTextBox, AddressPlaceholder);
-                    UpdateTextBoxPlaceholder(AreaTextBox, AreaPlaceholder);
-                    UpdateTextBoxPlaceholder(ValueTextBox, ValuePlaceholder);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при добавлении имущества: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    AddPropertyButton.Visibility = Visibility.Visible;
                 }
             }
             else
             {
-                MessageBox.Show("Пожалуйста, заполните все обязательные поля: тип имущества, адрес, площадь, стоимость.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Пожалуйста, выберите имущество для удаления.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private void ShowNewPropertyPanelButton_Click(object sender, RoutedEventArgs e)
+        {
+            NewPropertyPanel.Visibility = Visibility.Visible;
+            
+            // Очищаем поля имущества
+            PropertyTypeComboBox.SelectedItem = null;
+            AddressTextBox.Text = string.Empty;
+            AreaTextBox.Text = string.Empty;
+            ValueTextBox.Text = string.Empty;
+
+            // Обновляем плейсхолдеры
+            UpdateComboBoxPlaceholder(PropertyTypeComboBox, PropertyTypePlaceholder);
+            UpdateTextBoxPlaceholder(AddressTextBox, AddressPlaceholder);
+            UpdateTextBoxPlaceholder(AreaTextBox, AreaPlaceholder);
+            UpdateTextBoxPlaceholder(ValueTextBox, ValuePlaceholder);
+        }
+
+        private void HideNewPropertyPanelButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Очищаем поля имущества
+            PropertyTypeComboBox.SelectedItem = null;
+            AddressTextBox.Text = string.Empty;
+            AreaTextBox.Text = string.Empty;
+            ValueTextBox.Text = string.Empty;
+
+            // Обновляем плейсхолдеры
+            UpdateComboBoxPlaceholder(PropertyTypeComboBox, PropertyTypePlaceholder);
+            UpdateTextBoxPlaceholder(AddressTextBox, AddressPlaceholder);
+            UpdateTextBoxPlaceholder(AreaTextBox, AreaPlaceholder);
+            UpdateTextBoxPlaceholder(ValueTextBox, ValuePlaceholder);
+
+            // Скрываем панель
+            NewPropertyPanel.Visibility = Visibility.Collapsed;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedClients.Any() &&
-                PolicyTypeComboBox.SelectedItem is PolicyTypes selectedPolicyType &&
-                StatusComboBox.SelectedItem is PolicyStatuses selectedStatus &&
-                decimal.TryParse(InsuranceAmountTextBox.Text, out decimal insuranceAmount) &&
-                StartDatePicker.SelectedDate.HasValue &&
-                EndDatePicker.SelectedDate.HasValue)
+            // Извлечение данных из полей
+            decimal? insuranceAmount = null;
+            if (decimal.TryParse(InsuranceAmountTextBox.Text, out decimal parsedAmount))
             {
-                // Дополнительные проверки
-                if (insuranceAmount <= 0)
-                {
-                    MessageBox.Show("Сумма страхования должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (EndDatePicker.SelectedDate.Value <= StartDatePicker.SelectedDate.Value)
-                {
-                    MessageBox.Show("Дата окончания должна быть позже даты начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (!SelectedProperties.Any())
-                {
-                    MessageBox.Show("Добавьте хотя бы одно имущество.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                try
-                {
-                    // Создаём новый полис
-                    var policy = new Policies
-                    {
-                        PolicyTypeID = selectedPolicyType.PolicyTypeID,
-                        StatusID = selectedStatus.StatusID,
-                        InsuranceAmount = insuranceAmount,
-                        StartDate = StartDatePicker.SelectedDate.Value,
-                        EndDate = EndDatePicker.SelectedDate.Value
-                    };
-
-                    // Добавляем клиентов в коллекцию навигационного свойства
-                    foreach (var client in _selectedClients)
-                    {
-                        policy.Clients.Add(client);
-                    }
-
-                    // Добавляем имущество
-                    foreach (var property in SelectedProperties)
-                    {
-                        property.Policies = policy; // Связываем имущество с полисом
-                        _context.Properties.Add(property);
-                    }
-
-                    _context.Policies.Add(policy);
-                    _context.SaveChanges();
-
-                    // Логирование добавления полиса
-                    LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами и {SelectedProperties.Count} объектами имущества");
-
-                    MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                    // Очищаем форму после сохранения
-                    ClearForm();
-                    Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
-                }
-                catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
-                {
-                    var errorMessages = dbEx.EntityValidationErrors
-                        .SelectMany(x => x.ValidationErrors)
-                        .Select(x => x.ErrorMessage);
-                    var fullErrorMessage = string.Join("; ", errorMessages);
-                    var exceptionMessage = $"Ошибка валидации: {fullErrorMessage}";
-                    MessageBox.Show(exceptionMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                insuranceAmount = parsedAmount;
             }
-            else
+            DateTime? startDate = StartDatePicker.SelectedDate;
+            DateTime? endDate = EndDatePicker.SelectedDate;
+            PolicyTypes policyType = PolicyTypeComboBox.SelectedItem as PolicyTypes;
+            PolicyStatuses status = StatusComboBox.SelectedItem as PolicyStatuses;
+
+            // Валидация данных полиса
+            var validationResult = _propertyInsuranceValidator.ValidatePolicyData(
+                startDate,
+                endDate,
+                insuranceAmount,
+                policyType,
+                status,
+                _selectedClients,
+                SelectedProperties
+            );
+
+            if (!validationResult.IsValid)
             {
-                MessageBox.Show("Пожалуйста, проверьте все обязательные поля и добавьте хотя бы одного клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(validationResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                // Создание полиса
+                var policy = new Policies
+                {
+                    PolicyTypeID = policyType.PolicyTypeID,
+                    StatusID = status.StatusID,
+                    InsuranceAmount = insuranceAmount.Value,
+                    StartDate = startDate.Value,
+                    EndDate = endDate.Value
+                };
+
+                // Добавление клиентов
+                foreach (var client in _selectedClients)
+                {
+                    policy.Clients.Add(client);
+                }
+
+                _context.Policies.Add(policy);
+                _context.SaveChanges(); // Сохраняем полис, чтобы получить PolicyID
+
+                // Создание записей для имущества
+                foreach (var property in SelectedProperties)
+                {
+                    var newProperty = new Diplom.Classes.Properties
+                    {
+                        PolicyID = policy.PolicyID,
+                        PropertyTypeID = property.PropertyTypeID,
+                        Address = property.Address,
+                        Area = property.Area,
+                        Value = property.Value
+                    };
+                    _context.Properties.Add(newProperty);
+                }
+
+                _context.SaveChanges();
+
+                // Логирование
+                LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами и {SelectedProperties.Count} объектами имущества");
+
+                LogAction("Properties", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с {SelectedProperties.Count} объектами имущества");
+
+                MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                ClearForm();
+                Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -483,6 +598,7 @@ namespace Diplom.Pages.AddPrintPage
             StartDatePicker.SelectedDate = null;
             EndDatePicker.SelectedDate = null;
             SelectedProperties.Clear();
+            PropertiesListBox.ItemsSource = null;
 
             // Очищаем поля имущества
             PropertyTypeComboBox.SelectedItem = null;
@@ -490,9 +606,11 @@ namespace Diplom.Pages.AddPrintPage
             AreaTextBox.Text = string.Empty;
             ValueTextBox.Text = string.Empty;
 
-            // Очищаем поля клиента и скрываем панель
+            // Очищаем поля клиента и скрываем панели
             ClearClientForm();
             NewClientPanel.Visibility = Visibility.Collapsed;
+            NewPropertyPanel.Visibility = Visibility.Collapsed;
+            RemovePropertyButton.Visibility = Visibility.Collapsed;
 
             InitializePlaceholders();
         }

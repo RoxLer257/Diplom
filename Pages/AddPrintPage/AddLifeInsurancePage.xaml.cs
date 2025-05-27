@@ -4,14 +4,16 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Diplom.Classes;
+using Diplom.Classes.Validator;
 
 namespace Diplom.Pages.AddPrintPage
 {
     public partial class AddLifeInsurancePage : Page
     {
-        // ПОЧИНИТЬ УСТАНОВКУ ТИПА СТРАХОВАНИЯ
         private readonly VSK_DBEntities _context;
         private List<Clients> _selectedClients; // Список выбранных клиентов
+        private readonly LifeInsuranceValidator _lifeInsuranceValidator;
+        private readonly ClientValidator _clientValidator;
 
         public AddLifeInsurancePage()
         {
@@ -19,6 +21,8 @@ namespace Diplom.Pages.AddPrintPage
 
             _context = ClassFrame.ConnectDB;
             _selectedClients = new List<Clients>(); // Инициализируем список клиентов
+            _lifeInsuranceValidator = new LifeInsuranceValidator(_context);
+            _clientValidator = new ClientValidator(_context);
 
             LoadData();
             InitializePlaceholders();
@@ -312,54 +316,124 @@ namespace Diplom.Pages.AddPrintPage
         }
         private void CreateClientButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ClientTypeComboBox.SelectedItem is ClientTypes selectedClientType &&
-                !string.IsNullOrWhiteSpace(PhoneTextBox.Text) &&
-                !string.IsNullOrWhiteSpace(EmailTextBox.Text))
+            var validationResult = _clientValidator.ValidateClient(
+                ClientTypeComboBox.SelectedItem as ClientTypes,
+                LastNameTextBox.Text,
+                FirstNameTextBox.Text,
+                MiddleNameTextBox.Text,
+                CompanyNameTextBox.Text,
+                PassportNumberTextBox.Text,
+                INNTextBox.Text,
+                PhoneTextBox.Text,
+                EmailTextBox.Text);
+
+            if (!validationResult.IsValid)
             {
-                try
-                {
-                    var newClient = new Clients
-                    {
-                        ClientTypeID = selectedClientType.ClientTypeID,
-                        AgentID = CurrentUser.EmployeeID, // Используем EmployeeID из CurrentUser
-                        LastName = LastNameTextBox.Text,
-                        FirstName = FirstNameTextBox.Text,
-                        MiddleName = MiddleNameTextBox.Text,
-                        CompanyName = CompanyNameTextBox.Text,
-                        PassportNumber = PassportNumberTextBox.Text,
-                        INN = INNTextBox.Text,
-                        Phone = PhoneTextBox.Text,
-                        Email = EmailTextBox.Text
-                    };
-
-                    _context.Clients.Add(newClient);
-                    _context.SaveChanges();
-
-                    // Логирование добавления клиента
-                    LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
-
-                    // Добавляем нового клиента в список выбранных
-                    if (!_selectedClients.Any(c => c.ClientID == newClient.ClientID))
-                    {
-                        _selectedClients.Add(newClient);
-                        ClientsListBox.ItemsSource = null;
-                        ClientsListBox.ItemsSource = _selectedClients;
-                    }
-
-                    // Очищаем поля для создания клиента и скрываем панель
-                    ClearClientForm();
-                    NewClientPanel.Visibility = Visibility.Collapsed;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                MessageBox.Show(validationResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            else
+
+            try
             {
-                MessageBox.Show("Пожалуйста, заполните все обязательные поля (тип клиента, телефон, email).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                var newClient = new Clients
+                {
+                    ClientTypeID = (ClientTypeComboBox.SelectedItem as ClientTypes).ClientTypeID,
+                    AgentID = CurrentUser.EmployeeID,
+                    LastName = LastNameTextBox.Text,
+                    FirstName = FirstNameTextBox.Text,
+                    MiddleName = MiddleNameTextBox.Text,
+                    CompanyName = CompanyNameTextBox.Text,
+                    PassportNumber = PassportNumberTextBox.Text,
+                    INN = INNTextBox.Text,
+                    Phone = PhoneTextBox.Text,
+                    Email = EmailTextBox.Text
+                };
+
+                _context.Clients.Add(newClient);
+                _context.SaveChanges();
+
+                LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
+
+                if (!_selectedClients.Any())
+                {
+                    _selectedClients.Add(newClient);
+                    ClientsListBox.ItemsSource = null;
+                    ClientsListBox.ItemsSource = _selectedClients;
+                    AddClientButton.Visibility = Visibility.Collapsed;
+                    RemoveClientButton.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    MessageBox.Show("Клиент успешно создан, но в полис можно добавить только одного клиента.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                ClearClientForm();
+                NewClientPanel.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        //private void CreateClientButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (ClientTypeComboBox.SelectedItem is ClientTypes selectedClientType &&
+        //        !string.IsNullOrWhiteSpace(PhoneTextBox.Text) &&
+        //        !string.IsNullOrWhiteSpace(EmailTextBox.Text))
+        //    {
+        //        try
+        //        {
+        //            var newClient = new Clients
+        //            {
+        //                ClientTypeID = selectedClientType.ClientTypeID,
+        //                AgentID = CurrentUser.EmployeeID, // Используем EmployeeID из CurrentUser
+        //                LastName = LastNameTextBox.Text,
+        //                FirstName = FirstNameTextBox.Text,
+        //                MiddleName = MiddleNameTextBox.Text,
+        //                CompanyName = CompanyNameTextBox.Text,
+        //                PassportNumber = PassportNumberTextBox.Text,
+        //                INN = INNTextBox.Text,
+        //                Phone = PhoneTextBox.Text,
+        //                Email = EmailTextBox.Text
+        //            };
+
+        //            _context.Clients.Add(newClient);
+        //            _context.SaveChanges();
+
+        //            // Логирование добавления клиента
+        //            LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
+
+        //            // Проверяем, есть ли уже клиент в списке
+        //            if (!_selectedClients.Any())
+        //            {
+        //                // Если клиентов нет, добавляем нового клиента в список
+        //                _selectedClients.Add(newClient);
+        //                ClientsListBox.ItemsSource = null;
+        //                ClientsListBox.ItemsSource = _selectedClients;
+        //                AddClientButton.Visibility = Visibility.Collapsed;
+        //                RemoveClientButton.Visibility = Visibility.Visible;
+        //            }
+        //            else
+        //            {
+        //                // Если клиент уже есть, просто показываем сообщение
+        //                MessageBox.Show("Клиент успешно создан, но в полис можно добавить только одного клиента. Выберите другого клиента, удалив текущего.",
+        //                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+        //            }
+
+        //            // Очищаем поля для создания клиента и скрываем панель
+        //            ClearClientForm();
+        //            NewClientPanel.Visibility = Visibility.Collapsed;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Пожалуйста, заполните все обязательные поля (тип клиента, телефон, email).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //    }
+        //}
 
         private void ClearClientForm()
         {
@@ -386,102 +460,186 @@ namespace Diplom.Pages.AddPrintPage
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // Проверка всех обязательных полей
-            if (_selectedClients.Any() &&
-                PolicyTypeComboBox.SelectedItem is PolicyTypes selectedPolicyType &&
-                StatusComboBox.SelectedItem is PolicyStatuses selectedStatus &&
-                decimal.TryParse(InsuranceAmountTextBox.Text, out decimal insuranceAmount) &&
-                StartDatePicker.SelectedDate.HasValue &&
-                EndDatePicker.SelectedDate.HasValue &&
-                int.TryParse(AgeTextBox.Text, out int age) &&
-                GenderComboBox.SelectedItem is ComboBoxItem selectedGender &&
-                HealthConditionComboBox.SelectedItem is HealthConditions selectedHealthCondition &&
-                !string.IsNullOrWhiteSpace(OccupationTextBox.Text))
+            int? age = null;
+            if (int.TryParse(AgeTextBox.Text, out int parsedAge))
             {
-                // Дополнительные проверки
-                if (insuranceAmount <= 0)
-                {
-                    MessageBox.Show("Сумма страхования должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (EndDatePicker.SelectedDate.Value <= StartDatePicker.SelectedDate.Value)
-                {
-                    MessageBox.Show("Дата окончания должна быть позже даты начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (age <= 0 || age > 120)
-                {
-                    MessageBox.Show("Возраст должен быть в диапазоне от 1 до 120 лет.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                try
-                {
-                    // Создаём новый полис
-                    var policy = new Policies
-                    {
-                        PolicyTypeID = selectedPolicyType.PolicyTypeID,
-                        StatusID = selectedStatus.StatusID,
-                        InsuranceAmount = insuranceAmount,
-                        StartDate = StartDatePicker.SelectedDate.Value,
-                        EndDate = EndDatePicker.SelectedDate.Value
-                    };
-
-                    // Добавляем клиентов в коллекцию навигационного свойства
-                    foreach (var client in _selectedClients)
-                    {
-                        policy.Clients.Add(client);
-                    }
-
-                    _context.Policies.Add(policy);
-                    _context.SaveChanges();
-
-                    // Логирование добавления полиса
-                    LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами");
-
-                    // Создаём запись в таблице LifeAndHealth
-                    var lifeAndHealth = new LifeAndHealth
-                    {
-                        PolicyID = policy.PolicyID,
-                        Age = age,
-                        Gender = selectedGender.Content.ToString(),
-                        HealthConditionID = selectedHealthCondition.HealthConditionID,
-                        Occupation = OccupationTextBox.Text
-                    };
-
-                    _context.LifeAndHealth.Add(lifeAndHealth);
-                    _context.SaveChanges();
-
-                    // Логирование добавления записи в LifeAndHealth
-                    LogAction("LifeAndHealth", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с состоянием здоровья {selectedHealthCondition.HealthConditionID}");
-
-                    MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                    // Очищаем форму после сохранения
-                    ClearForm();
-                    Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
-                }
-                catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
-                {
-                    var errorMessages = dbEx.EntityValidationErrors
-                        .SelectMany(x => x.ValidationErrors)
-                        .Select(x => x.ErrorMessage);
-                    var fullErrorMessage = string.Join("; ", errorMessages);
-                    var exceptionMessage = $"Ошибка валидации: {fullErrorMessage}";
-                    MessageBox.Show(exceptionMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                age = parsedAge;
             }
-            else
+            string gender = (GenderComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+            HealthConditions healthCondition = HealthConditionComboBox.SelectedItem as HealthConditions;
+            string occupation = OccupationTextBox.Text;
+            decimal? insuranceAmount = null;
+            if (decimal.TryParse(InsuranceAmountTextBox.Text, out decimal parsedAmount))
             {
-                MessageBox.Show("Пожалуйста, заполните все обязательные поля и добавьте хотя бы одного клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                insuranceAmount = parsedAmount;
+            }
+            DateTime? startDate = StartDatePicker.SelectedDate;
+            DateTime? endDate = EndDatePicker.SelectedDate;
+            PolicyTypes policyType = PolicyTypeComboBox.SelectedItem as PolicyTypes;
+            PolicyStatuses status = StatusComboBox.SelectedItem as PolicyStatuses;
+
+            var validationResult = _lifeInsuranceValidator.ValidateLifeInsurance(
+                age,
+                gender,
+                healthCondition,
+                occupation,
+                insuranceAmount,
+                startDate,
+                endDate,
+                policyType,
+                status,
+                _selectedClients);
+
+            if (!validationResult.IsValid)
+            {
+                MessageBox.Show(validationResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                var policy = new Policies
+                {
+                    PolicyTypeID = policyType.PolicyTypeID,
+                    StatusID = status.StatusID,
+                    InsuranceAmount = insuranceAmount.Value,
+                    StartDate = startDate.Value,
+                    EndDate = endDate.Value
+                };
+
+                foreach (var client in _selectedClients)
+                {
+                    policy.Clients.Add(client);
+                }
+
+                _context.Policies.Add(policy);
+                _context.SaveChanges();
+
+                LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами");
+
+                var lifeAndHealth = new LifeAndHealth
+                {
+                    PolicyID = policy.PolicyID,
+                    Age = age.Value,
+                    Gender = gender,
+                    HealthConditionID = healthCondition.HealthConditionID,
+                    Occupation = occupation
+                };
+
+                _context.LifeAndHealth.Add(lifeAndHealth);
+                _context.SaveChanges();
+
+                LogAction("LifeAndHealth", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с состоянием здоровья {healthCondition.HealthConditionID}");
+
+                MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                ClearForm();
+                Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        //private void SaveButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    // Проверка всех обязательных полей
+        //    if (_selectedClients.Any() &&
+        //        PolicyTypeComboBox.SelectedItem is PolicyTypes selectedPolicyType &&
+        //        StatusComboBox.SelectedItem is PolicyStatuses selectedStatus &&
+        //        decimal.TryParse(InsuranceAmountTextBox.Text, out decimal insuranceAmount) &&
+        //        StartDatePicker.SelectedDate.HasValue &&
+        //        EndDatePicker.SelectedDate.HasValue &&
+        //        int.TryParse(AgeTextBox.Text, out int age) &&
+        //        GenderComboBox.SelectedItem is ComboBoxItem selectedGender &&
+        //        HealthConditionComboBox.SelectedItem is HealthConditions selectedHealthCondition &&
+        //        !string.IsNullOrWhiteSpace(OccupationTextBox.Text))
+        //    {
+        //        // Дополнительные проверки
+        //        if (insuranceAmount <= 0)
+        //        {
+        //            MessageBox.Show("Сумма страхования должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+
+        //        if (EndDatePicker.SelectedDate.Value <= StartDatePicker.SelectedDate.Value)
+        //        {
+        //            MessageBox.Show("Дата окончания должна быть позже даты начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+
+        //        if (age <= 0 || age > 120)
+        //        {
+        //            MessageBox.Show("Возраст должен быть в диапазоне от 1 до 120 лет.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+
+        //        try
+        //        {
+        //            // Создаём новый полис
+        //            var policy = new Policies
+        //            {
+        //                PolicyTypeID = selectedPolicyType.PolicyTypeID,
+        //                StatusID = selectedStatus.StatusID,
+        //                InsuranceAmount = insuranceAmount,
+        //                StartDate = StartDatePicker.SelectedDate.Value,
+        //                EndDate = EndDatePicker.SelectedDate.Value
+        //            };
+
+        //            // Добавляем клиентов в коллекцию навигационного свойства
+        //            foreach (var client in _selectedClients)
+        //            {
+        //                policy.Clients.Add(client);
+        //            }
+
+        //            _context.Policies.Add(policy);
+        //            _context.SaveChanges();
+
+        //            // Логирование добавления полиса
+        //            LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами");
+
+        //            // Создаём запись в таблице LifeAndHealth
+        //            var lifeAndHealth = new LifeAndHealth
+        //            {
+        //                PolicyID = policy.PolicyID,
+        //                Age = age,
+        //                Gender = selectedGender.Content.ToString(),
+        //                HealthConditionID = selectedHealthCondition.HealthConditionID,
+        //                Occupation = OccupationTextBox.Text
+        //            };
+
+        //            _context.LifeAndHealth.Add(lifeAndHealth);
+        //            _context.SaveChanges();
+
+        //            // Логирование добавления записи в LifeAndHealth
+        //            LogAction("LifeAndHealth", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с состоянием здоровья {selectedHealthCondition.HealthConditionID}");
+
+        //            MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+        //            // Очищаем форму после сохранения
+        //            ClearForm();
+        //            Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
+        //        }
+        //        catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+        //        {
+        //            var errorMessages = dbEx.EntityValidationErrors
+        //                .SelectMany(x => x.ValidationErrors)
+        //                .Select(x => x.ErrorMessage);
+        //            var fullErrorMessage = string.Join("; ", errorMessages);
+        //            var exceptionMessage = $"Ошибка валидации: {fullErrorMessage}";
+        //            MessageBox.Show(exceptionMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Пожалуйста, заполните все обязательные поля и добавьте хотя бы одного клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //    }
+        //}
 
         private void ClearForm()
         {

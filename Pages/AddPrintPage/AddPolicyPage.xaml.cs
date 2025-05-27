@@ -11,12 +11,23 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Diplom.Classes;
 using Diplom.Classes.Calculator;
+using Diplom.Classes.Validator;
+using ValidationResult = Diplom.Classes.Validator.ValidationResult;
 
 namespace Diplom.Pages
 {
     public partial class AddPolicyPage : Page
     {
+        //private bool isEditMode = false;
+        //private Policies editablePolicy;
+
         private readonly VSK_DBEntities _context;
+
+        private readonly ClientValidator _clientValidator;
+        private readonly DriverValidator _driverValidator;
+        private readonly VehicleValidator _vehicleValidator;
+        private readonly PolicyValidator _policyValidator;
+
         private ObservableCollection<Drivers> SelectedDrivers { get; set; }
         private List<Clients> _selectedClients; // Список выбранных клиентов
         private readonly InsuranceCalculator _calculator;
@@ -25,7 +36,7 @@ namespace Diplom.Pages
         private Dictionary<int, decimal> DriverKBMMap = new Dictionary<int, decimal>();
 
 
-        public AddPolicyPage()
+        public AddPolicyPage(/*Policies policyToEdit*/)
         {
             InitializeComponent();
 
@@ -34,9 +45,56 @@ namespace Diplom.Pages
             SelectedDrivers = new ObservableCollection<Drivers>();
             _selectedClients = new List<Clients>(); // Инициализируем список клиентов
 
+            _clientValidator = new ClientValidator(_context);
+            _driverValidator = new DriverValidator(_context);
+            _vehicleValidator = new VehicleValidator(_context);
+            _policyValidator = new PolicyValidator();
+
+            //isEditMode = true;
+            //editablePolicy = policyToEdit;
+            //LoadPolicyData(policyToEdit);
+
             LoadData();
             InitializePlaceholders();
         }
+        //private void LoadPolicyData(Policies policy)
+        //{
+        //    // Заполнение UI-полей из policy
+        //    PolicyTypeComboBox.SelectedItem = policy.PolicyTypes;
+        //    StatusComboBox.SelectedItem = policy.PolicyStatuses;
+        //    StartDatePicker.SelectedDate = policy.StartDate;
+        //    EndDatePicker.SelectedDate = policy.EndDate;
+        //    CalculatedCostTextBlock.Text = $"{policy.InsuranceAmount:F2} руб.";
+        //    SaveButton.Visibility = Visibility.Visible;
+
+        //    // Загрузка клиента
+        //    _selectedClients.Clear();
+        //    foreach (var client in policy.Clients)
+        //    {
+        //        _selectedClients.Add(client);
+        //    }
+        //    ClientsListBox.ItemsSource = null;
+        //    ClientsListBox.ItemsSource = _selectedClients;
+
+        //    // Загрузка водителей
+        //    SelectedDrivers.Clear();
+        //    foreach (var driver in policy.Drivers)
+        //    {
+        //        SelectedDrivers.Add(driver);
+        //    }
+        //    SelectedDriversListBox.ItemsSource = null;
+        //    SelectedDriversListBox.ItemsSource = SelectedDrivers;
+
+        //    // Загрузка ТС
+        //    var vehicle = _context.Vehicles.FirstOrDefault(v => v.PolicyID == policy.PolicyID);
+        //    if (vehicle != null)
+        //    {
+        //        VehicleModelComboBox.SelectedItem = vehicle.VehicleModels;
+        //        VinTextBox.Text = vehicle.VIN;
+        //        YearTextBox.Text = vehicle.Year.ToString();
+        //        LicensePlateTextBox.Text = vehicle.LicensePlate;
+        //    }
+        //}
 
         private void LoadData()
         {
@@ -126,6 +184,109 @@ namespace Diplom.Pages
             if (sender is TextBox textBox)
             {
                 UpdateTextBoxPlaceholder(textBox, textBox.Tag as TextBlock);
+                ValidateTextBox(textBox);
+            }
+        }
+        private void ValidateTextBox(TextBox textBox)
+        {
+            string text = textBox.Text;
+            Classes.Validator.ValidationResult result = null;
+            Brush originalBorderBrush = textBox.BorderBrush;
+
+            textBox.BorderBrush = originalBorderBrush;
+            textBox.ToolTip = null;
+
+            try
+            {
+                switch (textBox.Name)
+                {
+                    case "LastNameTextBox":
+                        result = _clientValidator.ValidateLastName(text);
+                        break;
+                    case "FirstNameTextBox":
+                        result = _clientValidator.ValidateFirstName(text);
+                        break;
+                    case "MiddleNameTextBox":
+                        result = _clientValidator.ValidateMiddleName(text);
+                        break;
+                    case "CompanyNameTextBox":
+                        result = _clientValidator.ValidateCompanyName(text);
+                        break;
+                    case "PassportNumberTextBox":
+                        result = _clientValidator.ValidatePassportNumber(text);
+                        break;
+                    case "INNTextBox":
+                        if (ClientTypeComboBox.SelectedItem is ClientTypes clientType)
+                            result = _clientValidator.ValidateINN(text, clientType.ClientTypeID);
+                        else
+                            result = new Classes.Validator.ValidationResult(false, "Выберите тип клиента.");
+                        break;
+                    case "PhoneTextBox":
+                        result = _clientValidator.ValidatePhone(text, _selectedClients.FirstOrDefault()?.ClientID);
+                        break;
+                    case "EmailTextBox":
+                        result = _clientValidator.ValidateEmail(text, _selectedClients.FirstOrDefault()?.ClientID);
+                        break;
+                    case "DriverLastNameTextBox":
+                        result = _driverValidator.ValidateLastName(text);
+                        break;
+                    case "DriverFirstNameTextBox":
+                        result = _driverValidator.ValidateFirstName(text);
+                        break;
+                    case "DriverMiddleNameTextBox":
+                        result = _driverValidator.ValidateMiddleName(text);
+                        break;
+                    case "DriverPassportNumberTextBox":
+                        result = _driverValidator.ValidatePassportNumber(text);
+                        break;
+                    case "DriverINNTextBox":
+                        result = _driverValidator.ValidateINN(text);
+                        break;
+                    case "DriverPhoneTextBox":
+                        result = _driverValidator.ValidatePhone(text);
+                        break;
+                    case "DriverEmailTextBox":
+                        result = _driverValidator.ValidateEmail(text);
+                        break;
+                    case "VinTextBox":
+                        result = _vehicleValidator.ValidateVIN(text);
+                        break;
+                    case "YearTextBox":
+                        if (int.TryParse(text, out int year))
+                            result = _vehicleValidator.ValidateYear(year);
+                        else
+                            result = new Classes.Validator.ValidationResult(false, "Год выпуска: числовое значение.");
+                        break;
+                    case "LicensePlateTextBox":
+                        result = _vehicleValidator.ValidateLicensePlate(text);
+                        break;
+                    case "DriverLicenseNumberTextBox":
+                        result = _driverValidator.ValidateLicenseNumber(text);
+                        break;
+                    case "DriverExperienceTextBox":
+                        if (int.TryParse(text, out int experience))
+                            result = _driverValidator.ValidateDrivingExperience(experience, DriverDateOfBirthPicker.SelectedDate.Value);
+                        else
+                            result = new Classes.Validator.ValidationResult(false, "Стаж: числовое значение.");
+                        break;
+                    case "EnginePowerTextBox":
+                        if (int.TryParse(text, out int power))
+                            result = _vehicleValidator.ValidateEnginePower(power);
+                        else
+                            result = new Classes.Validator.ValidationResult(false, "Мощность: числовое значение.");
+                        break;
+                }
+
+                if (result != null && !result.IsValid)
+                {
+                    textBox.BorderBrush = Brushes.Red;
+                    textBox.ToolTip = result.ErrorMessage;
+                }
+            }
+            catch (Exception ex)
+            {
+                textBox.BorderBrush = Brushes.Red;
+                textBox.ToolTip = $"Ошибка валидации: {ex.Message}";
             }
         }
 
@@ -136,9 +297,14 @@ namespace Diplom.Pages
                 placeholder.Visibility = string.IsNullOrWhiteSpace(textBox.Text) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
-
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (sender is ComboBox comboBox)
+            {
+                UpdateComboBoxPlaceholder(comboBox, comboBox.Tag as TextBlock);
+                ValidateComboBox(comboBox);
+            }
+
             if (sender == ClientTypeComboBox)
             {
                 if (ClientTypeComboBox.SelectedItem is ClientTypes selectedType)
@@ -159,14 +325,111 @@ namespace Diplom.Pages
                     }
                 }
             }
-            UpdateComboBoxPlaceholder(ClientTypeComboBox, ClientTypePlaceholder); 
-            UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
-            UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
-            UpdateComboBoxPlaceholder(VehicleMakeComboBox, VehicleMakePlaceholder);
-            UpdateComboBoxPlaceholder(VehicleModelComboBox, VehicleModelPlaceholder);
-            UpdateComboBoxPlaceholder(ClientTypeComboBox, ClientTypePlaceholder);
-            UpdateComboBoxPlaceholder(RegionComboBox, RegionPlaceholder);
         }
+
+        private void ValidateComboBox(ComboBox comboBox)
+        {
+            ValidationResult result = null;
+            Brush originalBorderBrush = comboBox.BorderBrush;
+
+            comboBox.BorderBrush = originalBorderBrush;
+            comboBox.ToolTip = null;
+
+            switch (comboBox.Name)
+            {
+                case "ClientTypeComboBox":
+                    result = _clientValidator.ValidateClientType(comboBox.SelectedItem as ClientTypes);
+                    break;
+                case "PolicyTypeComboBox":
+                    result = _policyValidator.ValidatePolicyType(comboBox.SelectedItem as PolicyTypes);
+                    break;
+                case "StatusComboBox":
+                    result = _policyValidator.ValidateStatus(comboBox.SelectedItem as PolicyStatuses);
+                    break;
+                case "VehicleMakeComboBox":
+                    result = _vehicleValidator.ValidateVehicleMake(comboBox.SelectedItem as VehicleMakes);
+                    break;
+                case "VehicleModelComboBox":
+                    result = _vehicleValidator.ValidateVehicleModel(comboBox.SelectedItem as VehicleModels);
+                    break;
+                case "RegionComboBox":
+                    result = _vehicleValidator.ValidateRegion(comboBox.SelectedItem);
+                    break;
+            }
+
+            if (result != null && !result.IsValid)
+            {
+                comboBox.BorderBrush = Brushes.Red;
+                comboBox.ToolTip = result.ErrorMessage;
+            }
+        }
+
+        private void DatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is DatePicker datePicker)
+            {
+                ValidateDatePicker(datePicker);
+            }
+        }
+        private void ValidateDatePicker(DatePicker datePicker)
+        {
+            ValidationResult result = null;
+            Brush originalBorderBrush = datePicker.BorderBrush;
+
+            datePicker.BorderBrush = originalBorderBrush;
+            datePicker.ToolTip = null;
+
+            if (datePicker.Name == "DriverDateOfBirthPicker")
+            {
+                result = _driverValidator.ValidateDateOfBirth(datePicker.SelectedDate);
+            }
+            else if (datePicker.Name == "StartDatePicker")
+            {
+                result = _policyValidator.ValidateStartDate(datePicker.SelectedDate);
+            }
+            else if (datePicker.Name == "EndDatePicker")
+            {
+                result = _policyValidator.ValidateEndDate(datePicker.SelectedDate, StartDatePicker.SelectedDate);
+            }
+
+            if (result != null && !result.IsValid)
+            {
+                datePicker.BorderBrush = Brushes.Red;
+                datePicker.ToolTip = result.ErrorMessage;
+            }
+        }
+
+        //private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    if (sender == ClientTypeComboBox)
+        //    {
+
+        //        if (ClientTypeComboBox.SelectedItem is ClientTypes selectedType)
+        //        {
+        //            if (selectedType.ClientTypeID == 1) // Физическое лицо
+        //            {
+        //                GrdLastName.Visibility = Visibility.Visible;
+        //                GrdFirstName.Visibility = Visibility.Visible;
+        //                GrdMiddleName.Visibility = Visibility.Visible;
+        //                GrdCompany.Visibility = Visibility.Collapsed;
+        //            }
+        //            else if (selectedType.ClientTypeID == 2) // Юридическое лицо
+        //            {
+        //                GrdLastName.Visibility = Visibility.Collapsed;
+        //                GrdFirstName.Visibility = Visibility.Collapsed;
+        //                GrdMiddleName.Visibility = Visibility.Collapsed;
+        //                GrdCompany.Visibility = Visibility.Visible;
+        //            }
+        //        }
+        //    }
+        //    UpdateComboBoxPlaceholder(ClientTypeComboBox, ClientTypePlaceholder); 
+        //    UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
+        //    UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
+        //    UpdateComboBoxPlaceholder(VehicleMakeComboBox, VehicleMakePlaceholder);
+        //    UpdateComboBoxPlaceholder(VehicleModelComboBox, VehicleModelPlaceholder);
+        //    UpdateComboBoxPlaceholder(ClientTypeComboBox, ClientTypePlaceholder);
+        //    UpdateComboBoxPlaceholder(RegionComboBox, RegionPlaceholder);
+        //}
         private void UpdateComboBoxPlaceholder(ComboBox comboBox, TextBlock placeholder)
         {
             if (placeholder != null)
@@ -189,45 +452,51 @@ namespace Diplom.Pages
 
         private void CalculateCostButton_Click(object sender, RoutedEventArgs e)
         {
+            var startDateResult = _policyValidator.ValidateStartDate(StartDatePicker.SelectedDate);
+            if (!startDateResult.IsValid)
+            {
+                MessageBox.Show(startDateResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var endDateResult = _policyValidator.ValidateEndDate(EndDatePicker.SelectedDate, StartDatePicker.SelectedDate);
+            if (!endDateResult.IsValid)
+            {
+                MessageBox.Show(endDateResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            string enginePowerText = EnginePowerTextBox.Text.Replace("л.с.", "").Trim();
+            if (!int.TryParse(enginePowerText, out int enginePower))
+            {
+                MessageBox.Show("Мощность: введите числовое значение.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var powerResult = _vehicleValidator.ValidateEnginePower(enginePower);
+            if (!powerResult.IsValid)
+            {
+                MessageBox.Show(powerResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var regionResult = _vehicleValidator.ValidateRegion(RegionComboBox.SelectedItem);
+            if (!regionResult.IsValid)
+            {
+                MessageBox.Show(regionResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var driversResult = _policyValidator.ValidateDrivers(SelectedDrivers);
+            if (!driversResult.IsValid)
+            {
+                MessageBox.Show(driversResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             try
             {
-                if (!StartDatePicker.SelectedDate.HasValue)
-                {
-                    MessageBox.Show("Выберите дату начала действия полиса.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                if (!EndDatePicker.SelectedDate.HasValue)
-                {
-                    MessageBox.Show("Выберите дату окончания действия полиса.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                if (!int.TryParse(EnginePowerTextBox.Text, out int enginePower) || enginePower <= 0)
-                {
-                    MessageBox.Show("Введите корректную мощность двигателя (в л.с.).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                if (!(RegionComboBox.SelectedItem is ComboBoxItem regionItem))
-                {
-                    MessageBox.Show("Выберите регион регистрации.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                if (SelectedDrivers.Count == 0)
-                {
-                    MessageBox.Show("Добавьте хотя бы одного водителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                if (EndDatePicker.SelectedDate.Value <= StartDatePicker.SelectedDate.Value)
-                {
-                    MessageBox.Show("Дата окончания должна быть позже даты начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
+                double kt = double.Parse((RegionComboBox.SelectedItem as ComboBoxItem).Tag.ToString(), CultureInfo.InvariantCulture);
 
-                if (!double.TryParse(regionItem.Tag.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double kt))
-                {
-                    throw new FormatException($"Не удалось преобразовать региональный коэффициент '{regionItem.Tag}' в число.");
-                }
-
-                // Рассчитываем КБМ каждого водителя и сохраняем в словарь
                 foreach (var driver in SelectedDrivers)
                 {
                     decimal kbmDecimal = (decimal)_calculator.CalculateKBM(driver);
@@ -251,13 +520,85 @@ namespace Diplom.Pages
                 CalculatedCostTextBlock.Text = $"{cost:F2} руб.";
                 CalculatedCostTextBlock.Visibility = Visibility.Visible;
                 SaveButton.Visibility = Visibility.Visible;
-                MessageBox.Show($"Стоимость рассчитана: {cost:F2} руб.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Стоимость: {cost:F2} руб.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Произошла ошибка: {ex.Message}\nПодробности: {ex.StackTrace}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        //private void CalculateCostButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (!StartDatePicker.SelectedDate.HasValue)
+        //        {
+        //            MessageBox.Show("Выберите дату начала действия полиса.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+        //        if (!EndDatePicker.SelectedDate.HasValue)
+        //        {
+        //            MessageBox.Show("Выберите дату окончания действия полиса.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+        //        if (!int.TryParse(EnginePowerTextBox.Text, out int enginePower) || enginePower <= 0)
+        //        {
+        //            MessageBox.Show("Введите корректную мощность двигателя (в л.с.).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+        //        if (!(RegionComboBox.SelectedItem is ComboBoxItem regionItem))
+        //        {
+        //            MessageBox.Show("Выберите регион регистрации.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+        //        if (SelectedDrivers.Count == 0)
+        //        {
+        //            MessageBox.Show("Добавьте хотя бы одного водителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+        //        if (EndDatePicker.SelectedDate.Value <= StartDatePicker.SelectedDate.Value)
+        //        {
+        //            MessageBox.Show("Дата окончания должна быть позже даты начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+
+        //        if (!double.TryParse(regionItem.Tag.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double kt))
+        //        {
+        //            throw new FormatException($"Не удалось преобразовать региональный коэффициент '{regionItem.Tag}' в число.");
+        //        }
+
+        //        // Рассчитываем КБМ каждого водителя и сохраняем в словарь
+        //        foreach (var driver in SelectedDrivers)
+        //        {
+        //            decimal kbmDecimal = (decimal)_calculator.CalculateKBM(driver);
+        //            DriverKBMMap[driver.DriverID] = kbmDecimal;
+        //        }
+
+        //        double cost = _calculator.CalculateInsuranceCost(
+        //            StartDatePicker.SelectedDate.Value,
+        //            EndDatePicker.SelectedDate.Value,
+        //            enginePower,
+        //            SelectedDrivers.ToList(),
+        //            kt.ToString(CultureInfo.InvariantCulture)
+        //        );
+
+        //        if (cost == 0.0)
+        //        {
+        //            MessageBox.Show("Не удалось рассчитать стоимость. Проверьте введенные данные.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+
+        //        CalculatedCostTextBlock.Text = $"{cost:F2} руб.";
+        //        CalculatedCostTextBlock.Visibility = Visibility.Visible;
+        //        SaveButton.Visibility = Visibility.Visible;
+        //        MessageBox.Show($"Стоимость рассчитана: {cost:F2} руб.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"Произошла ошибка: {ex.Message}\nПодробности: {ex.StackTrace}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //    }
+        //}
 
         private void AddClientButton_Click(object sender, RoutedEventArgs e)
         {
@@ -346,57 +687,128 @@ namespace Diplom.Pages
             // Сбрасываем выбор или задаём тип клиента по умолчанию
             ClientTypeComboBox.SelectedIndex = -1; // Или установи ClientTypeComboBox.SelectedValue = 1 для "Физическое лицо"
         }
-
         private void CreateClientButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ClientTypeComboBox.SelectedItem is ClientTypes selectedClientType &&
-                !string.IsNullOrWhiteSpace(PhoneTextBox.Text) &&
-                !string.IsNullOrWhiteSpace(EmailTextBox.Text))
+            var validationResult = _clientValidator.ValidateClient(
+                ClientTypeComboBox.SelectedItem as ClientTypes,
+                LastNameTextBox.Text,
+                FirstNameTextBox.Text,
+                MiddleNameTextBox.Text,
+                CompanyNameTextBox.Text,
+                PassportNumberTextBox.Text,
+                INNTextBox.Text,
+                PhoneTextBox.Text,
+                EmailTextBox.Text);
+
+            if (!validationResult.IsValid)
             {
-                try
-                {
-                    var newClient = new Clients
-                    {
-                        ClientTypeID = selectedClientType.ClientTypeID,
-                        AgentID = CurrentUser.EmployeeID, // Используем EmployeeID из CurrentUser
-                        LastName = LastNameTextBox.Text,
-                        FirstName = FirstNameTextBox.Text,
-                        MiddleName = MiddleNameTextBox.Text,
-                        CompanyName = CompanyNameTextBox.Text,
-                        PassportNumber = PassportNumberTextBox.Text,
-                        INN = INNTextBox.Text,
-                        Phone = PhoneTextBox.Text,
-                        Email = EmailTextBox.Text
-                    };
-
-                    _context.Clients.Add(newClient);
-                    _context.SaveChanges();
-
-                    // Логирование добавления клиента
-                    LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
-
-                    // Добавляем нового клиента в список выбранных
-                    if (!_selectedClients.Any(c => c.ClientID == newClient.ClientID))
-                    {
-                        _selectedClients.Add(newClient);
-                        ClientsListBox.ItemsSource = null;
-                        ClientsListBox.ItemsSource = _selectedClients;
-                    }
-
-                    // Очищаем поля для создания клиента и скрываем панель
-                    ClearClientForm();
-                    NewClientPanel.Visibility = Visibility.Collapsed;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                MessageBox.Show(validationResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            else
+
+            try
             {
-                MessageBox.Show("Пожалуйста, заполните все обязательные поля (тип клиента, телефон, email).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                var newClient = new Clients
+                {
+                    ClientTypeID = (ClientTypeComboBox.SelectedItem as ClientTypes).ClientTypeID,
+                    AgentID = CurrentUser.EmployeeID,
+                    LastName = LastNameTextBox.Text,
+                    FirstName = FirstNameTextBox.Text,
+                    MiddleName = MiddleNameTextBox.Text,
+                    CompanyName = CompanyNameTextBox.Text,
+                    PassportNumber = PassportNumberTextBox.Text,
+                    INN = INNTextBox.Text,
+                    Phone = PhoneTextBox.Text,
+                    Email = EmailTextBox.Text
+                };
+
+                _context.Clients.Add(newClient);
+                _context.SaveChanges();
+
+                LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
+
+                if (!_selectedClients.Any())
+                {
+                    _selectedClients.Add(newClient);
+                    ClientsListBox.ItemsSource = null;
+                    ClientsListBox.ItemsSource = _selectedClients;
+                    AddClientButton.Visibility = Visibility.Collapsed;
+                    RemoveClientButton.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    MessageBox.Show("Клиент успешно создан, но в полис можно добавить только одного клиента.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                ClearClientForm();
+                NewClientPanel.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        //private void CreateClientButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (ClientTypeComboBox.SelectedItem is ClientTypes selectedClientType &&
+        //        !string.IsNullOrWhiteSpace(PhoneTextBox.Text) &&
+        //        !string.IsNullOrWhiteSpace(EmailTextBox.Text))
+        //    {
+        //        try
+        //        {
+        //            var newClient = new Clients
+        //            {
+        //                ClientTypeID = selectedClientType.ClientTypeID,
+        //                AgentID = CurrentUser.EmployeeID, // Используем EmployeeID из CurrentUser
+        //                LastName = LastNameTextBox.Text,
+        //                FirstName = FirstNameTextBox.Text,
+        //                MiddleName = MiddleNameTextBox.Text,
+        //                CompanyName = CompanyNameTextBox.Text,
+        //                PassportNumber = PassportNumberTextBox.Text,
+        //                INN = INNTextBox.Text,
+        //                Phone = PhoneTextBox.Text,
+        //                Email = EmailTextBox.Text
+        //            };
+
+        //            _context.Clients.Add(newClient);
+        //            _context.SaveChanges();
+
+        //            // Логирование добавления клиента
+        //            LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
+
+
+        //            // Проверяем, есть ли уже клиент в списке
+        //            if (!_selectedClients.Any())
+        //            {
+        //                // Если клиентов нет, добавляем нового клиента в список
+        //                _selectedClients.Add(newClient);
+        //                ClientsListBox.ItemsSource = null;
+        //                ClientsListBox.ItemsSource = _selectedClients;
+        //                AddClientButton.Visibility = Visibility.Collapsed;
+        //                RemoveClientButton.Visibility = Visibility.Visible;
+        //            }
+        //            else
+        //            {
+        //                // Если клиент уже есть, просто показываем сообщение
+        //                MessageBox.Show("Клиент успешно создан, но в полис можно добавить только одного клиента. Выберите другого клиента, удалив текущего.",
+        //                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+        //            }
+
+        //            // Очищаем поля для создания клиента и скрываем панель
+        //            ClearClientForm();
+        //            NewClientPanel.Visibility = Visibility.Collapsed;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Пожалуйста, заполните все обязательные поля (тип клиента, телефон, email).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //    }
+        //}
 
         private void ClearClientForm()
         {
@@ -441,39 +853,51 @@ namespace Diplom.Pages
         {
             NewDriverPanel.Visibility = Visibility.Visible;
         }
-
         private void AddNewDriverButton_Click(object sender, RoutedEventArgs e)
         {
+            int? experience = null;
+            if (int.TryParse(DriverExperienceTextBox.Text, out int exp))
+            {
+                experience = exp;
+            }
+            var experienceResult = _driverValidator.ValidateDrivingExperience(experience, DriverDateOfBirthPicker.SelectedDate ?? DateTime.Today);
+            if (!experienceResult.IsValid)
+            {
+                MessageBox.Show(experienceResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var validationResult = _driverValidator.ValidateDriver(
+                DriverLastNameTextBox.Text,
+                DriverFirstNameTextBox.Text,
+                DriverMiddleNameTextBox.Text,
+                DriverDateOfBirthPicker.SelectedDate,
+                DriverLicenseNumberTextBox.Text,
+                experience,
+                DriverPassportNumberTextBox.Text,
+                DriverINNTextBox.Text,
+                DriverPhoneTextBox.Text,
+                DriverEmailTextBox.Text);
+
+            if (!validationResult.IsValid)
+            {
+                MessageBox.Show(validationResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             string lastName = DriverLastNameTextBox.Text;
             string firstName = DriverFirstNameTextBox.Text;
             string middleName = DriverMiddleNameTextBox.Text;
-            DateTime? dateOfBirth = DriverDateOfBirthPicker.SelectedDate;
+            DateTime dateOfBirth = DriverDateOfBirthPicker.SelectedDate.Value;
             string licenseNumber = DriverLicenseNumberTextBox.Text;
-            int? experience = int.TryParse(DriverExperienceTextBox.Text, out int exp) ? exp : (int?)null;
             string phone = DriverPhoneTextBox.Text;
             string email = DriverEmailTextBox.Text;
             string passportNumber = DriverPassportNumberTextBox.Text;
             string inn = DriverINNTextBox.Text;
             bool hadAccident = DriverHadAccidentCheckBox.IsChecked == true;
 
-            if (string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(firstName) ||
-                !dateOfBirth.HasValue || string.IsNullOrWhiteSpace(licenseNumber) || !experience.HasValue ||
-                string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(email) ||
-                string.IsNullOrWhiteSpace(passportNumber) || string.IsNullOrWhiteSpace(inn))
-            {
-                MessageBox.Show("Заполните все обязательные поля, включая Паспорт и ИНН.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
             try
             {
-                var existingDriver = _context.Drivers.FirstOrDefault(d => d.LicenseNumber == licenseNumber);
-                if (existingDriver != null)
-                {
-                    MessageBox.Show("Водитель с таким номером удостоверения уже существует.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
                 var existingClient = _context.Clients.FirstOrDefault(c => c.Phone == phone || c.Email == email);
                 Clients client;
 
@@ -507,7 +931,7 @@ namespace Diplom.Pages
                     LastName = lastName,
                     FirstName = firstName,
                     MiddleName = middleName,
-                    DateOfBirth = dateOfBirth.Value,
+                    DateOfBirth = dateOfBirth,
                     LicenseNumber = licenseNumber,
                     DrivingExperience = experience.Value,
                     ClientID = client.ClientID
@@ -529,11 +953,102 @@ namespace Diplom.Pages
             }
             catch (Exception ex)
             {
-                string errorDetails = ex.InnerException?.InnerException?.Message ?? ex.InnerException?.Message ?? ex.Message;
-                MessageBox.Show($"Ошибка при добавлении водителя:\n{errorDetails}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-
+                MessageBox.Show($"Ошибка при добавлении водителя: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        //private void AddNewDriverButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    string lastName = DriverLastNameTextBox.Text;
+        //    string firstName = DriverFirstNameTextBox.Text;
+        //    string middleName = DriverMiddleNameTextBox.Text;
+        //    DateTime? dateOfBirth = DriverDateOfBirthPicker.SelectedDate;
+        //    string licenseNumber = DriverLicenseNumberTextBox.Text;
+        //    int? experience = int.TryParse(DriverExperienceTextBox.Text, out int exp) ? exp : (int?)null;
+        //    string phone = DriverPhoneTextBox.Text;
+        //    string email = DriverEmailTextBox.Text;
+        //    string passportNumber = DriverPassportNumberTextBox.Text;
+        //    string inn = DriverINNTextBox.Text;
+        //    bool hadAccident = DriverHadAccidentCheckBox.IsChecked == true;
+
+        //    if (string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(firstName) ||
+        //        !dateOfBirth.HasValue || string.IsNullOrWhiteSpace(licenseNumber) || !experience.HasValue ||
+        //        string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(email) ||
+        //        string.IsNullOrWhiteSpace(passportNumber) || string.IsNullOrWhiteSpace(inn))
+        //    {
+        //        MessageBox.Show("Заполните все обязательные поля, включая Паспорт и ИНН.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //        return;
+        //    }
+
+        //    try
+        //    {
+        //        var existingDriver = _context.Drivers.FirstOrDefault(d => d.LicenseNumber == licenseNumber);
+        //        if (existingDriver != null)
+        //        {
+        //            MessageBox.Show("Водитель с таким номером удостоверения уже существует.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+
+        //        var existingClient = _context.Clients.FirstOrDefault(c => c.Phone == phone || c.Email == email);
+        //        Clients client;
+
+        //        if (existingClient != null)
+        //        {
+        //            client = existingClient;
+        //            if (string.IsNullOrWhiteSpace(client.PassportNumber)) client.PassportNumber = passportNumber;
+        //            if (string.IsNullOrWhiteSpace(client.INN)) client.INN = inn;
+        //        }
+        //        else
+        //        {
+        //            client = new Clients
+        //            {
+        //                LastName = lastName,
+        //                FirstName = firstName,
+        //                MiddleName = middleName,
+        //                ClientTypeID = 1,
+        //                Phone = phone,
+        //                Email = email,
+        //                PassportNumber = passportNumber,
+        //                INN = inn,
+        //                AgentID = CurrentUser.EmployeeID
+        //            };
+        //            _context.Clients.Add(client);
+        //            _context.SaveChanges();
+        //            LogAction("Clients", "Добавление", $"Добавлен клиент: {client.LastName} {client.FirstName} {client.MiddleName}");
+        //        }
+
+        //        var newDriver = new Drivers
+        //        {
+        //            LastName = lastName,
+        //            FirstName = firstName,
+        //            MiddleName = middleName,
+        //            DateOfBirth = dateOfBirth.Value,
+        //            LicenseNumber = licenseNumber,
+        //            DrivingExperience = experience.Value,
+        //            ClientID = client.ClientID
+        //        };
+
+        //        _context.Drivers.Add(newDriver);
+        //        _context.SaveChanges();
+
+        //        LogAction("Drivers", "Добавление", $"Добавлен водитель: {newDriver.LastName} {newDriver.FirstName} {newDriver.MiddleName}");
+
+        //        SelectedDrivers.Add(newDriver);
+        //        DriverAccidentMap[newDriver.DriverID] = hadAccident;
+        //        ClientsListBox.ItemsSource = null;
+        //        ClientsListBox.ItemsSource = _selectedClients;
+
+        //        ClearDriverFields();
+        //        NewDriverPanel.Visibility = Visibility.Collapsed;
+        //        RemoveDriverButton.Visibility = Visibility.Visible;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string errorDetails = ex.InnerException?.InnerException?.Message ?? ex.InnerException?.Message ?? ex.Message;
+        //        MessageBox.Show($"Ошибка при добавлении водителя:\n{errorDetails}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+        //    }
+        //}
 
         private void ClearDriverFields()
         {
@@ -549,116 +1064,338 @@ namespace Diplom.Pages
             DriverINNTextBox.Text = string.Empty;
         }
 
+        //private void SaveButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (_selectedClients.Any() &&
+        //        PolicyTypeComboBox.SelectedItem is PolicyTypes selectedPolicyType &&
+        //        StatusComboBox.SelectedItem is PolicyStatuses selectedStatus &&
+        //        double.TryParse(CalculatedCostTextBlock.Text.Replace(" руб.", ""), out double insuranceAmount) &&
+        //        StartDatePicker.SelectedDate.HasValue &&
+        //        EndDatePicker.SelectedDate.HasValue &&
+        //        VehicleModelComboBox.SelectedItem is VehicleModels selectedModel &&
+        //        !string.IsNullOrWhiteSpace(VinTextBox.Text) &&
+        //        int.TryParse(YearTextBox.Text, out int year) &&
+        //        !string.IsNullOrWhiteSpace(LicensePlateTextBox.Text))
+        //    {
+        //        if (insuranceAmount <= 0)
+        //        {
+        //            MessageBox.Show("Сумма страхования должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+        //        if (EndDatePicker.SelectedDate.Value <= StartDatePicker.SelectedDate.Value)
+        //        {
+        //            MessageBox.Show("Дата окончания должна быть позже даты начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+        //        if (year < 1900 || year > DateTime.Now.Year + 1)
+        //        {
+        //            MessageBox.Show($"Год выпуска автомобиля должен быть в диапазоне от 1900 до {DateTime.Now.Year + 1}.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //            return;
+        //        }
+
+        //        try
+        //        {
+        //            var policy = new Policies
+        //            {
+        //                PolicyTypeID = selectedPolicyType.PolicyTypeID,
+        //                StatusID = selectedStatus.StatusID,
+        //                InsuranceAmount = (decimal)insuranceAmount,
+        //                StartDate = StartDatePicker.SelectedDate.Value,
+        //                EndDate = EndDatePicker.SelectedDate.Value
+        //            };
+        //            foreach (var client in _selectedClients) policy.Clients.Add(client);
+        //            foreach (var driver in SelectedDrivers) policy.Drivers.Add(driver);
+        //            _context.Policies.Add(policy);
+        //            _context.SaveChanges();
+
+        //            int currentYear = DateTime.Now.Year;
+        //            foreach (var driver in SelectedDrivers)
+        //            {
+        //                var history = _context.DriverInsuranceHistory
+        //                    .Where(h => h.DriverID == driver.DriverID && h.Year == currentYear)
+        //                    .OrderByDescending(h => h.LastUpdated)
+        //                    .FirstOrDefault();
+
+        //                if (history == null)
+        //                {
+        //                    history = new DriverInsuranceHistory
+        //                    {
+        //                        DriverID = driver.DriverID,
+        //                        PolicyID = policy.PolicyID,
+        //                        Year = currentYear,
+        //                        HadAccident = DriverAccidentMap.ContainsKey(driver.DriverID) && DriverAccidentMap[driver.DriverID],
+        //                        KBM = DriverKBMMap.ContainsKey(driver.DriverID) ? DriverKBMMap[driver.DriverID] : 1.0m,
+        //                        LastUpdated = DateTime.Now
+        //                    };
+        //                    _context.DriverInsuranceHistory.Add(history);
+        //                }
+        //                else
+        //                {
+        //                    history.PolicyID = policy.PolicyID;
+
+        //                    if (DriverAccidentMap.ContainsKey(driver.DriverID))
+        //                    {
+        //                        history.HadAccident = DriverAccidentMap[driver.DriverID];
+        //                    }
+
+        //                    if (DriverKBMMap.ContainsKey(driver.DriverID))
+        //                    {
+        //                        history.KBM = DriverKBMMap[driver.DriverID];
+        //                    }
+        //                }
+        //            }
+
+        //            _context.SaveChanges();
+
+        //            var vehicle = new Vehicles
+        //            {
+        //                PolicyID = policy.PolicyID,
+        //                ModelID = selectedModel.ModelID,
+        //                VIN = VinTextBox.Text,
+        //                Year = year,
+        //                LicensePlate = LicensePlateTextBox.Text
+        //            };
+        //            _context.Vehicles.Add(vehicle);
+        //            _context.SaveChanges();
+
+        //            LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID}");
+        //            LogAction("Vehicles", "Добавление", $"Добавлен автомобиль: {vehicle.VehicleID}");
+        //            MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+        //            ClearForm();
+        //            Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Проверьте все поля и добавьте клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //    }
+        //}
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedClients.Any() &&
-                PolicyTypeComboBox.SelectedItem is PolicyTypes selectedPolicyType &&
-                StatusComboBox.SelectedItem is PolicyStatuses selectedStatus &&
-                double.TryParse(CalculatedCostTextBlock.Text.Replace(" руб.", ""), out double insuranceAmount) &&
-                StartDatePicker.SelectedDate.HasValue &&
-                EndDatePicker.SelectedDate.HasValue &&
-                VehicleModelComboBox.SelectedItem is VehicleModels selectedModel &&
-                !string.IsNullOrWhiteSpace(VinTextBox.Text) &&
-                int.TryParse(YearTextBox.Text, out int year) &&
-                !string.IsNullOrWhiteSpace(LicensePlateTextBox.Text))
+            if (!decimal.TryParse(CalculatedCostTextBlock.Text.Replace(" руб.", ""), out decimal insuranceCost))
             {
-                if (insuranceAmount <= 0)
-                {
-                    MessageBox.Show("Сумма страхования должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                if (EndDatePicker.SelectedDate.Value <= StartDatePicker.SelectedDate.Value)
-                {
-                    MessageBox.Show("Дата окончания должна быть позже даты начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                if (year < 1900 || year > DateTime.Now.Year + 1)
-                {
-                    MessageBox.Show($"Год выпуска автомобиля должен быть в диапазоне от 1900 до {DateTime.Now.Year + 1}.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                try
-                {
-                    var policy = new Policies
-                    {
-                        PolicyTypeID = selectedPolicyType.PolicyTypeID,
-                        StatusID = selectedStatus.StatusID,
-                        InsuranceAmount = (decimal)insuranceAmount,
-                        StartDate = StartDatePicker.SelectedDate.Value,
-                        EndDate = EndDatePicker.SelectedDate.Value
-                    };
-                    foreach (var client in _selectedClients) policy.Clients.Add(client);
-                    foreach (var driver in SelectedDrivers) policy.Drivers.Add(driver);
-                    _context.Policies.Add(policy);
-                    _context.SaveChanges();
-
-                    int currentYear = DateTime.Now.Year;
-                    foreach (var driver in SelectedDrivers)
-                    {
-                        var history = _context.DriverInsuranceHistory
-                            .Where(h => h.DriverID == driver.DriverID && h.Year == currentYear)
-                            .OrderByDescending(h => h.LastUpdated)
-                            .FirstOrDefault();
-
-                        if (history == null)
-                        {
-                            history = new DriverInsuranceHistory
-                            {
-                                DriverID = driver.DriverID,
-                                PolicyID = policy.PolicyID,
-                                Year = currentYear,
-                                HadAccident = DriverAccidentMap.ContainsKey(driver.DriverID) && DriverAccidentMap[driver.DriverID],
-                                KBM = DriverKBMMap.ContainsKey(driver.DriverID) ? DriverKBMMap[driver.DriverID] : 1.0m,
-                                LastUpdated = DateTime.Now
-                            };
-                            _context.DriverInsuranceHistory.Add(history);
-                        }
-                        else
-                        {
-                            history.PolicyID = policy.PolicyID;
-
-                            if (DriverAccidentMap.ContainsKey(driver.DriverID))
-                            {
-                                history.HadAccident = DriverAccidentMap[driver.DriverID];
-                            }
-
-                            if (DriverKBMMap.ContainsKey(driver.DriverID))
-                            {
-                                history.KBM = DriverKBMMap[driver.DriverID];
-                            }
-                        }
-                    }
-
-                    _context.SaveChanges();
-
-                    var vehicle = new Vehicles
-                    {
-                        PolicyID = policy.PolicyID,
-                        ModelID = selectedModel.ModelID,
-                        VIN = VinTextBox.Text,
-                        Year = year,
-                        LicensePlate = LicensePlateTextBox.Text
-                    };
-                    _context.Vehicles.Add(vehicle);
-                    _context.SaveChanges();
-
-                    LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID}");
-                    LogAction("Vehicles", "Добавление", $"Добавлен автомобиль: {vehicle.VehicleID}");
-                    MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    ClearForm();
-                    Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                MessageBox.Show("Некорректная сумма страхования.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            else
+
+            if (!int.TryParse(YearTextBox.Text, out int year))
             {
-                MessageBox.Show("Проверьте все поля и добавьте клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Год выпуска: числовое значение.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            string enginePowerText = EnginePowerTextBox.Text.Trim();
+            if (!int.TryParse(enginePowerText, out int enginePower))
+            {
+                MessageBox.Show("Некорректное значение мощности двигателя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var vehicleValidation = _vehicleValidator.ValidateVehicle(
+                VehicleMakeComboBox.SelectedItem as VehicleMakes,
+                VehicleModelComboBox.SelectedItem as VehicleModels,
+                VinTextBox.Text,
+                year,
+                LicensePlateTextBox.Text,
+                RegionComboBox.SelectedItem,
+                enginePower); // Мощность не нужна здесь, проверяется отдельно при расчёте
+
+            if (!vehicleValidation.IsValid)
+            {
+                MessageBox.Show(vehicleValidation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var policyValidation = _policyValidator.ValidatePolicy(
+                PolicyTypeComboBox.SelectedItem as PolicyTypes,
+                StatusComboBox.SelectedItem as PolicyStatuses,
+                StartDatePicker.SelectedDate,
+                EndDatePicker.SelectedDate,
+                insuranceCost,
+                _selectedClients,
+                SelectedDrivers);
+
+            if (!policyValidation.IsValid)
+            {
+                MessageBox.Show(policyValidation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                var policy = new Policies
+                {
+                    PolicyTypeID = (PolicyTypeComboBox.SelectedItem as PolicyTypes).PolicyTypeID,
+                    StatusID = (StatusComboBox.SelectedItem as PolicyStatuses).StatusID,
+                    InsuranceAmount = insuranceCost,
+                    StartDate = StartDatePicker.SelectedDate.Value,
+                    EndDate = EndDatePicker.SelectedDate.Value
+                };
+                foreach (var client in _selectedClients) policy.Clients.Add(client);
+                foreach (var driver in SelectedDrivers) policy.Drivers.Add(driver);
+                _context.Policies.Add(policy);
+                _context.SaveChanges();
+
+                int currentYear = DateTime.Now.Year;
+                foreach (var driver in SelectedDrivers)
+                {
+                    var history = _context.DriverInsuranceHistory
+                        .Where(h => h.DriverID == driver.DriverID && h.Year == currentYear)
+                        .OrderByDescending(h => h.LastUpdated)
+                        .FirstOrDefault();
+
+                    if (history == null)
+                    {
+                        history = new DriverInsuranceHistory
+                        {
+                            DriverID = driver.DriverID,
+                            PolicyID = policy.PolicyID,
+                            Year = currentYear,
+                            HadAccident = DriverAccidentMap.ContainsKey(driver.DriverID) && DriverAccidentMap[driver.DriverID],
+                            KBM = DriverKBMMap.ContainsKey(driver.DriverID) ? DriverKBMMap[driver.DriverID] : 1.0m,
+                            LastUpdated = DateTime.Now
+                        };
+                        _context.DriverInsuranceHistory.Add(history);
+                    }
+                    else
+                    {
+                        history.PolicyID = policy.PolicyID;
+                        if (DriverAccidentMap.ContainsKey(driver.DriverID))
+                            history.HadAccident = DriverAccidentMap[driver.DriverID];
+                        if (DriverKBMMap.ContainsKey(driver.DriverID))
+                            history.KBM = DriverKBMMap[driver.DriverID];
+                    }
+                }
+
+                _context.SaveChanges();
+
+                var vehicle = new Vehicles
+                {
+                    PolicyID = policy.PolicyID,
+                    ModelID = (VehicleModelComboBox.SelectedItem as VehicleModels).ModelID,
+                    VIN = VinTextBox.Text,
+                    Year = year,
+                    LicensePlate = LicensePlateTextBox.Text
+                };
+                _context.Vehicles.Add(vehicle);
+                _context.SaveChanges();
+
+                LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID}");
+                LogAction("Vehicles", "Добавление", $"Добавлен автомобиль: {vehicle.VehicleID}");
+                MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                ClearForm();
+                Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        //private void SaveButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (_selectedClients.Any() &&
+        //        PolicyTypeComboBox.SelectedItem is PolicyTypes selectedPolicyType &&
+        //        StatusComboBox.SelectedItem is PolicyStatuses selectedStatus &&
+        //        double.TryParse(CalculatedCostTextBlock.Text.Replace(" руб.", ""), out double insuranceAmount) &&
+        //        StartDatePicker.SelectedDate.HasValue &&
+        //        EndDatePicker.SelectedDate.HasValue &&
+        //        VehicleModelComboBox.SelectedItem is VehicleModels selectedModel &&
+        //        !string.IsNullOrWhiteSpace(VinTextBox.Text) &&
+        //        int.TryParse(YearTextBox.Text, out int year) &&
+        //        !string.IsNullOrWhiteSpace(LicensePlateTextBox.Text))
+        //    {
+        //        try
+        //        {
+        //            Policies policy;
+        //            if (isEditMode)
+        //            {
+        //                policy = editablePolicy;
+        //                policy.PolicyTypeID = selectedPolicyType.PolicyTypeID;
+        //                policy.StatusID = selectedStatus.StatusID;
+        //                policy.InsuranceAmount = (decimal)insuranceAmount;
+        //                policy.StartDate = StartDatePicker.SelectedDate.Value;
+        //                policy.EndDate = EndDatePicker.SelectedDate.Value;
+
+        //                policy.Clients.Clear();
+        //                foreach (var client in _selectedClients)
+        //                    policy.Clients.Add(client);
+
+        //                policy.Drivers.Clear();
+        //                foreach (var driver in SelectedDrivers)
+        //                    policy.Drivers.Add(driver);
+
+        //                var existingVehicle = _context.Vehicles.FirstOrDefault(v => v.PolicyID == policy.PolicyID);
+        //                if (existingVehicle != null)
+        //                {
+        //                    existingVehicle.ModelID = selectedModel.ModelID;
+        //                    existingVehicle.VIN = VinTextBox.Text;
+        //                    existingVehicle.Year = year;
+        //                    existingVehicle.LicensePlate = LicensePlateTextBox.Text;
+        //                }
+        //                else
+        //                {
+        //                    _context.Vehicles.Add(new Vehicles
+        //                    {
+        //                        PolicyID = policy.PolicyID,
+        //                        ModelID = selectedModel.ModelID,
+        //                        VIN = VinTextBox.Text,
+        //                        Year = year,
+        //                        LicensePlate = LicensePlateTextBox.Text
+        //                    });
+        //                }
+
+        //                LogAction("Policies", "Редактирование", $"Полис {policy.PolicyID} обновлён.");
+        //            }
+        //            else
+        //            {
+        //                policy = new Policies
+        //                {
+        //                    PolicyTypeID = selectedPolicyType.PolicyTypeID,
+        //                    StatusID = selectedStatus.StatusID,
+        //                    InsuranceAmount = (decimal)insuranceAmount,
+        //                    StartDate = StartDatePicker.SelectedDate.Value,
+        //                    EndDate = EndDatePicker.SelectedDate.Value
+        //                };
+        //                foreach (var client in _selectedClients)
+        //                    policy.Clients.Add(client);
+        //                foreach (var driver in SelectedDrivers)
+        //                    policy.Drivers.Add(driver);
+
+        //                _context.Policies.Add(policy);
+        //                _context.SaveChanges();
+
+        //                _context.Vehicles.Add(new Vehicles
+        //                {
+        //                    PolicyID = policy.PolicyID,
+        //                    ModelID = selectedModel.ModelID,
+        //                    VIN = VinTextBox.Text,
+        //                    Year = year,
+        //                    LicensePlate = LicensePlateTextBox.Text
+        //                });
+
+        //                LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID}");
+        //            }
+
+        //            _context.SaveChanges();
+
+        //            MessageBox.Show("Полис успешно сохранён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+        //            ClassFrame.frmObj.Navigate(new MainPage.MainPage());
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Заполните все обязательные поля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //    }
+        //}
+
 
         private void ClearForm()
         {
