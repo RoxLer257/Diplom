@@ -30,8 +30,7 @@ namespace Diplom.Classes
         public System.DateTime DateOfBirth { get; set; }
         public string LicenseNumber { get; set; }
         public int DrivingExperience { get; set; }
-
-
+    
         public virtual Clients Clients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Clients> Clients1 { get; set; }

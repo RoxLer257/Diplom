@@ -1,5 +1,6 @@
 ﻿using Diplom.Classes;
 using Diplom.Pages.AddPrintPage;
+using Diplom.Pages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -277,40 +278,43 @@ namespace Diplom.Pages.MainPage
         }
         private void Prolongpolicy_Click(object sender, RoutedEventArgs e)
         {
-            //if (DtgContracts.SelectedItem is Policies selectedPolicy)
-            //{
-            //    var fullPolicy = ClassFrame.ConnectDB.Policies
-            //        .Include(p => p.Clients)
-            //        .Include(p => p.Drivers)
-            //        .Include(p => p.Vehicles)
-            //        .FirstOrDefault(p => p.PolicyID == selectedPolicy.PolicyID);
+            if (sender is Button btn && btn.DataContext is Policies selectedPolicy)
+            {
+                var fullPolicy = ClassFrame.ConnectDB.Policies
+                    .Include(p => p.Clients)
+                    .Include(p => p.Drivers)
+                    .Include(p => p.Vehicles)
+                    .FirstOrDefault(p => p.PolicyID == selectedPolicy.PolicyID);
 
-            //    if (fullPolicy == null)
-            //    {
-            //        MessageBox.Show("Не удалось найти полис для редактирования.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            //        return;
-            //    }
+                if (fullPolicy == null)
+                {
+                    MessageBox.Show("Не удалось найти полис для редактирования.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
-            //    switch (fullPolicy.PolicyTypeID)
-            //    {
-            //        case 1: // автострахование
-            //            ClassFrame.frmObj.Navigate(new Pages.AddPolicyPage(fullPolicy));
-            //            break;
-            //        case 2: // страхование жизни
-            //            ClassFrame.frmObj.Navigate(new Pages.AddPrintPage.AddLifeInsurancePage(fullPolicy));
-            //            break;
-            //        case 3: // страхование имущества
-            //            ClassFrame.frmObj.Navigate(new Pages.AddPrintPage.AddPropertyInsurance(fullPolicy));
-            //            break;
-            //        default:
-            //            MessageBox.Show("Редактирование данного типа полиса пока не поддерживается.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-            //            break;
-            //    }
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Выберите полис для редактирования.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            //}
+                switch (fullPolicy.PolicyTypeID)
+                {
+                    case 1: // ОСАГО
+                        ClassFrame.frmObj.Navigate(new AddPolicyPage(fullPolicy));
+                        break;
+                    case 2: // КАСКО
+                        ClassFrame.frmObj.Navigate(new AddPolicyPage(fullPolicy));
+                        break;
+                    case 3: // Жизнь и здоровье
+                        ClassFrame.frmObj.Navigate(new AddPropertyInsurance(fullPolicy));
+                        break;
+                    case 4: // Имущество
+                        ClassFrame.frmObj.Navigate(new AddLifeInsurancePage(fullPolicy));
+                        break;
+                    default:
+                        MessageBox.Show("Редактирование данного типа полиса пока не поддерживается.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                        break;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите полис для редактирования.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
     }

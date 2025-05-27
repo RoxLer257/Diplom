@@ -11,8 +11,7 @@ namespace Diplom.Classes
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-
+    
     public partial class Policies
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -32,8 +31,7 @@ namespace Diplom.Classes
         public decimal InsuranceAmount { get; set; }
         public System.DateTime StartDate { get; set; }
         public System.DateTime EndDate { get; set; }
-
-
+    
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<LifeAndHealth> LifeAndHealth { get; set; }
         public virtual PolicyTypes PolicyTypes { get; set; }

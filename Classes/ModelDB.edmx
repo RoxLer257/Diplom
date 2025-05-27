@@ -196,6 +196,8 @@
           <Property Name="VIN" Type="nvarchar" MaxLength="17" Nullable="false" />
           <Property Name="Year" Type="int" Nullable="false" />
           <Property Name="LicensePlate" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="RegistrationRegion" Type="nvarchar" MaxLength="100" />
+          <Property Name="EnginePower" Type="int" />
         </EntityType>
         <Association Name="FK_ClientDrivers_Client">
           <End Role="Clients" Type="Self.Clients" Multiplicity="1" />
@@ -784,6 +786,8 @@
           <Property Name="LicensePlate" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Policies" Relationship="Self.FK_Vehicles_Policy" FromRole="Vehicles" ToRole="Policies" />
           <NavigationProperty Name="VehicleModels" Relationship="Self.FK_Vehicles_Model" FromRole="Vehicles" ToRole="VehicleModels" />
+          <Property Name="RegistrationRegion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="EnginePower" Type="Int32" />
         </EntityType>
         <Association Name="FK_Clients_Agent">
           <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
@@ -1283,6 +1287,8 @@
           <EntitySetMapping Name="Vehicles">
             <EntityTypeMapping TypeName="VSK_ArchiveModel.Vehicles">
               <MappingFragment StoreEntitySet="Vehicles">
+                <ScalarProperty Name="EnginePower" ColumnName="EnginePower" />
+                <ScalarProperty Name="RegistrationRegion" ColumnName="RegistrationRegion" />
                 <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
                 <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
                 <ScalarProperty Name="ModelID" ColumnName="ModelID" />

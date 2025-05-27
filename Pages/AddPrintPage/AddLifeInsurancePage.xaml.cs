@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Diplom.Classes;
 using Diplom.Classes.Validator;
+using System.Data.Entity;
 
 namespace Diplom.Pages.AddPrintPage
 {
@@ -14,6 +15,8 @@ namespace Diplom.Pages.AddPrintPage
         private List<Clients> _selectedClients; // Список выбранных клиентов
         private readonly LifeInsuranceValidator _lifeInsuranceValidator;
         private readonly ClientValidator _clientValidator;
+        private bool isEditMode = false;
+        private Policies editablePolicy;
 
         public AddLifeInsurancePage()
         {
@@ -27,6 +30,14 @@ namespace Diplom.Pages.AddPrintPage
             LoadData();
             InitializePlaceholders();
             SetPolicyType("Страхование жизни");
+        }
+
+        // Конструктор для режима редактирования
+        public AddLifeInsurancePage(Policies policyToEdit) : this()
+        {
+            isEditMode = true;
+            editablePolicy = policyToEdit;
+            LoadPolicyData(policyToEdit);
         }
 
         private void SetPolicyType(string typeName)
@@ -177,56 +188,6 @@ namespace Diplom.Pages.AddPrintPage
             }
         }
 
-        //private void AddClientButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var clients = _context.Clients.ToList();
-        //    var selectClientWindow = new Window
-        //    {
-        //        Title = "Выберите клиента",
-        //        Width = 300,
-        //        Height = 400,
-        //        WindowStartupLocation = WindowStartupLocation.CenterScreen,
-        //        ResizeMode = ResizeMode.NoResize
-        //    };
-
-        //    var stackPanel = new StackPanel { Margin = new Thickness(10) };
-        //    var clientComboBox = new ComboBox
-        //    {
-        //        DisplayMemberPath = "FullName",
-        //        SelectedValuePath = "ClientID",
-        //        ItemsSource = clients,
-        //        Margin = new Thickness(0, 0, 0, 10)
-        //    };
-        //    var addButton = new Button
-        //    {
-        //        Content = "Добавить",
-        //        Width = 100,
-        //        Height = 30,
-        //        Margin = new Thickness(0, 10, 0, 0)
-        //    };
-        //    addButton.Click += (s, args) =>
-        //    {
-        //        if (clientComboBox.SelectedItem is Clients selectedClient)
-        //        {
-        //            if (!_selectedClients.Any(c => c.ClientID == selectedClient.ClientID))
-        //            {
-        //                _selectedClients.Add(selectedClient);
-        //                ClientsListBox.ItemsSource = null;
-        //                ClientsListBox.ItemsSource = _selectedClients;
-        //            }
-        //            selectClientWindow.Close();
-        //        }
-        //        else
-        //        {
-        //            MessageBox.Show("Пожалуйста, выберите клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //        }
-        //    };
-
-        //    stackPanel.Children.Add(clientComboBox);
-        //    stackPanel.Children.Add(addButton);
-        //    selectClientWindow.Content = stackPanel;
-        //    selectClientWindow.ShowDialog();
-        //}
         private void AddClientButton_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedClients.Any())
@@ -375,65 +336,6 @@ namespace Diplom.Pages.AddPrintPage
                 MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        //private void CreateClientButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (ClientTypeComboBox.SelectedItem is ClientTypes selectedClientType &&
-        //        !string.IsNullOrWhiteSpace(PhoneTextBox.Text) &&
-        //        !string.IsNullOrWhiteSpace(EmailTextBox.Text))
-        //    {
-        //        try
-        //        {
-        //            var newClient = new Clients
-        //            {
-        //                ClientTypeID = selectedClientType.ClientTypeID,
-        //                AgentID = CurrentUser.EmployeeID, // Используем EmployeeID из CurrentUser
-        //                LastName = LastNameTextBox.Text,
-        //                FirstName = FirstNameTextBox.Text,
-        //                MiddleName = MiddleNameTextBox.Text,
-        //                CompanyName = CompanyNameTextBox.Text,
-        //                PassportNumber = PassportNumberTextBox.Text,
-        //                INN = INNTextBox.Text,
-        //                Phone = PhoneTextBox.Text,
-        //                Email = EmailTextBox.Text
-        //            };
-
-        //            _context.Clients.Add(newClient);
-        //            _context.SaveChanges();
-
-        //            // Логирование добавления клиента
-        //            LogAction("Clients", "Добавление", $"Добавлен клиент: {newClient.ClientID}");
-
-        //            // Проверяем, есть ли уже клиент в списке
-        //            if (!_selectedClients.Any())
-        //            {
-        //                // Если клиентов нет, добавляем нового клиента в список
-        //                _selectedClients.Add(newClient);
-        //                ClientsListBox.ItemsSource = null;
-        //                ClientsListBox.ItemsSource = _selectedClients;
-        //                AddClientButton.Visibility = Visibility.Collapsed;
-        //                RemoveClientButton.Visibility = Visibility.Visible;
-        //            }
-        //            else
-        //            {
-        //                // Если клиент уже есть, просто показываем сообщение
-        //                MessageBox.Show("Клиент успешно создан, но в полис можно добавить только одного клиента. Выберите другого клиента, удалив текущего.",
-        //                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-        //            }
-
-        //            // Очищаем поля для создания клиента и скрываем панель
-        //            ClearClientForm();
-        //            NewClientPanel.Visibility = Visibility.Collapsed;
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show($"Ошибка при сохранении клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Пожалуйста, заполните все обязательные поля (тип клиента, телефон, email).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //    }
-        //}
 
         private void ClearClientForm()
         {
@@ -498,41 +400,69 @@ namespace Diplom.Pages.AddPrintPage
 
             try
             {
-                var policy = new Policies
+                Policies policy;
+                if (isEditMode)
                 {
-                    PolicyTypeID = policyType.PolicyTypeID,
-                    StatusID = status.StatusID,
-                    InsuranceAmount = insuranceAmount.Value,
-                    StartDate = startDate.Value,
-                    EndDate = endDate.Value
-                };
+                    policy = editablePolicy;
+                    policy.PolicyTypeID = policyType.PolicyTypeID;
+                    policy.StatusID = status.StatusID;
+                    policy.InsuranceAmount = insuranceAmount.Value;
+                    policy.StartDate = startDate.Value;
+                    policy.EndDate = endDate.Value;
 
-                foreach (var client in _selectedClients)
+                    policy.Clients.Clear();
+                    foreach (var client in _selectedClients)
+                    {
+                        policy.Clients.Add(client);
+                    }
+
+                    var existingLifeAndHealth = _context.LifeAndHealth.FirstOrDefault(lh => lh.PolicyID == policy.PolicyID);
+                    if (existingLifeAndHealth != null)
+                    {
+                        existingLifeAndHealth.Age = age.Value;
+                        existingLifeAndHealth.Gender = gender;
+                        existingLifeAndHealth.HealthConditionID = healthCondition.HealthConditionID;
+                        existingLifeAndHealth.Occupation = occupation;
+                    }
+
+                    LogAction("Policies", "Редактирование", $"Полис {policy.PolicyID} обновлён");
+                    LogAction("LifeAndHealth", "Редактирование", $"Обновлена запись для полиса: {policy.PolicyID}");
+                }
+                else
                 {
-                    policy.Clients.Add(client);
+                    policy = new Policies
+                    {
+                        PolicyTypeID = policyType.PolicyTypeID,
+                        StatusID = status.StatusID,
+                        InsuranceAmount = insuranceAmount.Value,
+                        StartDate = startDate.Value,
+                        EndDate = endDate.Value
+                    };
+
+                    foreach (var client in _selectedClients)
+                    {
+                        policy.Clients.Add(client);
+                    }
+
+                    _context.Policies.Add(policy);
+                    _context.SaveChanges();
+
+                    var lifeAndHealth = new LifeAndHealth
+                    {
+                        PolicyID = policy.PolicyID,
+                        Age = age.Value,
+                        Gender = gender,
+                        HealthConditionID = healthCondition.HealthConditionID,
+                        Occupation = occupation
+                    };
+
+                    _context.LifeAndHealth.Add(lifeAndHealth);
+                    LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID}");
+                    LogAction("LifeAndHealth", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID}");
                 }
 
-                _context.Policies.Add(policy);
                 _context.SaveChanges();
-
-                LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами");
-
-                var lifeAndHealth = new LifeAndHealth
-                {
-                    PolicyID = policy.PolicyID,
-                    Age = age.Value,
-                    Gender = gender,
-                    HealthConditionID = healthCondition.HealthConditionID,
-                    Occupation = occupation
-                };
-
-                _context.LifeAndHealth.Add(lifeAndHealth);
-                _context.SaveChanges();
-
-                LogAction("LifeAndHealth", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с состоянием здоровья {healthCondition.HealthConditionID}");
-
                 MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-
                 ClearForm();
                 Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
             }
@@ -541,105 +471,6 @@ namespace Diplom.Pages.AddPrintPage
                 MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        //private void SaveButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    // Проверка всех обязательных полей
-        //    if (_selectedClients.Any() &&
-        //        PolicyTypeComboBox.SelectedItem is PolicyTypes selectedPolicyType &&
-        //        StatusComboBox.SelectedItem is PolicyStatuses selectedStatus &&
-        //        decimal.TryParse(InsuranceAmountTextBox.Text, out decimal insuranceAmount) &&
-        //        StartDatePicker.SelectedDate.HasValue &&
-        //        EndDatePicker.SelectedDate.HasValue &&
-        //        int.TryParse(AgeTextBox.Text, out int age) &&
-        //        GenderComboBox.SelectedItem is ComboBoxItem selectedGender &&
-        //        HealthConditionComboBox.SelectedItem is HealthConditions selectedHealthCondition &&
-        //        !string.IsNullOrWhiteSpace(OccupationTextBox.Text))
-        //    {
-        //        // Дополнительные проверки
-        //        if (insuranceAmount <= 0)
-        //        {
-        //            MessageBox.Show("Сумма страхования должна быть больше 0.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //            return;
-        //        }
-
-        //        if (EndDatePicker.SelectedDate.Value <= StartDatePicker.SelectedDate.Value)
-        //        {
-        //            MessageBox.Show("Дата окончания должна быть позже даты начала.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //            return;
-        //        }
-
-        //        if (age <= 0 || age > 120)
-        //        {
-        //            MessageBox.Show("Возраст должен быть в диапазоне от 1 до 120 лет.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //            return;
-        //        }
-
-        //        try
-        //        {
-        //            // Создаём новый полис
-        //            var policy = new Policies
-        //            {
-        //                PolicyTypeID = selectedPolicyType.PolicyTypeID,
-        //                StatusID = selectedStatus.StatusID,
-        //                InsuranceAmount = insuranceAmount,
-        //                StartDate = StartDatePicker.SelectedDate.Value,
-        //                EndDate = EndDatePicker.SelectedDate.Value
-        //            };
-
-        //            // Добавляем клиентов в коллекцию навигационного свойства
-        //            foreach (var client in _selectedClients)
-        //            {
-        //                policy.Clients.Add(client);
-        //            }
-
-        //            _context.Policies.Add(policy);
-        //            _context.SaveChanges();
-
-        //            // Логирование добавления полиса
-        //            LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами");
-
-        //            // Создаём запись в таблице LifeAndHealth
-        //            var lifeAndHealth = new LifeAndHealth
-        //            {
-        //                PolicyID = policy.PolicyID,
-        //                Age = age,
-        //                Gender = selectedGender.Content.ToString(),
-        //                HealthConditionID = selectedHealthCondition.HealthConditionID,
-        //                Occupation = OccupationTextBox.Text
-        //            };
-
-        //            _context.LifeAndHealth.Add(lifeAndHealth);
-        //            _context.SaveChanges();
-
-        //            // Логирование добавления записи в LifeAndHealth
-        //            LogAction("LifeAndHealth", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с состоянием здоровья {selectedHealthCondition.HealthConditionID}");
-
-        //            MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-
-        //            // Очищаем форму после сохранения
-        //            ClearForm();
-        //            Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
-        //        }
-        //        catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
-        //        {
-        //            var errorMessages = dbEx.EntityValidationErrors
-        //                .SelectMany(x => x.ValidationErrors)
-        //                .Select(x => x.ErrorMessage);
-        //            var fullErrorMessage = string.Join("; ", errorMessages);
-        //            var exceptionMessage = $"Ошибка валидации: {fullErrorMessage}";
-        //            MessageBox.Show(exceptionMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Пожалуйста, заполните все обязательные поля и добавьте хотя бы одного клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //    }
-        //}
 
         private void ClearForm()
         {
@@ -678,6 +509,77 @@ namespace Diplom.Pages.AddPrintPage
         {
             ClearForm();
             NavigationService.GoBack();
+        }
+
+        private void LoadPolicyData(Policies policy)
+        {
+            try
+            {
+                // Загрузка и установка типа полиса
+                var policyType = _context.PolicyTypes.FirstOrDefault(pt => pt.PolicyTypeID == policy.PolicyTypeID);
+                PolicyTypeComboBox.SelectedItem = policyType;
+                //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
+
+                // Загрузка и установка статуса
+                var status = _context.PolicyStatuses.FirstOrDefault(ps => ps.StatusID == policy.StatusID);
+                StatusComboBox.SelectedItem = status;
+                UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
+
+                // Установка дат
+                StartDatePicker.SelectedDate = policy.StartDate;
+                EndDatePicker.SelectedDate = policy.EndDate;
+
+                // Установка стоимости
+                InsuranceAmountTextBox.Text = policy.InsuranceAmount.ToString();
+                UpdateTextBoxPlaceholder(InsuranceAmountTextBox, InsuranceAmountPlaceholder);
+
+                // Загрузка клиентов
+                _selectedClients.Clear();
+                foreach (var client in policy.Clients)
+                {
+                    _selectedClients.Add(client);
+                }
+                ClientsListBox.ItemsSource = null;
+                ClientsListBox.ItemsSource = _selectedClients;
+
+                // Загрузка данных о здоровье
+                var lifeAndHealth = _context.LifeAndHealth
+                    .Include(lh => lh.HealthConditions)
+                    .FirstOrDefault(lh => lh.PolicyID == policy.PolicyID);
+
+                if (lifeAndHealth != null)
+                {
+                    AgeTextBox.Text = lifeAndHealth.Age.ToString();
+                    UpdateTextBoxPlaceholder(AgeTextBox, AgePlaceholder);
+
+                    // Установка пола
+                    var genderItem = GenderComboBox.Items.Cast<ComboBoxItem>()
+                        .FirstOrDefault(item => item.Content.ToString() == lifeAndHealth.Gender);
+                    if (genderItem != null)
+                    {
+                        GenderComboBox.SelectedItem = genderItem;
+                        UpdateComboBoxPlaceholder(GenderComboBox, GenderPlaceholder);
+                    }
+
+                    // Установка состояния здоровья
+                    HealthConditionComboBox.SelectedItem = lifeAndHealth.HealthConditions;
+                    UpdateComboBoxPlaceholder(HealthConditionComboBox, HealthConditionPlaceholder);
+
+                    OccupationTextBox.Text = lifeAndHealth.Occupation;
+                    UpdateTextBoxPlaceholder(OccupationTextBox, OccupationPlaceholder);
+                }
+
+                // Обновление видимости кнопок
+                if (_selectedClients.Any())
+                {
+                    RemoveClientButton.Visibility = Visibility.Visible;
+                    AddClientButton.Visibility = Visibility.Collapsed;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке данных полиса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

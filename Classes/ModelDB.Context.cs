@@ -15,13 +15,6 @@ namespace Diplom.Classes
     
     public partial class VSK_DBEntities : DbContext
     {
-        //private static VSK_DBEntities _context;
-        //public static VSK_DBEntities GetContext()
-        //{
-        //    if( _context == null )
-        //        _context = new VSK_DBEntities();
-        //    return _context;
-        //}
         public VSK_DBEntities()
             : base("name=VSK_DBEntities")
         {

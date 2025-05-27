@@ -20,6 +20,8 @@ namespace Diplom.Classes
         public string VIN { get; set; }
         public int Year { get; set; }
         public string LicensePlate { get; set; }
+        public string RegistrationRegion { get; set; }
+        public Nullable<int> EnginePower { get; set; }
     
         public virtual Policies Policies { get; set; }
         public virtual VehicleModels VehicleModels { get; set; }

@@ -33,9 +33,7 @@ namespace Diplom.Classes
         public string INN { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
-
-
-
+    
         public virtual Employees Employees { get; set; }
         public virtual ClientTypes ClientTypes { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

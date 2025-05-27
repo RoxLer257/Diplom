@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Data.Entity;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -28,6 +29,8 @@ namespace Diplom.Pages.AddPrintPage
         private List<Clients> _selectedClients; // Список выбранных клиентов
         private readonly PropertyInsuranceValidator _propertyInsuranceValidator;
         private readonly ClientValidator _clientValidator;
+        private bool isEditMode = false;
+        private Policies editablePolicy;
 
         public AddPropertyInsurance()
         {
@@ -41,6 +44,14 @@ namespace Diplom.Pages.AddPrintPage
             LoadData();
             InitializePlaceholders();
             SetPolicyType("Страхование имущества");
+        }
+
+        // Конструктор для режима редактирования
+        public AddPropertyInsurance(Policies policyToEdit) : this()
+        {
+            isEditMode = true;
+            editablePolicy = policyToEdit;
+            LoadPolicyData(policyToEdit);
         }
 
         private void SetPolicyType(string typeName)
@@ -537,47 +548,90 @@ namespace Diplom.Pages.AddPrintPage
 
             try
             {
-                // Создание полиса
-                var policy = new Policies
+                if (isEditMode)
                 {
-                    PolicyTypeID = policyType.PolicyTypeID,
-                    StatusID = status.StatusID,
-                    InsuranceAmount = insuranceAmount.Value,
-                    StartDate = startDate.Value,
-                    EndDate = endDate.Value
-                };
+                    // Обновление существующего полиса
+                    editablePolicy.PolicyTypeID = policyType.PolicyTypeID;
+                    editablePolicy.StatusID = status.StatusID;
+                    editablePolicy.InsuranceAmount = insuranceAmount.Value;
+                    editablePolicy.StartDate = startDate.Value;
+                    editablePolicy.EndDate = endDate.Value;
 
-                // Добавление клиентов
-                foreach (var client in _selectedClients)
-                {
-                    policy.Clients.Add(client);
-                }
-
-                _context.Policies.Add(policy);
-                _context.SaveChanges(); // Сохраняем полис, чтобы получить PolicyID
-
-                // Создание записей для имущества
-                foreach (var property in SelectedProperties)
-                {
-                    var newProperty = new Diplom.Classes.Properties
+                    // Обновление клиентов
+                    editablePolicy.Clients.Clear();
+                    foreach (var client in _selectedClients)
                     {
-                        PolicyID = policy.PolicyID,
-                        PropertyTypeID = property.PropertyTypeID,
-                        Address = property.Address,
-                        Area = property.Area,
-                        Value = property.Value
-                    };
-                    _context.Properties.Add(newProperty);
+                        editablePolicy.Clients.Add(client);
+                    }
+
+                    // Обновление имущества
+                    var existingProperties = _context.Properties.Where(p => p.PolicyID == editablePolicy.PolicyID).ToList();
+                    _context.Properties.RemoveRange(existingProperties);
+
+                    foreach (var property in SelectedProperties)
+                    {
+                        var newProperty = new Diplom.Classes.Properties
+                        {
+                            PolicyID = editablePolicy.PolicyID,
+                            PropertyTypeID = property.PropertyTypeID,
+                            Address = property.Address,
+                            Area = property.Area,
+                            Value = property.Value
+                        };
+                        _context.Properties.Add(newProperty);
+                    }
+
+                    _context.SaveChanges();
+
+                    // Логирование
+                    LogAction("Policies", "Редактирование", $"Отредактирован полис: {editablePolicy.PolicyID}");
+                    LogAction("Properties", "Редактирование", $"Обновлены записи имущества для полиса: {editablePolicy.PolicyID}");
+
+                    MessageBox.Show("Полис успешно обновлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
+                else
+                {
+                    // Создание полиса
+                    var policy = new Policies
+                    {
+                        PolicyTypeID = policyType.PolicyTypeID,
+                        StatusID = status.StatusID,
+                        InsuranceAmount = insuranceAmount.Value,
+                        StartDate = startDate.Value,
+                        EndDate = endDate.Value
+                    };
 
-                _context.SaveChanges();
+                    // Добавление клиентов
+                    foreach (var client in _selectedClients)
+                    {
+                        policy.Clients.Add(client);
+                    }
 
-                // Логирование
-                LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами и {SelectedProperties.Count} объектами имущества");
+                    _context.Policies.Add(policy);
+                    _context.SaveChanges(); // Сохраняем полис, чтобы получить PolicyID
 
-                LogAction("Properties", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с {SelectedProperties.Count} объектами имущества");
+                    // Создание записей для имущества
+                    foreach (var property in SelectedProperties)
+                    {
+                        var newProperty = new Diplom.Classes.Properties
+                        {
+                            PolicyID = policy.PolicyID,
+                            PropertyTypeID = property.PropertyTypeID,
+                            Address = property.Address,
+                            Area = property.Area,
+                            Value = property.Value
+                        };
+                        _context.Properties.Add(newProperty);
+                    }
 
-                MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    _context.SaveChanges();
+
+                    // Логирование
+                    LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами и {SelectedProperties.Count} объектами имущества");
+                    LogAction("Properties", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с {SelectedProperties.Count} объектами имущества");
+
+                    MessageBox.Show("Полис успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
 
                 ClearForm();
                 Classes.ClassFrame.frmObj.Navigate(new Pages.MainPage.MainPage());
@@ -586,6 +640,59 @@ namespace Diplom.Pages.AddPrintPage
             {
                 MessageBox.Show($"Произошла ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private bool ValidateInput()
+        {
+            if (PolicyTypeComboBox.SelectedItem == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите тип полиса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (StatusComboBox.SelectedItem == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите статус полиса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(InsuranceAmountTextBox.Text) || !decimal.TryParse(InsuranceAmountTextBox.Text, out decimal amount) || amount <= 0)
+            {
+                MessageBox.Show("Пожалуйста, введите корректную сумму страхования", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!StartDatePicker.SelectedDate.HasValue)
+            {
+                MessageBox.Show("Пожалуйста, выберите дату начала действия полиса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!EndDatePicker.SelectedDate.HasValue)
+            {
+                MessageBox.Show("Пожалуйста, выберите дату окончания действия полиса", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (StartDatePicker.SelectedDate.Value >= EndDatePicker.SelectedDate.Value)
+            {
+                MessageBox.Show("Дата начала действия полиса должна быть раньше даты окончания", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!_selectedClients.Any())
+            {
+                MessageBox.Show("Пожалуйста, выберите хотя бы одного клиента", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!SelectedProperties.Any())
+            {
+                MessageBox.Show("Пожалуйста, добавьте хотя бы один объект имущества", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            return true;
         }
 
         private void ClearForm()
@@ -634,6 +741,69 @@ namespace Diplom.Pages.AddPrintPage
         {
             ClearForm();
             NavigationService.GoBack();
+        }
+
+        private void LoadPolicyData(Policies policy)
+        {
+            try
+            {
+                // Загрузка и установка типа полиса
+                var policyType = _context.PolicyTypes.FirstOrDefault(pt => pt.PolicyTypeID == policy.PolicyTypeID);
+                PolicyTypeComboBox.SelectedItem = policyType;
+                //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
+
+                // Загрузка и установка статуса
+                var status = _context.PolicyStatuses.FirstOrDefault(ps => ps.StatusID == policy.StatusID);
+                StatusComboBox.SelectedItem = status;
+                UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
+
+                // Установка дат
+                StartDatePicker.SelectedDate = policy.StartDate;
+                EndDatePicker.SelectedDate = policy.EndDate;
+
+                // Установка стоимости
+                InsuranceAmountTextBox.Text = policy.InsuranceAmount.ToString();
+                UpdateTextBoxPlaceholder(InsuranceAmountTextBox, InsuranceAmountPlaceholder);
+
+                // Загрузка клиентов
+                _selectedClients.Clear();
+                foreach (var client in policy.Clients)
+                {
+                    _selectedClients.Add(client);
+                }
+                ClientsListBox.ItemsSource = null;
+                ClientsListBox.ItemsSource = _selectedClients;
+
+                // Загрузка имущества
+                SelectedProperties.Clear();
+                var properties = _context.Properties
+                    .Include(p => p.PropertyTypes)
+                    .Where(p => p.PolicyID == policy.PolicyID)
+                    .ToList();
+
+                foreach (var property in properties)
+                {
+                    SelectedProperties.Add(property);
+                }
+                PropertiesListBox.ItemsSource = null;
+                PropertiesListBox.ItemsSource = SelectedProperties;
+
+                // Обновление видимости кнопок
+                if (_selectedClients.Any())
+                {
+                    RemoveClientButton.Visibility = Visibility.Visible;
+                    AddClientButton.Visibility = Visibility.Collapsed;
+                }
+                if (SelectedProperties.Any())
+                {
+                    RemovePropertyButton.Visibility = Visibility.Visible;
+                    AddPropertyButton.Visibility = Visibility.Collapsed;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке данных полиса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
