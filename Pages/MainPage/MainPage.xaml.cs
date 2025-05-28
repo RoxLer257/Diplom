@@ -5,6 +5,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Data.Entity;
+using System.IO;
+using Xceed.Words.NET;
+using System;
+using System.Text;
+using Xceed.Document.NET;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace Diplom.Pages.MainPage
 {
@@ -308,5 +314,445 @@ namespace Diplom.Pages.MainPage
             }
         }
 
+        private void DownloadPolicy_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is Policies selectedPolicy)
+            {
+                var fullPolicy = ClassFrame.ConnectDB.Policies
+                    .Include(p => p.Clients)
+                    .Include(p => p.Drivers)
+                    .Include(p => p.Vehicles.Select(v => v.VehicleModels.VehicleMakes))
+                    .Include(p => p.Properties.Select(pr => pr.PropertyTypes))
+                    .Include(p => p.PolicyTypes)
+                    .Include(p => p.PolicyStatuses)
+                    .FirstOrDefault(p => p.PolicyID == selectedPolicy.PolicyID);
+
+                if (fullPolicy == null)
+                {
+                    MessageBox.Show("Не удалось найти полис для скачивания.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                DownloadPolicyFile(fullPolicy);
+            }
+            else
+            {
+                MessageBox.Show("Выберите полис для скачивания.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        private void DownloadPolicyFile(Policies policy)
+        {
+            try
+            {
+                // Объявляем client один раз в начале
+                var client = policy.Clients.FirstOrDefault();
+                string templatePath;
+                if (policy.PolicyTypes?.TypeName == "ОСАГО" || policy.PolicyTypes?.TypeName == "КАСКО")
+                {
+                    templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Шаблоны полисов", "Страхование авто.docx");
+                }
+                else if (policy.PolicyTypes?.TypeName == "Страхование жизни")
+                {
+                    templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Шаблоны полисов", "Образец полиса страхования жизни и здоровья.docx");
+                }
+                else if (policy.PolicyTypes?.TypeName == "Страхование имущества")
+                {
+                    templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Шаблоны полисов", "Полис страхования имущества.docx");
+                }
+                else
+                {
+                    MessageBox.Show("Данный тип полиса не поддерживается для скачивания.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (!File.Exists(templatePath))
+                {
+                    MessageBox.Show($"Не найден шаблон: {templatePath}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                using (var document = Xceed.Words.NET.DocX.Load(templatePath))
+                {
+                    string currentUserInfo = $"{CurrentUser.FullName ?? "Не указан"} {CurrentUser.RoleName ?? "Не указана"}".Trim();
+                    document.ReplaceText("{CurrentUser.FullName} {CurrentUser.RoleName}", currentUserInfo);
+
+                    // Заполняем основные поля
+                    document.ReplaceText("{PolicyID}", policy.PolicyID.ToString());
+                    document.ReplaceText("{StartDate}", policy.StartDate.ToString("dd.MM.yyyy"));
+                    document.ReplaceText("{EndDate}", policy.EndDate.ToString("dd.MM.yyyy"));
+                    document.ReplaceText("{ContractDate}", policy.StartDate.ToString("dd.MM.yyyy"));
+
+                    // Заполняем данные клиента
+                    if (client != null)
+                    {
+                        string clientType = client.ClientTypeID == 1 ? "Физическое лицо" : "Юридическое лицо";
+                        string clientName = client.ClientTypeID == 1
+                            ? $"{client.LastName} {client.FirstName} {client.MiddleName ?? ""}"
+                            : client.CompanyName ?? "";
+
+                        document.ReplaceText("{ClientFullName}", clientName.Trim());
+                        document.ReplaceText("{CompanyName}", client.CompanyName ?? "");
+                        document.ReplaceText("{TypeName}", clientType);
+                        document.ReplaceText("{INN}", client.INN ?? "Не указан");
+                        document.ReplaceText("{PassportNumber}", client.PassportNumber ?? "Не указан");
+                        document.ReplaceText("{Phone}", client.Phone ?? "Не указан");
+
+                        // Для полиса страхования жизни и здоровья
+                        if (policy.PolicyTypes?.TypeName == "Страхование жизни")
+                        {
+                            // Получаем возраст из LifeAndHealth
+                            var lifeAndHealth = policy.LifeAndHealth?.FirstOrDefault();
+                            int? age = lifeAndHealth?.Age;
+                            if (age == null || age < 1 || age > 120)
+                            {
+                                MessageBox.Show("Возраст не найден или некорректен в записи LifeAndHealth!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+                            int year = DateTime.Today.Year - age.Value;
+                            Random random = new Random();
+                            int month = random.Next(1, 13); // Месяц от 1 до 12
+                            int maxDay = DateTime.DaysInMonth(year, month);
+                            int day = random.Next(1, maxDay + 1); // День от 1 до maxDay
+                            DateTime birthDate = new DateTime(year, month, day);
+                            string birthDateStr = birthDate.ToString("dd.MM.yyyy");
+                            document.ReplaceText("{DateTime.Today – Age}", birthDateStr);
+                            document.ReplaceText("{DateOfBirth}", birthDateStr);
+
+                            // Конвертируем сумму в пропись
+                            string amountInWords = ConvertToWords(policy.InsuranceAmount);
+                            document.ReplaceText("{InsuranceAmount}", $"{policy.InsuranceAmount:N2} ({amountInWords}) рублей");
+
+                        }
+                    }
+
+                    // Заменяем дату оформления
+                    string todayStr = DateTime.Today.ToString("dd.MM.yyyy");
+                    document.ReplaceText("{DateTime.Today}", todayStr);
+
+                    // Для автострахования
+                    if (policy.PolicyTypes?.TypeName == "ОСАГО" || policy.PolicyTypes?.TypeName == "КАСКО")
+                    {
+                        // Заполняем данные автомобиля
+                        var vehicle = policy.Vehicles.FirstOrDefault();
+                        if (vehicle != null)
+                        {
+                            document.ReplaceText("{MakeName}", vehicle.VehicleModels?.VehicleMakes?.MakeName ?? "");
+                            document.ReplaceText("{ModelName}", vehicle.VehicleModels?.ModelName ?? "");
+                            document.ReplaceText("{Year}", vehicle.Year.ToString());
+                            document.ReplaceText("{LicensePlate}", vehicle.LicensePlate ?? "");
+                            document.ReplaceText("{VIN}", vehicle.VIN ?? "Не указан");
+                        }
+
+                        // Заполняем тип доступа водителей
+                        string driverAccessType = policy.Drivers.Any()
+                            ? "лиц, допущенных к управлению транспортным средством"
+                            : "неограниченного количества лиц, допущенных к управлению транспортным средством";
+                        document.ReplaceText("{DriverAccessType}", driverAccessType);
+
+                        // Заполняем таблицу водителей
+                        if (policy.Drivers.Any())
+                        {
+                            // Находим таблицу водителей
+                            Table driverTable = null;
+                            foreach (var table in document.Tables)
+                            {
+                                foreach (var row in table.Rows)
+                                {
+                                    foreach (var cell in row.Cells)
+                                    {
+                                        if (cell.Paragraphs.Any(p => p.Text.Contains("{FullName}")))
+                                        {
+                                            driverTable = table;
+                                            break;
+                                        }
+                                    }
+                                    if (driverTable != null) break;
+                                }
+                                if (driverTable != null) break;
+                            }
+
+                            if (driverTable != null)
+                            {
+                                // Находим шаблонную строку
+                                Row templateRow = null;
+                                int templateRowIndex = -1;
+                                for (int i = 0; i < driverTable.Rows.Count; i++)
+                                {
+                                    if (driverTable.Rows[i].Cells.Any(c => c.Paragraphs.Any(p => p.Text.Contains("{FullName}"))))
+                                    {
+                                        templateRow = driverTable.Rows[i];
+                                        templateRowIndex = i;
+                                        break;
+                                    }
+                                }
+
+                                // Удаляем шаблонную строку, если она найдена
+                                if (templateRow != null && templateRowIndex >= 0)
+                                {
+                                    driverTable.RemoveRow(templateRowIndex);
+                                }
+                                else
+                                {
+                                    // Если шаблонная строка не найдена, используем последнюю строку
+                                    templateRowIndex = driverTable.RowCount;
+                                }
+
+                                // Добавляем строки для каждого водителя
+                                int driverNumber = 1;
+                                foreach (var driver in policy.Drivers)
+                                {
+                                    // Получаем КБМ водителя
+                                    var driverKbm = ClassFrame.ConnectDB.DriverInsuranceHistory
+                                        .Where(h => h.DriverID == driver.DriverID)
+                                        .OrderByDescending(h => h.LastUpdated)
+                                        .FirstOrDefault()?.KBM;
+
+                                    string kbmValue = driverKbm.HasValue ? ((double)driverKbm.Value).ToString("N2") : "Не указан";
+                                    string driverFullName = $"{driver.LastName} {driver.FirstName} {driver.MiddleName ?? ""}".Trim();
+                                    string licenseNumber = driver.LicenseNumber ?? "Не указан";
+
+                                    // Создаем новую строку
+                                    var newRow = driverTable.InsertRow(templateRowIndex);
+                                    newRow.Cells[0].Paragraphs.First().Append(driverNumber.ToString()); // № п/п
+                                    newRow.Cells[1].Paragraphs.First().Append(driverFullName); // ФИО
+                                    newRow.Cells[2].Paragraphs.First().Append(licenseNumber); // Водительское удостоверение
+                                    newRow.Cells[4].Paragraphs.First().Append(kbmValue); // КБМ
+
+                                    templateRowIndex++;
+                                    driverNumber++;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Таблица водителей не найдена в шаблоне.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            // Если водителей нет, обрабатываем таблицу
+                            Table driverTable = null;
+                            foreach (var table in document.Tables)
+                            {
+                                foreach (var row in table.Rows)
+                                {
+                                    foreach (var cell in row.Cells)
+                                    {
+                                        if (cell.Paragraphs.Any(p => p.Text.Contains("{FullName}")))
+                                        {
+                                            driverTable = table;
+                                            break;
+                                        }
+                                    }
+                                    if (driverTable != null) break;
+                                }
+                                if (driverTable != null) break;
+                            }
+
+                            if (driverTable != null)
+                            {
+                                // Находим и удаляем шаблонную строку
+                                Row templateRow = null;
+                                int templateRowIndex = -1;
+                                for (int i = 0; i < driverTable.Rows.Count; i++)
+                                {
+                                    if (driverTable.Rows[i].Cells.Any(c => c.Paragraphs.Any(p => p.Text.Contains("{FullName}"))))
+                                    {
+                                        templateRow = driverTable.Rows[i];
+                                        templateRowIndex = i;
+                                        break;
+                                    }
+                                }
+
+                                if (templateRow != null && templateRowIndex >= 0)
+                                {
+                                    driverTable.RemoveRow(templateRowIndex);
+                                }
+                                else
+                                {
+                                    templateRowIndex = driverTable.RowCount;
+                                }
+
+                                // Добавляем пустую строку с текстом "Не указаны"
+                                var newRow = driverTable.InsertRow(templateRowIndex);
+                                newRow.Cells[0].Paragraphs.First().Append("1");
+                                newRow.Cells[1].Paragraphs.First().Append("Не указаны");
+                                newRow.Cells[2].Paragraphs.First().Append("");
+                                newRow.Cells[3].Paragraphs.First().Append("");
+                            }
+                        }
+
+                        // Заполняем таблицу расчета премии
+                        var calculator = new Diplom.Classes.Calculator.InsuranceCalculator(ClassFrame.ConnectDB);
+                        double tb = 0, kt = 0, kbm = 0, kvs = 0, ko = 0, ks = 0, km = 0;
+
+                        if (vehicle != null && policy.Drivers.Any())
+                        {
+                            tb = (1646 + 7535) / 2.0; // базовый тариф
+                            kt = 1.8; // территориальный коэффициент
+                            kvs = policy.Drivers.Min(d => calculator.CalculateKVS(d));
+                            km = calculator.CalculateKM(vehicle.EnginePower ?? 100);
+                            ks = calculator.CalculateKS(policy.StartDate, policy.EndDate);
+                            ko = policy.Drivers.Count > 1 ? 2.32 : 1.0;
+
+                            // Получаем максимальный КБМ среди всех водителей
+                            kbm = policy.Drivers.Max(d =>
+                            {
+                                var driverKbm = ClassFrame.ConnectDB.DriverInsuranceHistory
+                                    .Where(h => h.DriverID == d.DriverID)
+                                    .OrderByDescending(h => h.LastUpdated)
+                                    .FirstOrDefault()?.KBM;
+                                return driverKbm.HasValue ? (double)driverKbm.Value : 1.0;
+                            });
+                        }
+                        else
+                        {
+                            kbm = 1.0; // Для неограниченного использования
+                        }
+
+                        // Заполняем коэффициенты
+                        document.ReplaceText("{tb}", tb.ToString("N2"));
+                        document.ReplaceText("{kt}", kt.ToString("N2"));
+                        document.ReplaceText("{KBM}", kbm.ToString("N2"));
+                        document.ReplaceText("{kvs}", kvs.ToString("N2"));
+                        document.ReplaceText("{ko}", ko.ToString("N2"));
+                        document.ReplaceText("{ks}", ks.ToString("N2"));
+                        document.ReplaceText("{km}", km.ToString("N2"));
+                        document.ReplaceText("{TotalAmount}", policy.InsuranceAmount.ToString("N2") + " руб.");
+                        document.ReplaceText("{InsuranceAmount}", policy.InsuranceAmount.ToString("N2") + " руб.");
+
+                    }
+                    else if (policy.PolicyTypes?.TypeName == "Страхование имущества")
+                    {
+                        // Используем уже объявленную выше переменную client
+                        string clientType = client?.ClientTypeID == 1 ? "Физическое лицо" : "Юридическое лицо";
+                        string clientName = client?.ClientTypeID == 1
+                            ? $"{client.LastName} {client.FirstName} {client.MiddleName ?? ""}"
+                            : client?.CompanyName ?? "";
+                        document.ReplaceText("{ClientTypes.TypeName}", clientType);
+                        document.ReplaceText("{ClientFullName}", clientName.Trim());
+                        document.ReplaceText("{CurrentUser.RoleName} {CurrentUser.FullName}", $"{CurrentUser.RoleName} {CurrentUser.FullName}");
+                        document.ReplaceText("{PolicyID}", policy.PolicyID.ToString());
+                        document.ReplaceText("{StartDate}", policy.StartDate.ToString("dd.MM.yyyy"));
+                        document.ReplaceText("{EndDate}", policy.EndDate.ToString("dd.MM.yyyy"));
+
+                        // Адрес объекта страхования
+                        var property = policy.Properties?.FirstOrDefault();
+                        document.ReplaceText("{Address}", property?.Address ?? "");
+                        document.ReplaceText("{PropertyTypes.TypeName}", property?.PropertyTypes?.TypeName ?? "");
+
+                        // Страховая сумма и премия
+                        string amountInWords = ConvertToWords(policy.InsuranceAmount);
+                        document.ReplaceText("{InsuranceAmount}", $"{policy.InsuranceAmount:N2} ({amountInWords}) рублей");
+
+                        // Количество месяцев между датами
+                        int months = ((policy.EndDate.Year - policy.StartDate.Year) * 12 + policy.EndDate.Month - policy.StartDate.Month);
+                        if (policy.EndDate.Day < policy.StartDate.Day) months--;
+                        months = Math.Max(1, months); // минимум 1 месяц
+                        string monthsText = $"{months} ({ConvertToWords(months)}) календарный месяц";
+                        document.ReplaceText("{EndDate-StartDate}", monthsText);
+                    }
+
+                    // Сохраняем файл
+                    var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                    {
+                        Filter = "Word Document (*.docx)|*.docx",
+                        FileName = $"Полис_{policy.PolicyID}_{DateTime.Now:yyyyMMdd}.docx"
+                    };
+
+                    if (saveFileDialog.ShowDialog() == true)
+                    {
+                        document.SaveAs(saveFileDialog.FileName);
+                        MessageBox.Show("Файл успешно сохранён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при формировании файла: {ex.Message}\n\nПодробности: {ex.StackTrace}",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Метод для конвертации числа в пропись
+        private string ConvertToWords(decimal number)
+        {
+            string[] units = { "", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять" };
+            string[] teens = { "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать" };
+            string[] tens = { "", "десять", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто" };
+            string[] hundreds = { "", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот" };
+            string[] thousands = { "", "тысяча", "тысячи", "тысяч" };
+            string[] millions = { "", "миллион", "миллиона", "миллионов" };
+
+            if (number == 0) return "ноль";
+
+            string result = "";
+            int intPart = (int)number;
+            int decimalPart = (int)((number - intPart) * 100);
+
+            if (intPart >= 1000000)
+            {
+                int millionsCount = intPart / 1000000;
+                result += GetNumberInWords(millionsCount, hundreds, tens, units, teens) + " " + GetCorrectForm(millionsCount, millions) + " ";
+                intPart %= 1000000;
+            }
+
+            if (intPart >= 1000)
+            {
+                int thousandsCount = intPart / 1000;
+                result += GetNumberInWords(thousandsCount, hundreds, tens, units, teens) + " " + GetCorrectForm(thousandsCount, thousands) + " ";
+                intPart %= 1000;
+            }
+
+            if (intPart > 0)
+            {
+                result += GetNumberInWords(intPart, hundreds, tens, units, teens);
+            }
+
+            if (decimalPart > 0)
+            {
+                result += " " + decimalPart.ToString("D2") + " копеек";
+            }
+
+            return result.Trim();
+        }
+
+        private string GetNumberInWords(int number, string[] hundreds, string[] tens, string[] units, string[] teens)
+        {
+            string result = "";
+            if (number >= 100)
+            {
+                result += hundreds[number / 100] + " ";
+                number %= 100;
+            }
+            if (number >= 10 && number <= 19)
+            {
+                result += teens[number - 10] + " ";
+                return result;
+            }
+            if (number >= 20)
+            {
+                result += tens[number / 10] + " ";
+                number %= 10;
+            }
+            if (number > 0)
+            {
+                result += units[number] + " ";
+            }
+            return result;
+        }
+
+        private string GetCorrectForm(int number, string[] forms)
+        {
+            number = number % 100;
+            if (number >= 11 && number <= 19)
+                return forms[3];
+            int lastDigit = number % 10;
+            if (lastDigit == 1)
+                return forms[1];
+            if (lastDigit >= 2 && lastDigit <= 4)
+                return forms[2];
+            return forms[3];
+        }
     }
 }

@@ -148,6 +148,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Button Content="Пролонгировать полис" Width="150" Height="25" Background="#003087" Foreground="White" 
                                                 Margin="5" Name="Prolongpolicy" Click="Prolongpolicy_Click"/>
+                                        <Button Content="Скачать" Width="100" Height="25" Background="#003087" Foreground="White"
+                                                Margin="5" Name="DownloadPolicy" Click="DownloadPolicy_Click"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGrid.RowDetailsTemplate>
