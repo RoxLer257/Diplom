@@ -29,6 +29,13 @@ namespace Diplom.Pages.MainPage
 
             InitializePlaceholders();
             ResetContent();
+
+            // Оставляем только скрытие клиентов для агента
+            if (CurrentUser.RoleName == "Страховой агент")
+            {
+                ClientsButton.Visibility = Visibility.Collapsed;
+                DtgClients.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void InitializePlaceholders()
@@ -64,9 +71,13 @@ namespace Diplom.Pages.MainPage
 
                 if (isClientsVisible)
                 {
-                    if (string.IsNullOrWhiteSpace(search))
+                    if (CurrentUser.RoleName == "Страховой агент")
                     {
-                        DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList(); // Полный список клиентов
+                        DtgClients.ItemsSource = null; // Не показываем клиентов
+                    }
+                    else if (string.IsNullOrWhiteSpace(search))
+                    {
+                        DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList();
                     }
                     else
                     {
@@ -82,7 +93,7 @@ namespace Diplom.Pages.MainPage
                 {
                     if (string.IsNullOrWhiteSpace(search))
                     {
-                        DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList(); // Полный список договоров
+                        DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
                     }
                     else
                     {
@@ -104,7 +115,7 @@ namespace Diplom.Pages.MainPage
                 string search = textBox.Text;
                 if (string.IsNullOrWhiteSpace(search))
                 {
-                    DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList(); // Полный список при пустом поиске
+                    DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
                 }
                 else
                 {
@@ -130,8 +141,16 @@ namespace Diplom.Pages.MainPage
 
         public void UpdateTables()
         {
-            DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList();
-            DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
+            if (CurrentUser.RoleName == "Страховой агент")
+            {
+                DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
+                DtgClients.ItemsSource = null; // Не показываем клиентов
+            }
+            else
+            {
+                DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList();
+                DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
+            }
         }
 
         private void ExitAcc_Click(object sender, RoutedEventArgs e)
@@ -189,7 +208,7 @@ namespace Diplom.Pages.MainPage
                 isContractsVisible = true;
                 isClientsVisible = false;
                 isCatalogVisible = false;
-                DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList(); // Сбрасываем фильтр клиентов при переключении
+                DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
             }
         }
         private void ClientsButton_Click(object sender, RoutedEventArgs e)
@@ -213,6 +232,14 @@ namespace Diplom.Pages.MainPage
                 isClientsVisible = true;
                 isContractsVisible = false;
                 isCatalogVisible = false;
+                if (CurrentUser.RoleName == "Страховой агент")
+                {
+                    DtgClients.ItemsSource = null;
+                }
+                else
+                {
+                    DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList();
+                }
             }
         }
 
@@ -230,8 +257,16 @@ namespace Diplom.Pages.MainPage
             FIOSearchTxtBox.Text = string.Empty;
             PolicySearchTxtBox.Text = string.Empty;
             InitializePlaceholders();
-            DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList(); // Сбрасываем фильтр договоров
-            DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList(); // Сбрасываем фильтр клиентов
+            if (CurrentUser.RoleName == "Страховой агент")
+            {
+                DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
+                DtgClients.ItemsSource = null;
+            }
+            else
+            {
+                DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
+                DtgClients.ItemsSource = ClassFrame.ConnectDB.Clients.ToList();
+            }
         }
 
         private void SupportButton_Click(object sender, RoutedEventArgs e)

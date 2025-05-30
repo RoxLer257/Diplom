@@ -68,13 +68,7 @@
                                     <TextBlock Text="База клиентов" Foreground="Black" Margin="10,0,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Name="SupportButton" Click="SupportButton_Click" Style="{StaticResource MenuButtonStyle}">
-                                <StackPanel Orientation="Horizontal" Margin="10,5">
-                                    <Icon:PackIconMaterial Kind="Headset" Foreground="#003087" Width="20" Height="20" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Поддержка" Foreground="Black" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>
-                            <Grid Margin="10 0 5 5" Visibility="Collapsed" x:Name="FIOSearchGrid">
+                            <Grid Margin="10 5 5 5" Visibility="Collapsed" x:Name="FIOSearchGrid">
                                 <TextBox x:Name="FIOSearchTxtBox"
                                      VerticalAlignment="Center" 
                                      Margin="25 0 0 0"
@@ -147,7 +141,8 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <Button Content="Пролонгировать полис" Width="150" Height="25" Background="#003087" Foreground="White" 
-                                                Margin="5" Name="Prolongpolicy" Click="Prolongpolicy_Click"/>
+                                                Margin="5" Name="Prolongpolicy" Click="Prolongpolicy_Click">
+                                        </Button>
                                         <Button Content="Скачать" Width="100" Height="25" Background="#003087" Foreground="White"
                                                 Margin="5" Name="DownloadPolicy" Click="DownloadPolicy_Click"/>
                                     </StackPanel>

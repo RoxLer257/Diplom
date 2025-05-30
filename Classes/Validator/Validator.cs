@@ -275,8 +275,6 @@ namespace Diplom.Classes.Validator
 
             var experienceResult = ValidateDrivingExperience(experience, dateOfBirth.Value);
             if (!experienceResult.IsValid) return experienceResult;
-            //var experienceResult = ValidateDrivingExperience(experience);
-            //if (!experienceResult.IsValid) return experienceResult;
 
             var passportResult = ValidatePassportNumber(passportNumber);
             if (!passportResult.IsValid) return passportResult;
@@ -317,28 +315,51 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        public ValidationResult ValidateVIN(string vin)
+        public ValidationResult ValidateVIN(string vin, int? vehicleId = null)
         {
-            if (string.IsNullOrWhiteSpace(vin) || !Regex.IsMatch(vin, @"^[A-HJ-NPR-Z0-9]{17}$"))
-                return new ValidationResult(false, "VIN: 17 символов (буквы A-Z, цифры, без пробелов).");
-            if (_context.Vehicles.Any(v => v.VIN == vin))
-                return new ValidationResult(false, "VIN уже зарегистрирован.");
+            if (string.IsNullOrWhiteSpace(vin))
+                return new ValidationResult(false, "VIN не может быть пустым");
+            vin = vin.ToUpperInvariant();
+            // VIN: строго 17 символов, только латиница (A-H, J-N, P, R-Z, 0-9), без I, O, Q, без пробелов, только заглавные
+            if (!Regex.IsMatch(vin, @"^[A-HJ-NPR-Z0-9]{17}$"))
+                return new ValidationResult(false, "VIN: строго 17 символов (только латиница, без I, O, Q, без пробелов, только заглавные)");
+            
+            // Если это редактирование существующего автомобиля (есть vehicleId)
+            if (vehicleId.HasValue)
+            {
+                // Проверяем, существует ли VIN у другого автомобиля
+                var existingVehicle = _context.Vehicles.FirstOrDefault(v => v.VIN == vin && v.VehicleID != vehicleId.Value);
+                if (existingVehicle != null)
+                    return new ValidationResult(false, "VIN уже зарегистрирован на другой автомобиль.");
+            }
+            else
+            {
+                // При создании нового автомобиля проверяем уникальность VIN
+                if (_context.Vehicles.Any(v => v.VIN == vin))
+                    return new ValidationResult(false, "VIN уже зарегистрирован.");
+            }
             return new ValidationResult(true);
         }
 
         public ValidationResult ValidateYear(int? year)
         {
-            if (!year.HasValue || year < 1900 || year > DateTime.Now.Year + 1)
-                return new ValidationResult(false, $"Год выпуска: от 1900 до {DateTime.Now.Year + 1}.");
+            int currentYear = DateTime.Now.Year + 1;
+            if (!year.HasValue || year < 1900 || year > currentYear)
+                return new ValidationResult(false, $"Год выпуска: от 1900 до {currentYear}.");
+            // Строго 4 цифры
+            if (year.Value.ToString().Length != 4)
+                return new ValidationResult(false, "Год выпуска: строго 4 цифры.");
             return new ValidationResult(true);
         }
 
         public ValidationResult ValidateLicensePlate(string licensePlate)
         {
-            if (string.IsNullOrWhiteSpace(licensePlate) || !Regex.IsMatch(licensePlate, @"^[А-Я]{1}\d{3}[А-Я]{2}\d{2,3}$"))
-                return new ValidationResult(false, "Формат номера: А123БВ45 или А123БВ456.");
-            if (_context.Vehicles.Any(v => v.LicensePlate == licensePlate))
-                return new ValidationResult(false, "Номерной знак уже зарегистрирован.");
+            if (string.IsNullOrWhiteSpace(licensePlate))
+                return new ValidationResult(false, "Номер не может быть пустым");
+            licensePlate = licensePlate.ToUpperInvariant();
+            // Формат: 1 буква, 3 цифры, 2 буквы, 2 или 3 цифры (например, Х123ХХ12 или Х123ХХ123), только кириллица, без пробелов
+            if (!Regex.IsMatch(licensePlate, @"^[А-Я]{1}\d{3}[А-Я]{2}\d{2,3}$"))
+                return new ValidationResult(false, "Формат номера: Х123ХХ12 или Х123ХХ123 (строго: 1 буква, 3 цифры, 2 буквы, 2 или 3 цифры, только кириллица, без пробелов)");
             return new ValidationResult(true);
         }
 
