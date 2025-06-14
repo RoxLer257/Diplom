@@ -1,5 +1,6 @@
 ﻿using Diplom.Classes;
 using Diplom.Classes.ControlEventArgs;
+using Diplom.Classes.Validator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +54,6 @@ namespace Diplom.Controls
 
             RoleIdCmb.SelectedValue = employee.RoleID;
         }
-
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             string EmpLastName = LastNameBox.Text.Trim();
@@ -63,53 +63,115 @@ namespace Diplom.Controls
             string EmpPhone = PhoneBox.Text.Trim();
             string EmpPassword = PasswordBox.Password.Trim();
 
-            if (!string.IsNullOrWhiteSpace(EmpLastName) &&
-                !string.IsNullOrEmpty(EmpFirstName) &&
-                !string.IsNullOrEmpty(EmpMiddleName) &&
-                !string.IsNullOrWhiteSpace(EmpEmail) &&
-                !string.IsNullOrEmpty(EmpPhone) &&
-                RoleIdCmb.SelectedItem is Roles selectedRoleId)
+            var validator = new EmployeeValidator();
+            var validationResult = validator.ValidateEmployee(
+                EmpLastName,
+                EmpFirstName,
+                EmpMiddleName,
+                EmpEmail,
+                EmpPhone,
+                EmpPassword,
+                RoleIdCmb.SelectedItem as Roles
+            );
+
+            if (!validationResult.IsValid)
             {
-                var db = ClassFrame.ConnectDB;
-                Employees employee; 
+                MessageBox.Show(validationResult.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
-                if (_editingEmployee == null)
+            var db = ClassFrame.ConnectDB;
+            Employees employee;
+
+            if (_editingEmployee == null)
+            {
+                employee = new Employees
                 {
-                    employee = new Employees
-                    {
-                        LastName = EmpLastName,
-                        FirstName = EmpFirstName,
-                        MiddleName = EmpMiddleName,
-                        Email = EmpEmail,
-                        Phone = EmpPhone,
-                        Password = EmpPassword,
-                        RoleID = selectedRoleId.RoleID
-                    };
-                    db.Employees.Add(employee);
-                }
-                else
-                {
-                    employee = _editingEmployee;
-                    employee.LastName = EmpLastName;
-                    employee.FirstName = EmpFirstName;
-                    employee.MiddleName = EmpMiddleName;
-                    employee.Email = EmpEmail;
-                    employee.Phone = EmpPhone;
-                    employee.RoleID = selectedRoleId.RoleID;
-
-                    if (!string.IsNullOrEmpty(EmpPassword))
-                        employee.Password = EmpPassword;
-                }
-
-                db.SaveChanges();
-                
-                EmployeeAdded?.Invoke(this, new EmployeeEventArgs(employee));
+                    LastName = EmpLastName,
+                    FirstName = EmpFirstName,
+                    MiddleName = EmpMiddleName,
+                    Email = EmpEmail,
+                    Phone = EmpPhone,
+                    Password = EmpPassword,
+                    RoleID = (RoleIdCmb.SelectedItem as Roles).RoleID
+                };
+                db.Employees.Add(employee);
             }
             else
             {
-                MessageBox.Show("Пожалуйста, заполните все обязательные поля!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                employee = _editingEmployee;
+                employee.LastName = EmpLastName;
+                employee.FirstName = EmpFirstName;
+                employee.MiddleName = EmpMiddleName;
+                employee.Email = EmpEmail;
+                employee.Phone = EmpPhone;
+                employee.RoleID = (RoleIdCmb.SelectedItem as Roles).RoleID;
+
+                if (!string.IsNullOrEmpty(EmpPassword))
+                    employee.Password = EmpPassword;
             }
+
+            db.SaveChanges();
+
+            EmployeeAdded?.Invoke(this, new EmployeeEventArgs(employee));
         }
+
+        //private void SaveButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    string EmpLastName = LastNameBox.Text.Trim();
+        //    string EmpFirstName = FirstNameBox.Text.Trim();
+        //    string EmpMiddleName = MiddleNameBox.Text.Trim();
+        //    string EmpEmail = EmailBox.Text.Trim();
+        //    string EmpPhone = PhoneBox.Text.Trim();
+        //    string EmpPassword = PasswordBox.Password.Trim();
+
+        //    if (!string.IsNullOrWhiteSpace(EmpLastName) &&
+        //        !string.IsNullOrEmpty(EmpFirstName) &&
+        //        !string.IsNullOrEmpty(EmpMiddleName) &&
+        //        !string.IsNullOrWhiteSpace(EmpEmail) &&
+        //        !string.IsNullOrEmpty(EmpPhone) &&
+        //        RoleIdCmb.SelectedItem is Roles selectedRoleId)
+        //    {
+        //        var db = ClassFrame.ConnectDB;
+        //        Employees employee; 
+
+        //        if (_editingEmployee == null)
+        //        {
+        //            employee = new Employees
+        //            {
+        //                LastName = EmpLastName,
+        //                FirstName = EmpFirstName,
+        //                MiddleName = EmpMiddleName,
+        //                Email = EmpEmail,
+        //                Phone = EmpPhone,
+        //                Password = EmpPassword,
+        //                RoleID = selectedRoleId.RoleID
+        //            };
+        //            db.Employees.Add(employee);
+        //        }
+        //        else
+        //        {
+        //            employee = _editingEmployee;
+        //            employee.LastName = EmpLastName;
+        //            employee.FirstName = EmpFirstName;
+        //            employee.MiddleName = EmpMiddleName;
+        //            employee.Email = EmpEmail;
+        //            employee.Phone = EmpPhone;
+        //            employee.RoleID = selectedRoleId.RoleID;
+
+        //            if (!string.IsNullOrEmpty(EmpPassword))
+        //                employee.Password = EmpPassword;
+        //        }
+
+        //        db.SaveChanges();
+
+        //        EmployeeAdded?.Invoke(this, new EmployeeEventArgs(employee));
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("Пожалуйста, заполните все обязательные поля!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //    }
+        //}
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             ClearForm();

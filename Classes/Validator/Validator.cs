@@ -783,4 +783,109 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
     }
+
+    public class EmployeeValidator
+    {
+        // Валидация Фамилии
+        public ValidationResult ValidateLastName(string lastName)
+        {
+            if (string.IsNullOrWhiteSpace(lastName))
+                return new ValidationResult(false, "Фамилия не может быть пустой.");
+            if (!Regex.IsMatch(lastName, @"^[А-Яа-яЁё-]+$"))
+                return new ValidationResult(false, "Фамилия должна содержать только буквы кириллицы и дефис.");
+            return new ValidationResult(true);
+        }
+
+        // Валидация Имени
+        public ValidationResult ValidateFirstName(string firstName)
+        {
+            if (string.IsNullOrWhiteSpace(firstName))
+                return new ValidationResult(false, "Имя не может быть пустым.");
+            if (!Regex.IsMatch(firstName, @"^[А-Яа-яЁё-]+$"))
+                return new ValidationResult(false, "Имя должно содержать только буквы кириллицы и дефис.");
+            return new ValidationResult(true);
+        }
+
+        // Валидация Отчества
+        public ValidationResult ValidateMiddleName(string middleName)
+        {
+            if (string.IsNullOrWhiteSpace(middleName))
+                return new ValidationResult(false, "Отчество не может быть пустым.");
+            if (!Regex.IsMatch(middleName, @"^[А-Яа-яЁё-]+$"))
+                return new ValidationResult(false, "Отчество должно содержать только буквы кириллицы и дефис.");
+            return new ValidationResult(true);
+        }
+
+        // Валидация Email
+        public ValidationResult ValidateEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return new ValidationResult(false, "Email не может быть пустым.");
+            if (!Regex.IsMatch(email, @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"))
+                return new ValidationResult(false, "Некорректный формат Email.");
+            return new ValidationResult(true);
+        }
+
+        // Валидация Телефона
+        public ValidationResult ValidatePhone(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return new ValidationResult(false, "Телефон не может быть пустым.");
+            if (!Regex.IsMatch(phone, @"^\+?\d{10,15}$"))
+                return new ValidationResult(false, "Телефон должен содержать от 10 до 15 цифр (с опциональным '+' в начале).");
+            return new ValidationResult(true);
+        }
+
+        // Валидация Пароля
+        public ValidationResult ValidatePassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return new ValidationResult(false, "Пароль не может быть пустым.");
+            if (password.Length < 6)
+                return new ValidationResult(false, "Пароль должен содержать минимум 6 символов.");
+            return new ValidationResult(true);
+        }
+
+        // Валидация Роли
+        public ValidationResult ValidateRole(Roles role)
+        {
+            if (role == null)
+                return new ValidationResult(false, "Выберите роль сотрудника.");
+            return new ValidationResult(true);
+        }
+
+        // Полная валидация сотрудника
+        public ValidationResult ValidateEmployee(
+            string lastName,
+            string firstName,
+            string middleName,
+            string email,
+            string phone,
+            string password,
+            Roles role)
+        {
+            var lastNameResult = ValidateLastName(lastName);
+            if (!lastNameResult.IsValid) return lastNameResult;
+
+            var firstNameResult = ValidateFirstName(firstName);
+            if (!firstNameResult.IsValid) return firstNameResult;
+
+            var middleNameResult = ValidateMiddleName(middleName);
+            if (!middleNameResult.IsValid) return middleNameResult;
+
+            var emailResult = ValidateEmail(email);
+            if (!emailResult.IsValid) return emailResult;
+
+            var phoneResult = ValidatePhone(phone);
+            if (!phoneResult.IsValid) return phoneResult;
+
+            var passwordResult = ValidatePassword(password);
+            if (!passwordResult.IsValid) return passwordResult;
+
+            var roleResult = ValidateRole(role);
+            if (!roleResult.IsValid) return roleResult;
+
+            return new ValidationResult(true);
+        }
+    }
 }
