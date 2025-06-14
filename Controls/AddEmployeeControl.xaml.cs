@@ -115,63 +115,6 @@ namespace Diplom.Controls
 
             EmployeeAdded?.Invoke(this, new EmployeeEventArgs(employee));
         }
-
-        //private void SaveButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    string EmpLastName = LastNameBox.Text.Trim();
-        //    string EmpFirstName = FirstNameBox.Text.Trim();
-        //    string EmpMiddleName = MiddleNameBox.Text.Trim();
-        //    string EmpEmail = EmailBox.Text.Trim();
-        //    string EmpPhone = PhoneBox.Text.Trim();
-        //    string EmpPassword = PasswordBox.Password.Trim();
-
-        //    if (!string.IsNullOrWhiteSpace(EmpLastName) &&
-        //        !string.IsNullOrEmpty(EmpFirstName) &&
-        //        !string.IsNullOrEmpty(EmpMiddleName) &&
-        //        !string.IsNullOrWhiteSpace(EmpEmail) &&
-        //        !string.IsNullOrEmpty(EmpPhone) &&
-        //        RoleIdCmb.SelectedItem is Roles selectedRoleId)
-        //    {
-        //        var db = ClassFrame.ConnectDB;
-        //        Employees employee; 
-
-        //        if (_editingEmployee == null)
-        //        {
-        //            employee = new Employees
-        //            {
-        //                LastName = EmpLastName,
-        //                FirstName = EmpFirstName,
-        //                MiddleName = EmpMiddleName,
-        //                Email = EmpEmail,
-        //                Phone = EmpPhone,
-        //                Password = EmpPassword,
-        //                RoleID = selectedRoleId.RoleID
-        //            };
-        //            db.Employees.Add(employee);
-        //        }
-        //        else
-        //        {
-        //            employee = _editingEmployee;
-        //            employee.LastName = EmpLastName;
-        //            employee.FirstName = EmpFirstName;
-        //            employee.MiddleName = EmpMiddleName;
-        //            employee.Email = EmpEmail;
-        //            employee.Phone = EmpPhone;
-        //            employee.RoleID = selectedRoleId.RoleID;
-
-        //            if (!string.IsNullOrEmpty(EmpPassword))
-        //                employee.Password = EmpPassword;
-        //        }
-
-        //        db.SaveChanges();
-
-        //        EmployeeAdded?.Invoke(this, new EmployeeEventArgs(employee));
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Пожалуйста, заполните все обязательные поля!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //    }
-        //}
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             ClearForm();
