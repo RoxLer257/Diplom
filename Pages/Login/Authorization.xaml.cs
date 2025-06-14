@@ -77,16 +77,14 @@ namespace Diplom.Pages.Login
 
         private async void BtnEnter_Click(object sender, RoutedEventArgs e)
         {
-            // Сбрасываем стили перед проверкой
             TxtLogin.Background = Brushes.White;
             TxtPassword.Background = Brushes.White;
             TxtLogin.ToolTip = null;
             TxtPassword.ToolTip = null;
 
-            string login = TxtLogin.Text.Trim(); // Убираем пробелы
+            string login = TxtLogin.Text.Trim(); 
             string password = TxtPassword.Password.Trim();
 
-            // Проверка на пустые поля
             if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
             {
                 MessageBox.Show("Введите логин и пароль!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -100,27 +98,22 @@ namespace Diplom.Pages.Login
                     TxtPassword.Background = Brushes.Red;
                     TxtPassword.ToolTip = "Поле пароля не может быть пустым";
                 }
-                ResetFieldStyles(); // сбрасываю стиль через 2 секунды
+                ResetFieldStyles(); 
                 return;
             }
 
             try
             {
-                // Используем локальный контекст вместо статического
                 using (var context = new VSK_DBEntities())
                 {
-                    // Ищем сотрудника по email и паролю
                     var employee = await context.Employees
                         .FirstOrDefaultAsync(emp => emp.Email == login && emp.Password == password);
 
-                    // Если сотрудник не найден
                     if (employee == null)
                     {
-                        // Проверяем, существует ли пользователь с таким email
                         var userExists = await context.Employees.AnyAsync(emp => emp.Email == login);
                         if (userExists)
                         {
-                            // Если email существует, значит пароль неверный
                             TxtPassword.Background = Brushes.Red;
                             TxtPassword.ToolTip = "Неверный пароль";
                             MessageBox.Show("Неправильный пароль", "Ошибка при авторизации",
@@ -129,7 +122,6 @@ namespace Diplom.Pages.Login
                         }
                         else
                         {
-                            // Если email не существует
                             TxtLogin.Background = Brushes.Red;
                             TxtLogin.ToolTip = "Неверный логин";
                             MessageBox.Show("Неверный логин", "Ошибка при авторизации",
@@ -151,20 +143,18 @@ namespace Diplom.Pages.Login
                     context.Logs.Add(log);
                     await context.SaveChangesAsync();
 
-                    // Успешная авторизация
-                    ClassFrame.RoleID = employee.EmployeeID; // Предполагается, что это ID сотрудника
-                    CurrentUser.EmployeeID = employee.EmployeeID; // Сохраняем EmployeeID
+                    ClassFrame.RoleID = employee.EmployeeID; 
+                    CurrentUser.EmployeeID = employee.EmployeeID; 
                     CurrentUser.FullName = employee.FullName;
                     CurrentUser.Email = employee.Email;
-                    CurrentUser.Password = employee.Password; // Храним пароль (временно, позже заменим на хэш)
+                    CurrentUser.Password = employee.Password; 
                     CurrentUser.RoleName = context.Roles.FirstOrDefault(r => r.RoleID == employee.RoleID)?.RoleName;
 
-                    // Определяем, куда перенаправить пользователя
-                    if (employee.EmployeeID == 1) // Администратор
+                    if (employee.EmployeeID == 1) 
                     {
                         ClassFrame.frmObj.Navigate(new AdminPage());
                     }
-                    else // Обычный пользователь
+                    else 
                     {
                         ClassFrame.frmObj.Navigate(new MainPage.MainPage());
                     }
@@ -178,7 +168,7 @@ namespace Diplom.Pages.Login
         }
         private async void ResetFieldStyles()
         {
-            await Task.Delay(1250); // 1,25 секунды
+            await Task.Delay(1250); 
             TxtLogin.Background = Brushes.White;
             TxtPassword.Background = Brushes.White;
             TxtLogin.ToolTip = null;

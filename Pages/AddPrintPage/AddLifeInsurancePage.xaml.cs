@@ -12,7 +12,7 @@ namespace Diplom.Pages.AddPrintPage
     public partial class AddLifeInsurancePage : Page
     {
         private readonly VSK_DBEntities _context;
-        private List<Clients> _selectedClients; // Список выбранных клиентов
+        private List<Clients> _selectedClients; 
         private readonly LifeInsuranceValidator _lifeInsuranceValidator;
         private readonly ClientValidator _clientValidator;
         private bool isEditMode = false;
@@ -23,7 +23,7 @@ namespace Diplom.Pages.AddPrintPage
             InitializeComponent();
 
             _context = ClassFrame.ConnectDB;
-            _selectedClients = new List<Clients>(); // Инициализируем список клиентов
+            _selectedClients = new List<Clients>(); 
             _lifeInsuranceValidator = new LifeInsuranceValidator(_context);
             _clientValidator = new ClientValidator(_context);
 
@@ -32,7 +32,6 @@ namespace Diplom.Pages.AddPrintPage
             SetPolicyType("Страхование жизни");
         }
 
-        // Конструктор для режима редактирования
         public AddLifeInsurancePage(Policies policyToEdit) : this()
         {
             isEditMode = true;
@@ -55,19 +54,15 @@ namespace Diplom.Pages.AddPrintPage
 
         private void LoadData()
         {
-            // Загрузка типов полисов
             var policyTypes = _context.PolicyTypes.ToList();
             PolicyTypeComboBox.ItemsSource = policyTypes;
 
-            // Загрузка статусов полисов
             var policyStatuses = _context.PolicyStatuses.ToList();
             StatusComboBox.ItemsSource = policyStatuses;
 
-            // Загрузка состояний здоровья
             var healthConditions = _context.HealthConditions.ToList();
             HealthConditionComboBox.ItemsSource = healthConditions;
 
-            // Загрузка типов клиентов
             var clientTypes = _context.ClientTypes.ToList();
             ClientTypeComboBox.ItemsSource = clientTypes;
         }
@@ -140,14 +135,14 @@ namespace Diplom.Pages.AddPrintPage
             {
                 if (ClientTypeComboBox.SelectedItem is ClientTypes selectedType)
                 {
-                    if (selectedType.ClientTypeID == 1) // Физическое лицо
+                    if (selectedType.ClientTypeID == 1) 
                     {
                         GrdLastName.Visibility = Visibility.Visible;
                         GrdFirstName.Visibility = Visibility.Visible;
                         GrdMiddleName.Visibility = Visibility.Visible;
                         GrdCompany.Visibility = Visibility.Collapsed;
                     }
-                    else if (selectedType.ClientTypeID == 2) // Юридическое лицо
+                    else if (selectedType.ClientTypeID == 2) 
                     {
                         GrdLastName.Visibility = Visibility.Collapsed;
                         GrdFirstName.Visibility = Visibility.Collapsed;
@@ -265,13 +260,11 @@ namespace Diplom.Pages.AddPrintPage
         {
             NewClientPanel.Visibility = Visibility.Visible;
 
-            // Показываем поля ФИО, скрываем "Название компании"
             GrdLastName.Visibility = Visibility.Visible;
             GrdFirstName.Visibility = Visibility.Visible;
             GrdMiddleName.Visibility = Visibility.Visible;
             GrdCompany.Visibility = Visibility.Collapsed;
 
-            // Сбрасываем выбор или задаём тип клиента по умолчанию
             ClientTypeComboBox.SelectedIndex = -1; 
         }
         private void CreateClientButton_Click(object sender, RoutedEventArgs e)
@@ -497,8 +490,8 @@ namespace Diplom.Pages.AddPrintPage
                 Action = action,
                 ChangedData = changedData,
                 ChangeDate = DateTime.Now,
-                UserName = CurrentUser.Email ?? "System", // Используем Email из CurrentUser
-                EmployeeID = CurrentUser.EmployeeID // Используем EmployeeID из CurrentUser
+                UserName = CurrentUser.Email ?? "System", 
+                EmployeeID = CurrentUser.EmployeeID 
             };
             _context.Logs.Add(log);
             _context.SaveChanges();
@@ -514,24 +507,19 @@ namespace Diplom.Pages.AddPrintPage
         {
             try
             {
-                // Загрузка и установка типа полиса
                 var policyType = _context.PolicyTypes.FirstOrDefault(pt => pt.PolicyTypeID == policy.PolicyTypeID);
                 PolicyTypeComboBox.SelectedItem = policyType;
 
-                // Загрузка и установка статуса
                 var status = _context.PolicyStatuses.FirstOrDefault(ps => ps.StatusID == policy.StatusID);
                 StatusComboBox.SelectedItem = status;
                 UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
 
-                // Установка дат
                 StartDatePicker.SelectedDate = policy.StartDate;
                 EndDatePicker.SelectedDate = policy.EndDate;
 
-                // Установка стоимости
                 InsuranceAmountTextBox.Text = policy.InsuranceAmount.ToString();
                 UpdateTextBoxPlaceholder(InsuranceAmountTextBox, InsuranceAmountPlaceholder);
 
-                // Загрузка клиентов
                 _selectedClients.Clear();
                 foreach (var client in policy.Clients)
                 {
@@ -540,7 +528,6 @@ namespace Diplom.Pages.AddPrintPage
                 ClientsListBox.ItemsSource = null;
                 ClientsListBox.ItemsSource = _selectedClients;
 
-                // Загрузка данных о здоровье
                 var lifeAndHealth = _context.LifeAndHealth
                     .Include(lh => lh.HealthConditions)
                     .FirstOrDefault(lh => lh.PolicyID == policy.PolicyID);
@@ -550,7 +537,6 @@ namespace Diplom.Pages.AddPrintPage
                     AgeTextBox.Text = lifeAndHealth.Age.ToString();
                     UpdateTextBoxPlaceholder(AgeTextBox, AgePlaceholder);
 
-                    // Установка пола
                     var genderItem = GenderComboBox.Items.Cast<ComboBoxItem>()
                         .FirstOrDefault(item => item.Content.ToString() == lifeAndHealth.Gender);
                     if (genderItem != null)
@@ -559,7 +545,6 @@ namespace Diplom.Pages.AddPrintPage
                         UpdateComboBoxPlaceholder(GenderComboBox, GenderPlaceholder);
                     }
 
-                    // Установка состояния здоровья
                     HealthConditionComboBox.SelectedItem = lifeAndHealth.HealthConditions;
                     UpdateComboBoxPlaceholder(HealthConditionComboBox, HealthConditionPlaceholder);
 
@@ -567,7 +552,6 @@ namespace Diplom.Pages.AddPrintPage
                     UpdateTextBoxPlaceholder(OccupationTextBox, OccupationPlaceholder);
                 }
 
-                // Обновление видимости кнопок
                 if (_selectedClients.Any())
                 {
                     RemoveClientButton.Visibility = Visibility.Visible;

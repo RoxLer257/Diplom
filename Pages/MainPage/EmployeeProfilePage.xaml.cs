@@ -23,11 +23,9 @@ namespace Diplom.Pages.MainPage
         {
             try
             {
-                // Загружаем данные сотрудника из базы данных по EmployeeID из CurrentUser
                 _currentEmployee = _context.Employees
                     .FirstOrDefault(emp => emp.EmployeeID == CurrentUser.EmployeeID);
 
-                // Заполняем поля данными сотрудника
                 FullNameTextBox.Text = _currentEmployee.FullName;
                 EmailTextBox.Text = _currentEmployee.Email;
                 RoleTextBox.Text = _context.Roles
@@ -42,16 +40,14 @@ namespace Diplom.Pages.MainPage
 
         private void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
         {
-            // Показываем панель для ввода нового пароля
             PasswordChangePanel.Visibility = Visibility.Visible;
-            ChangePasswordButton.Visibility = Visibility.Collapsed; // Скрываем кнопку "Поменять пароль"
+            ChangePasswordButton.Visibility = Visibility.Collapsed; 
         }
 
         private void SavePasswordButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Проверяем, введён ли новый пароль
                 string newPassword = NewPasswordBox.Password.Trim();
                 string confirmPassword = ConfirmPasswordBox.Password.Trim();
 
@@ -62,7 +58,6 @@ namespace Diplom.Pages.MainPage
                     return;
                 }
 
-                // Проверяем длину пароля
                 if (newPassword.Length < 6)
                 {
                     MessageBox.Show("Новый пароль должен содержать не менее 6 символов.", "Ошибка",
@@ -70,7 +65,6 @@ namespace Diplom.Pages.MainPage
                     return;
                 }
 
-                // Проверяем совпадение паролей
                 if (newPassword != confirmPassword)
                 {
                     MessageBox.Show("Пароли не совпадают. Пожалуйста, проверьте введённые данные.", "Ошибка",
@@ -78,20 +72,16 @@ namespace Diplom.Pages.MainPage
                     return;
                 }
 
-                // Обновляем пароль сотрудника
                 _currentEmployee.Password = newPassword;
-                CurrentUser.Password = newPassword; // Обновляем пароль в CurrentUser
+                CurrentUser.Password = newPassword; 
 
-                // Логирование изменения пароля
                 LogAction("Employees", "Изменение", $"Сотрудник {CurrentUser.FullName} изменил пароль.");
 
-                // Сохраняем изменения в базе данных
                 _context.SaveChanges();
 
                 MessageBox.Show("Пароль успешно изменён!", "Успех",
                     MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Скрываем панель и очищаем поля
                 PasswordChangePanel.Visibility = Visibility.Collapsed;
                 ChangePasswordButton.Visibility = Visibility.Visible;
                 NewPasswordBox.Clear();
@@ -121,7 +111,6 @@ namespace Diplom.Pages.MainPage
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            // Возвращаемся на главную страницу
             NavigationService.GoBack();
         }
     }

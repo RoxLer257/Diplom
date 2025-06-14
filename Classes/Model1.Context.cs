@@ -27,6 +27,7 @@ namespace Diplom.Classes
     
         public virtual DbSet<Clients> Clients { get; set; }
         public virtual DbSet<ClientTypes> ClientTypes { get; set; }
+        public virtual DbSet<DriverInsuranceHistory> DriverInsuranceHistory { get; set; }
         public virtual DbSet<Drivers> Drivers { get; set; }
         public virtual DbSet<Employees> Employees { get; set; }
         public virtual DbSet<HealthConditions> HealthConditions { get; set; }
@@ -41,6 +42,5 @@ namespace Diplom.Classes
         public virtual DbSet<VehicleMakes> VehicleMakes { get; set; }
         public virtual DbSet<VehicleModels> VehicleModels { get; set; }
         public virtual DbSet<Vehicles> Vehicles { get; set; }
-        public virtual DbSet<DriverInsuranceHistory> DriverInsuranceHistory { get; set; }
     }
 }

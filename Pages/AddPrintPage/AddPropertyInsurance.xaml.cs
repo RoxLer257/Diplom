@@ -18,7 +18,7 @@ namespace Diplom.Pages.AddPrintPage
     {
         private readonly VSK_DBEntities _context;
         private ObservableCollection<Diplom.Classes.Properties> SelectedProperties { get; set; }
-        private List<Clients> _selectedClients; // Список выбранных клиентов
+        private List<Clients> _selectedClients;
         private readonly PropertyInsuranceValidator _propertyInsuranceValidator;
         private readonly ClientValidator _clientValidator;
         private bool isEditMode = false;
@@ -29,7 +29,7 @@ namespace Diplom.Pages.AddPrintPage
             InitializeComponent();
             _context = ClassFrame.ConnectDB;
             SelectedProperties = new ObservableCollection<Diplom.Classes.Properties>();
-            _selectedClients = new List<Clients>(); // Инициализируем список клиентов
+            _selectedClients = new List<Clients>();
             _propertyInsuranceValidator = new PropertyInsuranceValidator(_context);
             _clientValidator = new ClientValidator(_context);
 
@@ -38,7 +38,6 @@ namespace Diplom.Pages.AddPrintPage
             SetPolicyType("Страхование имущества");
         }
 
-        // Конструктор для режима редактирования
         public AddPropertyInsurance(Policies policyToEdit) : this()
         {
             isEditMode = true;
@@ -61,26 +60,20 @@ namespace Diplom.Pages.AddPrintPage
 
         private void LoadData()
         {
-            // Загрузка типов клиентов
             var clientTypes = _context.ClientTypes.ToList();
             ClientTypeComboBox.ItemsSource = clientTypes;
 
-            // Загрузка типов имущества
             var propertyTypes = _context.PropertyTypes.ToList();
             PropertyTypeComboBox.ItemsSource = propertyTypes;
 
-            // Загрузка типов полисов
             var policyTypes = _context.PolicyTypes.ToList();
             PolicyTypeComboBox.ItemsSource = policyTypes;
 
-            // Загрузка статусов полисов
             var policyStatuses = _context.PolicyStatuses.ToList();
             StatusComboBox.ItemsSource = policyStatuses;
 
-            // Привязка выбранных клиентов
             ClientsListBox.ItemsSource = _selectedClients;
 
-            // Привязка добавленного имущества
             PropertiesListBox.ItemsSource = SelectedProperties;
         }
 
@@ -145,14 +138,14 @@ namespace Diplom.Pages.AddPrintPage
             {
                 if (ClientTypeComboBox.SelectedItem is ClientTypes selectedType)
                 {
-                    if (selectedType.ClientTypeID == 1) // Физическое лицо
+                    if (selectedType.ClientTypeID == 1) 
                     {
                         GrdLastName.Visibility = Visibility.Visible;
                         GrdFirstName.Visibility = Visibility.Visible;
                         GrdMiddleName.Visibility = Visibility.Visible;
                         GrdCompany.Visibility = Visibility.Collapsed;
                     }
-                    else if (selectedType.ClientTypeID == 2) // Юридическое лицо
+                    else if (selectedType.ClientTypeID == 2) 
                     {
                         GrdLastName.Visibility = Visibility.Collapsed;
                         GrdFirstName.Visibility = Visibility.Collapsed;
@@ -252,13 +245,11 @@ namespace Diplom.Pages.AddPrintPage
         {
             NewClientPanel.Visibility = Visibility.Visible;
 
-            // Показываем поля ФИО, скрываем "Название компании"
             GrdLastName.Visibility = Visibility.Visible;
             GrdFirstName.Visibility = Visibility.Visible;
             GrdMiddleName.Visibility = Visibility.Visible;
             GrdCompany.Visibility = Visibility.Collapsed;
 
-            // Сбрасываем выбор или задаём тип клиента по умолчанию
             ClientTypeComboBox.SelectedIndex = -1;
         }
         private void CreateClientButton_Click(object sender, RoutedEventArgs e)
@@ -354,7 +345,6 @@ namespace Diplom.Pages.AddPrintPage
 
         private void AddNewPropertyButton_Click(object sender, RoutedEventArgs e)
         {
-            // Проверяем тип имущества
             if (PropertyTypeComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Выберите тип имущества", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -372,7 +362,6 @@ namespace Diplom.Pages.AddPrintPage
                 value = parsedValue;
             }
 
-            // Проверяем только данные имущества
             var propertyTypeResult = _propertyInsuranceValidator.ValidatePropertyType(PropertyTypeComboBox.SelectedItem as PropertyTypes);
             if (!propertyTypeResult.IsValid)
             {
@@ -415,10 +404,8 @@ namespace Diplom.Pages.AddPrintPage
                 PropertiesListBox.ItemsSource = null;
                 PropertiesListBox.ItemsSource = SelectedProperties;
 
-                // Скрываем кнопку добавления имущества
                 AddPropertyButton.Visibility = Visibility.Collapsed;
 
-                // Очищаем поля
                 PropertyTypeComboBox.SelectedItem = null;
                 AddressTextBox.Text = string.Empty;
                 AreaTextBox.Text = string.Empty;
@@ -429,7 +416,6 @@ namespace Diplom.Pages.AddPrintPage
                 UpdateTextBoxPlaceholder(AreaTextBox, AreaPlaceholder);
                 UpdateTextBoxPlaceholder(ValueTextBox, ValuePlaceholder);
 
-                // Скрываем панель добавления имущества
                 NewPropertyPanel.Visibility = Visibility.Collapsed;
             }
             catch (Exception ex)
@@ -452,7 +438,6 @@ namespace Diplom.Pages.AddPrintPage
                 PropertiesListBox.ItemsSource = SelectedProperties;
                 RemovePropertyButton.Visibility = Visibility.Collapsed;
                 
-                // Показываем кнопку добавления имущества, если список пуст
                 if (!SelectedProperties.Any())
                 {
                     AddPropertyButton.Visibility = Visibility.Visible;
@@ -468,13 +453,11 @@ namespace Diplom.Pages.AddPrintPage
         {
             NewPropertyPanel.Visibility = Visibility.Visible;
             
-            // Очищаем поля имущества
             PropertyTypeComboBox.SelectedItem = null;
             AddressTextBox.Text = string.Empty;
             AreaTextBox.Text = string.Empty;
             ValueTextBox.Text = string.Empty;
 
-            // Обновляем плейсхолдеры
             UpdateComboBoxPlaceholder(PropertyTypeComboBox, PropertyTypePlaceholder);
             UpdateTextBoxPlaceholder(AddressTextBox, AddressPlaceholder);
             UpdateTextBoxPlaceholder(AreaTextBox, AreaPlaceholder);
@@ -483,25 +466,21 @@ namespace Diplom.Pages.AddPrintPage
 
         private void HideNewPropertyPanelButton_Click(object sender, RoutedEventArgs e)
         {
-            // Очищаем поля имущества
             PropertyTypeComboBox.SelectedItem = null;
             AddressTextBox.Text = string.Empty;
             AreaTextBox.Text = string.Empty;
             ValueTextBox.Text = string.Empty;
 
-            // Обновляем плейсхолдеры
             UpdateComboBoxPlaceholder(PropertyTypeComboBox, PropertyTypePlaceholder);
             UpdateTextBoxPlaceholder(AddressTextBox, AddressPlaceholder);
             UpdateTextBoxPlaceholder(AreaTextBox, AreaPlaceholder);
             UpdateTextBoxPlaceholder(ValueTextBox, ValuePlaceholder);
 
-            // Скрываем панель
             NewPropertyPanel.Visibility = Visibility.Collapsed;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // Извлечение данных из полей
             decimal? insuranceAmount = null;
             if (decimal.TryParse(InsuranceAmountTextBox.Text, out decimal parsedAmount))
             {
@@ -512,7 +491,6 @@ namespace Diplom.Pages.AddPrintPage
             PolicyTypes policyType = PolicyTypeComboBox.SelectedItem as PolicyTypes;
             PolicyStatuses status = StatusComboBox.SelectedItem as PolicyStatuses;
 
-            // Валидация данных полиса
             var validationResult = _propertyInsuranceValidator.ValidatePolicyData(
                 startDate,
                 endDate,
@@ -533,21 +511,18 @@ namespace Diplom.Pages.AddPrintPage
             {
                 if (isEditMode)
                 {
-                    // Обновление существующего полиса
                     editablePolicy.PolicyTypeID = policyType.PolicyTypeID;
                     editablePolicy.StatusID = status.StatusID;
                     editablePolicy.InsuranceAmount = insuranceAmount.Value;
                     editablePolicy.StartDate = startDate.Value;
                     editablePolicy.EndDate = endDate.Value;
 
-                    // Обновление клиентов
                     editablePolicy.Clients.Clear();
                     foreach (var client in _selectedClients)
                     {
                         editablePolicy.Clients.Add(client);
                     }
 
-                    // Обновление имущества
                     var existingProperties = _context.Properties.Where(p => p.PolicyID == editablePolicy.PolicyID).ToList();
                     _context.Properties.RemoveRange(existingProperties);
 
@@ -566,7 +541,6 @@ namespace Diplom.Pages.AddPrintPage
 
                     _context.SaveChanges();
 
-                    // Логирование
                     LogAction("Policies", "Редактирование", $"Отредактирован полис: {editablePolicy.PolicyID}");
                     LogAction("Properties", "Редактирование", $"Обновлены записи имущества для полиса: {editablePolicy.PolicyID}");
 
@@ -574,7 +548,6 @@ namespace Diplom.Pages.AddPrintPage
                 }
                 else
                 {
-                    // Создание полиса
                     var policy = new Policies
                     {
                         PolicyTypeID = policyType.PolicyTypeID,
@@ -584,16 +557,14 @@ namespace Diplom.Pages.AddPrintPage
                         EndDate = endDate.Value
                     };
 
-                    // Добавление клиентов
                     foreach (var client in _selectedClients)
                     {
                         policy.Clients.Add(client);
                     }
 
                     _context.Policies.Add(policy);
-                    _context.SaveChanges(); // Сохраняем полис, чтобы получить PolicyID
+                    _context.SaveChanges(); 
 
-                    // Создание записей для имущества
                     foreach (var property in SelectedProperties)
                     {
                         var newProperty = new Diplom.Classes.Properties
@@ -609,7 +580,6 @@ namespace Diplom.Pages.AddPrintPage
 
                     _context.SaveChanges();
 
-                    // Логирование
                     LogAction("Policies", "Добавление", $"Добавлен полис: {policy.PolicyID} с {policy.Clients.Count} клиентами и {SelectedProperties.Count} объектами имущества");
                     LogAction("Properties", "Добавление", $"Добавлена запись для полиса: {policy.PolicyID} с {SelectedProperties.Count} объектами имущества");
 
@@ -637,13 +607,11 @@ namespace Diplom.Pages.AddPrintPage
             SelectedProperties.Clear();
             PropertiesListBox.ItemsSource = null;
 
-            // Очищаем поля имущества
             PropertyTypeComboBox.SelectedItem = null;
             AddressTextBox.Text = string.Empty;
             AreaTextBox.Text = string.Empty;
             ValueTextBox.Text = string.Empty;
 
-            // Очищаем поля клиента и скрываем панели
             ClearClientForm();
             NewClientPanel.Visibility = Visibility.Collapsed;
             NewPropertyPanel.Visibility = Visibility.Collapsed;
@@ -660,8 +628,8 @@ namespace Diplom.Pages.AddPrintPage
                 Action = action,
                 ChangedData = changedData,
                 ChangeDate = DateTime.Now,
-                UserName = CurrentUser.Email ?? "System", // Используем Email из CurrentUser
-                EmployeeID = CurrentUser.EmployeeID // Используем EmployeeID из CurrentUser
+                UserName = CurrentUser.Email ?? "System", 
+                EmployeeID = CurrentUser.EmployeeID 
             };
             _context.Logs.Add(log);
             _context.SaveChanges();
@@ -677,25 +645,19 @@ namespace Diplom.Pages.AddPrintPage
         {
             try
             {
-                // Загрузка и установка типа полиса
                 var policyType = _context.PolicyTypes.FirstOrDefault(pt => pt.PolicyTypeID == policy.PolicyTypeID);
                 PolicyTypeComboBox.SelectedItem = policyType;
-                //UpdateComboBoxPlaceholder(PolicyTypeComboBox, PolicyTypePlaceholder);
-
-                // Загрузка и установка статуса
+                
                 var status = _context.PolicyStatuses.FirstOrDefault(ps => ps.StatusID == policy.StatusID);
                 StatusComboBox.SelectedItem = status;
                 UpdateComboBoxPlaceholder(StatusComboBox, StatusPlaceholder);
 
-                // Установка дат
                 StartDatePicker.SelectedDate = policy.StartDate;
                 EndDatePicker.SelectedDate = policy.EndDate;
 
-                // Установка стоимости
                 InsuranceAmountTextBox.Text = policy.InsuranceAmount.ToString();
                 UpdateTextBoxPlaceholder(InsuranceAmountTextBox, InsuranceAmountPlaceholder);
 
-                // Загрузка клиентов
                 _selectedClients.Clear();
                 foreach (var client in policy.Clients)
                 {
@@ -704,7 +666,6 @@ namespace Diplom.Pages.AddPrintPage
                 ClientsListBox.ItemsSource = null;
                 ClientsListBox.ItemsSource = _selectedClients;
 
-                // Загрузка имущества
                 SelectedProperties.Clear();
                 var properties = _context.Properties
                     .Include(p => p.PropertyTypes)
@@ -718,7 +679,6 @@ namespace Diplom.Pages.AddPrintPage
                 PropertiesListBox.ItemsSource = null;
                 PropertiesListBox.ItemsSource = SelectedProperties;
 
-                // Обновление видимости кнопок
                 if (_selectedClients.Any())
                 {
                     RemoveClientButton.Visibility = Visibility.Visible;

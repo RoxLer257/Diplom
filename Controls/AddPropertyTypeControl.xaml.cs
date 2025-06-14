@@ -39,33 +39,9 @@ namespace Diplom.Controls
                 var newPropertyType = new PropertyTypes { TypeName = TypeName };
                 db.PropertyTypes.Add(newPropertyType);
                 db.SaveChanges();
-                // Передаем объект через событие
                 PropertyTypeAdded?.Invoke(this, new PropertyTypeEventArgs(newPropertyType));
             }
         }
-
-        //private void SaveButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    string TypeName = TypeNameBox.Text.Trim();
-
-        //    if (!string.IsNullOrWhiteSpace(TypeName))
-        //    {
-        //        var db = VSK_DBEntities.GetContext();
-
-        //        db.PropertyTypes.Add(new PropertyTypes
-        //        {
-        //            TypeName = TypeName
-        //        });
-
-        //        db.SaveChanges();
-
-        //        // Оповестим, что бренд добавлен
-        //        PropertyTypeAdded?.Invoke(this, EventArgs.Empty);
-
-        //        //LogAction("VehicleMakes", "Добавление", $"Добавлен автомобильный бренд {brandName}");
-        //    }
-
-        //}
 
         private void InitializePlaceholders()
         {

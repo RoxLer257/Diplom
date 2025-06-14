@@ -20,37 +20,28 @@ namespace Diplom.Classes.Calculator
         {
             try
             {
-                // Проверка обязательных данных
                 if (!startDate.HasValue || !endDate.HasValue || enginePower <= 0 || drivers == null || drivers.Count == 0 || string.IsNullOrEmpty(regionCoefficient))
                 {
                     throw new ArgumentException("Некорректные входные данные: проверьте даты, мощность двигателя, список водителей и региональный коэффициент.");
                 }
 
-                // Базовый тариф (среднее значение для ОСАГО)
                 double tb = (1646 + 7535) / 2;
 
-                // Территориальный коэффициент
                 if (!double.TryParse(regionCoefficient, NumberStyles.Any, CultureInfo.InvariantCulture, out double kt))
                 {
                     throw new FormatException($"Не удалось преобразовать региональный коэффициент '{regionCoefficient}' в число.");
                 }
 
-                // Коэффициент возраста и стажа (берем минимальный КВС среди водителей)
                 double kvs = drivers.Min(d => CalculateKVS(d));
 
-                // Коэффициент мощности
                 double km = CalculateKM(enginePower);
 
-                // Коэффициент срока страхования
                 double ks = CalculateKS(startDate.Value, endDate.Value);
 
-                // Коэффициент ограничения
                 double ko = drivers.Count > 1 ? 2.32 : 1.0;
 
-                // КБМ (берем максимальный среди водителей)
                 double kbm = drivers.Max(d => CalculateKBM(d));
 
-                // Итоговая стоимость
                 double cost = tb * kt * kbm * kvs * km * ks * ko;
                 return Math.Round(cost, 2);
             }
@@ -123,7 +114,7 @@ namespace Diplom.Classes.Calculator
 
                 if (!history.Any())
                 {
-                    return 1.17; // Новый водитель — базовый КБМ
+                    return 1.17; 
                 }
 
                 var latest = history.First();
@@ -136,12 +127,10 @@ namespace Diplom.Classes.Calculator
 
                     if (latest.HadAccident)
                     {
-                        // Авария — понижаем на 2 класса (но не ниже -1)
                         newClass = Math.Max(currentClass - 2, -1);
                     }
                     else
                     {
-                        // Без аварий — повышаем на 1 класс
                         newClass = Math.Min(currentClass + 1, 13);
                     }
 

@@ -38,34 +38,10 @@ namespace Diplom.Controls
                 var newHealthCondition = new HealthConditions { ConditionName = ConditionName };
                 db.HealthConditions.Add(newHealthCondition);
                 db.SaveChanges();
-                // Передаем объект через событие
                 HealthConditionAdded?.Invoke(this, new HealthConditionEventArgs(newHealthCondition));
             }
         }
 
-        //private void SaveButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    string ConditionName = AddConditionNameBox.Text.Trim();
-
-        //    if (!string.IsNullOrWhiteSpace(ConditionName))
-        //    {
-        //        var db = VSK_DBEntities.GetContext();
-
-        //        db.HealthConditions.Add(new HealthConditions
-        //        {
-        //            ConditionName = ConditionName
-        //        });
-
-        //        db.SaveChanges();
-
-        //        // Оповестим, что бренд добавлен
-        //        HealthConditionAdded?.Invoke(this, EventArgs.Empty);
-
-        //        //LogAction("VehicleMakes", "Добавление", $"Добавлен автомобильный бренд {brandName}");
-        //    }
-
-
-        //}
 
         private void InitializePlaceholders()
         {

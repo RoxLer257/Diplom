@@ -114,7 +114,6 @@ namespace Diplom.Pages
             UpdateTextBoxPlaceholder(DriverPassportNumberTextBox, DriverPassportNumberPlaceholder);
             UpdateTextBoxPlaceholder(DriverINNTextBox, DriverINNPlaceholder);
 
-            // Добавляем обработчики для автоматического преобразования в верхний регистр
             VinTextBox.TextChanged += (s, e) => {
                 if (VinTextBox.Text != VinTextBox.Text.ToUpperInvariant())
                 {
@@ -412,13 +411,11 @@ namespace Diplom.Pages
 
         private void CalculateCostButton_Click(object sender, RoutedEventArgs e)
         {
-            // 0. Проверка выбора типа полиса
             if (PolicyTypeComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Выберите тип полиса.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 1. Проверка VIN
             if (isEditMode && editablePolicy != null)
             {
                 var vehicle = _context.Vehicles.FirstOrDefault(v => v.PolicyID == editablePolicy.PolicyID);
@@ -441,7 +438,6 @@ namespace Diplom.Pages
                     return;
                 }
             }
-            // 2. Проверка года выпуска
             if (!int.TryParse(YearTextBox.Text, out int year))
             {
                 MessageBox.Show("Год выпуска: введите числовое значение.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -453,32 +449,27 @@ namespace Diplom.Pages
                 MessageBox.Show(yearResult.ErrorMessage, "Ошибка года выпуска", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 3. Проверка регистрационного номера
             var plateResult = _vehicleValidator.ValidateLicensePlate(LicensePlateTextBox.Text.ToUpperInvariant());
             if (!plateResult.IsValid)
             {
                 MessageBox.Show(plateResult.ErrorMessage, "Ошибка номера", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 4. Проверка марки
             if (VehicleMakeComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Выберите марку автомобиля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 5. Проверка модели
             if (VehicleModelComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Выберите модель автомобиля.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 6. Проверка региона
             if (RegionComboBox.SelectedItem == null)
             {
                 MessageBox.Show("Выберите регион регистрации.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 7. Проверка мощности
             string enginePowerText = EnginePowerTextBox.Text.Replace("л.с.", "").Trim();
             if (!int.TryParse(enginePowerText, out int enginePower))
             {
@@ -491,7 +482,6 @@ namespace Diplom.Pages
                 MessageBox.Show(powerResult.ErrorMessage, "Ошибка мощности", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 8. Проверка дат
             var startDateResult = _policyValidator.ValidateStartDate(StartDatePicker.SelectedDate);
             if (!startDateResult.IsValid)
             {
@@ -504,20 +494,17 @@ namespace Diplom.Pages
                 MessageBox.Show(endDateResult.ErrorMessage, "Ошибка даты окончания", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 9. Проверка клиентов
             if (!_selectedClients.Any())
             {
                 MessageBox.Show("Добавьте хотя бы одного клиента.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // 10. Проверка водителей
             var driversResult = _policyValidator.ValidateDrivers(SelectedDrivers);
             if (!driversResult.IsValid)
             {
                 MessageBox.Show(driversResult.ErrorMessage, "Ошибка водителей", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            // --- Если всё ок, только тогда считаем стоимость ---
             try
             {
                 double kt = double.Parse((RegionComboBox.SelectedItem as ComboBoxItem).Tag.ToString(), System.Globalization.CultureInfo.InvariantCulture);
@@ -1185,7 +1172,6 @@ namespace Diplom.Pages
 
                 if (vehicle != null)
                 {
-                    // Делаем поля автомобиля недоступными для редактирования
                     VehicleMakeComboBox.IsEnabled = false;
                     VehicleModelComboBox.IsEnabled = false;
                     VinTextBox.IsReadOnly = true;
@@ -1193,7 +1179,6 @@ namespace Diplom.Pages
                     LicensePlateTextBox.IsReadOnly = true;
                     EnginePowerTextBox.IsReadOnly = true;
 
-                    // Устанавливаем значения
                     VehicleMakeComboBox.SelectedItem = vehicle.VehicleModels.VehicleMakes;
                     UpdateComboBoxPlaceholder(VehicleMakeComboBox, VehicleMakePlaceholder);
 

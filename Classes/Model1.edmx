@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="Хранилище VSK_ArchiveModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="Хранилище VSK_DiplomModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="ClientDrivers">
           <Key>
             <PropertyRef Name="ClientID" />
@@ -475,7 +475,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="Хранилище VSK_ArchiveModelContainer">
+        <EntityContainer Name="Хранилище VSK_DiplomModelContainer">
           <EntitySet Name="ClientDrivers" EntityType="Self.ClientDrivers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Clients" EntityType="Self.Clients" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ClientTypes" EntityType="Self.ClientTypes" Schema="dbo" store:Type="Tables" />
@@ -589,10 +589,11 @@
             <End Role="Vehicles" EntitySet="Vehicles" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="VSK_ArchiveModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="VSK_DiplomModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Clients">
           <Key>
             <PropertyRef Name="ClientID" />
@@ -622,6 +623,20 @@
           <Property Name="TypeName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Clients" Relationship="Self.FK_Clients_ClientType" FromRole="ClientTypes" ToRole="Clients" />
         </EntityType>
+        <EntityType Name="DriverInsuranceHistory">
+          <Key>
+            <PropertyRef Name="HistoryID" />
+          </Key>
+          <Property Name="HistoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DriverID" Type="Int32" Nullable="false" />
+          <Property Name="PolicyID" Type="Int32" Nullable="false" />
+          <Property Name="Year" Type="Int32" Nullable="false" />
+          <Property Name="HadAccident" Type="Boolean" Nullable="false" />
+          <Property Name="KBM" Type="Decimal" Precision="4" Scale="2" Nullable="false" />
+          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Drivers" Relationship="Self.FK_DriverInsuranceHistory_Driver" FromRole="DriverInsuranceHistory" ToRole="Drivers" />
+          <NavigationProperty Name="Policies" Relationship="Self.FK_DriverInsuranceHistory_Policy" FromRole="DriverInsuranceHistory" ToRole="Policies" />
+        </EntityType>
         <EntityType Name="Drivers">
           <Key>
             <PropertyRef Name="DriverID" />
@@ -635,9 +650,9 @@
           <Property Name="LicenseNumber" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="DrivingExperience" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Clients" Relationship="Self.FK_Drivers_Clients" FromRole="Drivers" ToRole="Clients" />
+          <NavigationProperty Name="DriverInsuranceHistory" Relationship="Self.FK_DriverInsuranceHistory_Driver" FromRole="Drivers" ToRole="DriverInsuranceHistory" />
           <NavigationProperty Name="Clients1" Relationship="Self.ClientDrivers" FromRole="Drivers" ToRole="Clients" />
           <NavigationProperty Name="Policies" Relationship="Self.PolicyDrivers" FromRole="Drivers" ToRole="Policies" />
-          <NavigationProperty Name="DriverInsuranceHistory" Relationship="VSK_ArchiveModel.FK_DriverInsuranceHistory_Driver" FromRole="Drivers" ToRole="DriverInsuranceHistory" />
         </EntityType>
         <EntityType Name="Employees">
           <Key>
@@ -702,6 +717,7 @@
           <Property Name="InsuranceAmount" Type="Decimal" Precision="15" Scale="2" Nullable="false" />
           <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="DriverInsuranceHistory" Relationship="Self.FK_DriverInsuranceHistory_Policy" FromRole="Policies" ToRole="DriverInsuranceHistory" />
           <NavigationProperty Name="LifeAndHealth" Relationship="Self.FK_LifeAndHealth_Policy" FromRole="Policies" ToRole="LifeAndHealth" />
           <NavigationProperty Name="PolicyTypes" Relationship="Self.FK_Policies_PolicyType" FromRole="Policies" ToRole="PolicyTypes" />
           <NavigationProperty Name="PolicyStatuses" Relationship="Self.FK_Policies_Status" FromRole="Policies" ToRole="PolicyStatuses" />
@@ -709,7 +725,6 @@
           <NavigationProperty Name="Vehicles" Relationship="Self.FK_Vehicles_Policy" FromRole="Policies" ToRole="Vehicles" />
           <NavigationProperty Name="Clients" Relationship="Self.PolicyClients" FromRole="Policies" ToRole="Clients" />
           <NavigationProperty Name="Drivers" Relationship="Self.PolicyDrivers" FromRole="Policies" ToRole="Drivers" />
-          <NavigationProperty Name="DriverInsuranceHistory" Relationship="VSK_ArchiveModel.FK_DriverInsuranceHistory_Policy" FromRole="Policies" ToRole="DriverInsuranceHistory" />
         </EntityType>
         <EntityType Name="PolicyStatuses">
           <Key>
@@ -784,10 +799,10 @@
           <Property Name="VIN" Type="String" MaxLength="17" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Year" Type="Int32" Nullable="false" />
           <Property Name="LicensePlate" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Policies" Relationship="Self.FK_Vehicles_Policy" FromRole="Vehicles" ToRole="Policies" />
-          <NavigationProperty Name="VehicleModels" Relationship="Self.FK_Vehicles_Model" FromRole="Vehicles" ToRole="VehicleModels" />
           <Property Name="RegistrationRegion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="EnginePower" Type="Int32" />
+          <NavigationProperty Name="Policies" Relationship="Self.FK_Vehicles_Policy" FromRole="Vehicles" ToRole="Policies" />
+          <NavigationProperty Name="VehicleModels" Relationship="Self.FK_Vehicles_Model" FromRole="Vehicles" ToRole="VehicleModels" />
         </EntityType>
         <Association Name="FK_Clients_Agent">
           <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
@@ -822,6 +837,30 @@
             </Principal>
             <Dependent Role="Drivers">
               <PropertyRef Name="ClientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DriverInsuranceHistory_Driver">
+          <End Role="Drivers" Type="Self.Drivers" Multiplicity="1" />
+          <End Role="DriverInsuranceHistory" Type="Self.DriverInsuranceHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Drivers">
+              <PropertyRef Name="DriverID" />
+            </Principal>
+            <Dependent Role="DriverInsuranceHistory">
+              <PropertyRef Name="DriverID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DriverInsuranceHistory_Policy">
+          <End Role="Policies" Type="Self.Policies" Multiplicity="1" />
+          <End Role="DriverInsuranceHistory" Type="Self.DriverInsuranceHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Policies">
+              <PropertyRef Name="PolicyID" />
+            </Principal>
+            <Dependent Role="DriverInsuranceHistory">
+              <PropertyRef Name="PolicyID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -984,6 +1023,7 @@
         <EntityContainer Name="VSK_DBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Clients" EntityType="Self.Clients" />
           <EntitySet Name="ClientTypes" EntityType="Self.ClientTypes" />
+          <EntitySet Name="DriverInsuranceHistory" EntityType="Self.DriverInsuranceHistory" />
           <EntitySet Name="Drivers" EntityType="Self.Drivers" />
           <EntitySet Name="Employees" EntityType="Self.Employees" />
           <EntitySet Name="HealthConditions" EntityType="Self.HealthConditions" />
@@ -1009,6 +1049,14 @@
           <AssociationSet Name="FK_Drivers_Clients" Association="Self.FK_Drivers_Clients">
             <End Role="Clients" EntitySet="Clients" />
             <End Role="Drivers" EntitySet="Drivers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DriverInsuranceHistory_Driver" Association="Self.FK_DriverInsuranceHistory_Driver">
+            <End Role="Drivers" EntitySet="Drivers" />
+            <End Role="DriverInsuranceHistory" EntitySet="DriverInsuranceHistory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DriverInsuranceHistory_Policy" Association="Self.FK_DriverInsuranceHistory_Policy">
+            <End Role="Policies" EntitySet="Policies" />
+            <End Role="DriverInsuranceHistory" EntitySet="DriverInsuranceHistory" />
           </AssociationSet>
           <AssociationSet Name="FK_Employees_Manager" Association="Self.FK_Employees_Manager">
             <End Role="Employees" EntitySet="Employees" />
@@ -1070,62 +1118,15 @@
             <End Role="Drivers" EntitySet="Drivers" />
             <End Role="Policies" EntitySet="Policies" />
           </AssociationSet>
-          <EntitySet Name="DriverInsuranceHistory" EntityType="VSK_ArchiveModel.DriverInsuranceHistory" />
-          <AssociationSet Name="FK_DriverInsuranceHistory_Driver" Association="VSK_ArchiveModel.FK_DriverInsuranceHistory_Driver">
-            <End Role="Drivers" EntitySet="Drivers" />
-            <End Role="DriverInsuranceHistory" EntitySet="DriverInsuranceHistory" />
-          </AssociationSet>
-          <AssociationSet Name="FK_DriverInsuranceHistory_Policy" Association="VSK_ArchiveModel.FK_DriverInsuranceHistory_Policy">
-            <End Role="Policies" EntitySet="Policies" />
-            <End Role="DriverInsuranceHistory" EntitySet="DriverInsuranceHistory" />
-          </AssociationSet>
         </EntityContainer>
-        <EntityType Name="DriverInsuranceHistory">
-          <Key>
-            <PropertyRef Name="HistoryID" />
-          </Key>
-          <Property Name="HistoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DriverID" Type="Int32" Nullable="false" />
-          <Property Name="PolicyID" Type="Int32" Nullable="false" />
-          <Property Name="Year" Type="Int32" Nullable="false" />
-          <Property Name="HadAccident" Type="Boolean" Nullable="false" />
-          <Property Name="KBM" Type="Decimal" Nullable="false" Precision="4" Scale="2" />
-          <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Drivers" Relationship="VSK_ArchiveModel.FK_DriverInsuranceHistory_Driver" FromRole="DriverInsuranceHistory" ToRole="Drivers" />
-          <NavigationProperty Name="Policies" Relationship="VSK_ArchiveModel.FK_DriverInsuranceHistory_Policy" FromRole="DriverInsuranceHistory" ToRole="Policies" />
-        </EntityType>
-        <Association Name="FK_DriverInsuranceHistory_Driver">
-          <End Type="VSK_ArchiveModel.Drivers" Role="Drivers" Multiplicity="1" />
-          <End Type="VSK_ArchiveModel.DriverInsuranceHistory" Role="DriverInsuranceHistory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Drivers">
-              <PropertyRef Name="DriverID" />
-            </Principal>
-            <Dependent Role="DriverInsuranceHistory">
-              <PropertyRef Name="DriverID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_DriverInsuranceHistory_Policy">
-          <End Type="VSK_ArchiveModel.Policies" Role="Policies" Multiplicity="1" />
-          <End Type="VSK_ArchiveModel.DriverInsuranceHistory" Role="DriverInsuranceHistory" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Policies">
-              <PropertyRef Name="PolicyID" />
-            </Principal>
-            <Dependent Role="DriverInsuranceHistory">
-              <PropertyRef Name="PolicyID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="Хранилище VSK_ArchiveModelContainer" CdmEntityContainer="VSK_DBEntities">
+        <EntityContainerMapping StorageEntityContainer="Хранилище VSK_DiplomModelContainer" CdmEntityContainer="VSK_DBEntities">
           <EntitySetMapping Name="Clients">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.Clients">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.Clients">
               <MappingFragment StoreEntitySet="Clients">
                 <ScalarProperty Name="ClientID" ColumnName="ClientID" />
                 <ScalarProperty Name="ClientTypeID" ColumnName="ClientTypeID" />
@@ -1142,15 +1143,28 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="ClientTypes">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.ClientTypes">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.ClientTypes">
               <MappingFragment StoreEntitySet="ClientTypes">
                 <ScalarProperty Name="ClientTypeID" ColumnName="ClientTypeID" />
                 <ScalarProperty Name="TypeName" ColumnName="TypeName" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="DriverInsuranceHistory">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.DriverInsuranceHistory">
+              <MappingFragment StoreEntitySet="DriverInsuranceHistory">
+                <ScalarProperty Name="HistoryID" ColumnName="HistoryID" />
+                <ScalarProperty Name="DriverID" ColumnName="DriverID" />
+                <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="HadAccident" ColumnName="HadAccident" />
+                <ScalarProperty Name="KBM" ColumnName="KBM" />
+                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Drivers">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.Drivers">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.Drivers">
               <MappingFragment StoreEntitySet="Drivers">
                 <ScalarProperty Name="DriverID" ColumnName="DriverID" />
                 <ScalarProperty Name="ClientID" ColumnName="ClientID" />
@@ -1164,7 +1178,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Employees">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.Employees">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.Employees">
               <MappingFragment StoreEntitySet="Employees">
                 <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
                 <ScalarProperty Name="RoleID" ColumnName="RoleID" />
@@ -1179,7 +1193,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="HealthConditions">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.HealthConditions">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.HealthConditions">
               <MappingFragment StoreEntitySet="HealthConditions">
                 <ScalarProperty Name="HealthConditionID" ColumnName="HealthConditionID" />
                 <ScalarProperty Name="ConditionName" ColumnName="ConditionName" />
@@ -1187,7 +1201,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="LifeAndHealth">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.LifeAndHealth">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.LifeAndHealth">
               <MappingFragment StoreEntitySet="LifeAndHealth">
                 <ScalarProperty Name="LifeAndHealthID" ColumnName="LifeAndHealthID" />
                 <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
@@ -1199,7 +1213,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Logs">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.Logs">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.Logs">
               <MappingFragment StoreEntitySet="Logs">
                 <ScalarProperty Name="LogID" ColumnName="LogID" />
                 <ScalarProperty Name="TableName" ColumnName="TableName" />
@@ -1212,7 +1226,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Policies">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.Policies">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.Policies">
               <MappingFragment StoreEntitySet="Policies">
                 <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
                 <ScalarProperty Name="PolicyTypeID" ColumnName="PolicyTypeID" />
@@ -1224,7 +1238,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="PolicyStatuses">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.PolicyStatuses">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.PolicyStatuses">
               <MappingFragment StoreEntitySet="PolicyStatuses">
                 <ScalarProperty Name="StatusID" ColumnName="StatusID" />
                 <ScalarProperty Name="StatusName" ColumnName="StatusName" />
@@ -1232,7 +1246,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="PolicyTypes">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.PolicyTypes">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.PolicyTypes">
               <MappingFragment StoreEntitySet="PolicyTypes">
                 <ScalarProperty Name="PolicyTypeID" ColumnName="PolicyTypeID" />
                 <ScalarProperty Name="TypeName" ColumnName="TypeName" />
@@ -1240,7 +1254,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Properties">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.Properties">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.Properties">
               <MappingFragment StoreEntitySet="Properties">
                 <ScalarProperty Name="PropertyID" ColumnName="PropertyID" />
                 <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
@@ -1252,7 +1266,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="PropertyTypes">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.PropertyTypes">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.PropertyTypes">
               <MappingFragment StoreEntitySet="PropertyTypes">
                 <ScalarProperty Name="PropertyTypeID" ColumnName="PropertyTypeID" />
                 <ScalarProperty Name="TypeName" ColumnName="TypeName" />
@@ -1260,7 +1274,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Roles">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.Roles">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.Roles">
               <MappingFragment StoreEntitySet="Roles">
                 <ScalarProperty Name="RoleID" ColumnName="RoleID" />
                 <ScalarProperty Name="RoleName" ColumnName="RoleName" />
@@ -1268,7 +1282,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="VehicleMakes">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.VehicleMakes">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.VehicleMakes">
               <MappingFragment StoreEntitySet="VehicleMakes">
                 <ScalarProperty Name="MakeID" ColumnName="MakeID" />
                 <ScalarProperty Name="MakeName" ColumnName="MakeName" />
@@ -1276,7 +1290,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="VehicleModels">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.VehicleModels">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.VehicleModels">
               <MappingFragment StoreEntitySet="VehicleModels">
                 <ScalarProperty Name="ModelID" ColumnName="ModelID" />
                 <ScalarProperty Name="MakeID" ColumnName="MakeID" />
@@ -1285,20 +1299,20 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Vehicles">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.Vehicles">
+            <EntityTypeMapping TypeName="VSK_DiplomModel.Vehicles">
               <MappingFragment StoreEntitySet="Vehicles">
-                <ScalarProperty Name="EnginePower" ColumnName="EnginePower" />
-                <ScalarProperty Name="RegistrationRegion" ColumnName="RegistrationRegion" />
                 <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
                 <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
                 <ScalarProperty Name="ModelID" ColumnName="ModelID" />
                 <ScalarProperty Name="VIN" ColumnName="VIN" />
                 <ScalarProperty Name="Year" ColumnName="Year" />
                 <ScalarProperty Name="LicensePlate" ColumnName="LicensePlate" />
+                <ScalarProperty Name="RegistrationRegion" ColumnName="RegistrationRegion" />
+                <ScalarProperty Name="EnginePower" ColumnName="EnginePower" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="ClientDrivers" TypeName="VSK_ArchiveModel.ClientDrivers" StoreEntitySet="ClientDrivers">
+          <AssociationSetMapping Name="ClientDrivers" TypeName="VSK_DiplomModel.ClientDrivers" StoreEntitySet="ClientDrivers">
             <EndProperty Name="Clients">
               <ScalarProperty Name="ClientID" ColumnName="ClientID" />
             </EndProperty>
@@ -1306,7 +1320,7 @@
               <ScalarProperty Name="DriverID" ColumnName="DriverID" />
             </EndProperty>
           </AssociationSetMapping>
-          <AssociationSetMapping Name="PolicyClients" TypeName="VSK_ArchiveModel.PolicyClients" StoreEntitySet="PolicyClients">
+          <AssociationSetMapping Name="PolicyClients" TypeName="VSK_DiplomModel.PolicyClients" StoreEntitySet="PolicyClients">
             <EndProperty Name="Clients">
               <ScalarProperty Name="ClientID" ColumnName="ClientID" />
             </EndProperty>
@@ -1314,7 +1328,7 @@
               <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
             </EndProperty>
           </AssociationSetMapping>
-          <AssociationSetMapping Name="PolicyDrivers" TypeName="VSK_ArchiveModel.PolicyDrivers" StoreEntitySet="PolicyDrivers">
+          <AssociationSetMapping Name="PolicyDrivers" TypeName="VSK_DiplomModel.PolicyDrivers" StoreEntitySet="PolicyDrivers">
             <EndProperty Name="Drivers">
               <ScalarProperty Name="DriverID" ColumnName="DriverID" />
             </EndProperty>
@@ -1322,19 +1336,6 @@
               <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
             </EndProperty>
           </AssociationSetMapping>
-          <EntitySetMapping Name="DriverInsuranceHistory">
-            <EntityTypeMapping TypeName="VSK_ArchiveModel.DriverInsuranceHistory">
-              <MappingFragment StoreEntitySet="DriverInsuranceHistory">
-                <ScalarProperty Name="LastUpdated" ColumnName="LastUpdated" />
-                <ScalarProperty Name="KBM" ColumnName="KBM" />
-                <ScalarProperty Name="HadAccident" ColumnName="HadAccident" />
-                <ScalarProperty Name="Year" ColumnName="Year" />
-                <ScalarProperty Name="PolicyID" ColumnName="PolicyID" />
-                <ScalarProperty Name="DriverID" ColumnName="DriverID" />
-                <ScalarProperty Name="HistoryID" ColumnName="HistoryID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

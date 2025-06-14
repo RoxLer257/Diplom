@@ -30,7 +30,6 @@ namespace Diplom.Pages.MainPage
             InitializePlaceholders();
             ResetContent();
 
-            // Оставляем только скрытие клиентов для агента
             if (CurrentUser.RoleName == "Страховой агент")
             {
                 ClientsButton.Visibility = Visibility.Collapsed;
@@ -73,7 +72,7 @@ namespace Diplom.Pages.MainPage
                 {
                     if (CurrentUser.RoleName == "Страховой агент")
                     {
-                        DtgClients.ItemsSource = null; // Не показываем клиентов
+                        DtgClients.ItemsSource = null;
                     }
                     else if (string.IsNullOrWhiteSpace(search))
                     {
@@ -111,7 +110,7 @@ namespace Diplom.Pages.MainPage
         {
             if (sender is TextBox textBox)
             {
-                FIOSearchTxtBox.Text = string.Empty; // Очищаем поле поиска по ФИО
+                FIOSearchTxtBox.Text = string.Empty; 
                 string search = textBox.Text;
                 if (string.IsNullOrWhiteSpace(search))
                 {
@@ -144,7 +143,7 @@ namespace Diplom.Pages.MainPage
             if (CurrentUser.RoleName == "Страховой агент")
             {
                 DtgContracts.ItemsSource = ClassFrame.ConnectDB.Policies.ToList();
-                DtgClients.ItemsSource = null; // Не показываем клиентов
+                DtgClients.ItemsSource = null; 
             }
             else
             {
@@ -276,7 +275,7 @@ namespace Diplom.Pages.MainPage
 
         private void AutoInsurance_Click(object sender, RoutedEventArgs e)
         {
-            ClassFrame.frmObj.Navigate(new Pages.AddPolicyPage(/*null*/));
+            ClassFrame.frmObj.Navigate(new Pages.AddPolicyPage());
         }
 
         private void LifeInsurance_Click(object sender, RoutedEventArgs e)
@@ -291,12 +290,12 @@ namespace Diplom.Pages.MainPage
 
         private void BtnOsago_Click(object sender, RoutedEventArgs e)
         {
-            ClassFrame.frmObj.Navigate(new Pages.AddPolicyPage(/*null*/));
+            ClassFrame.frmObj.Navigate(new Pages.AddPolicyPage());
         }
 
         private void BtnKasko_Click(object sender, RoutedEventArgs e)
         {
-            ClassFrame.frmObj.Navigate(new Pages.AddPolicyPage(/*null*/));
+            ClassFrame.frmObj.Navigate(new Pages.AddPolicyPage());
         }
 
         private void BtnLifeInsurance_Click(object sender, RoutedEventArgs e)
@@ -326,16 +325,16 @@ namespace Diplom.Pages.MainPage
 
                 switch (fullPolicy.PolicyTypeID)
                 {
-                    case 1: // ОСАГО
+                    case 1:
                         ClassFrame.frmObj.Navigate(new AddPolicyPage(fullPolicy));
                         break;
-                    case 2: // КАСКО
+                    case 2: 
                         ClassFrame.frmObj.Navigate(new AddPolicyPage(fullPolicy));
                         break;
-                    case 3: // Жизнь и здоровье
+                    case 3: 
                         ClassFrame.frmObj.Navigate(new AddPropertyInsurance(fullPolicy));
                         break;
-                    case 4: // Имущество
+                    case 4:
                         ClassFrame.frmObj.Navigate(new AddLifeInsurancePage(fullPolicy));
                         break;
                     default:
@@ -379,7 +378,6 @@ namespace Diplom.Pages.MainPage
         {
             try
             {
-                // Объявляем client один раз в начале
                 var client = policy.Clients.FirstOrDefault();
                 string templatePath;
                 if (policy.PolicyTypes?.TypeName == "ОСАГО" || policy.PolicyTypes?.TypeName == "КАСКО")
@@ -411,13 +409,11 @@ namespace Diplom.Pages.MainPage
                     string currentUserInfo = $"{CurrentUser.FullName ?? "Не указан"} {CurrentUser.RoleName ?? "Не указана"}".Trim();
                     document.ReplaceText("{CurrentUser.FullName} {CurrentUser.RoleName}", currentUserInfo);
 
-                    // Заполняем основные поля
                     document.ReplaceText("{PolicyID}", policy.PolicyID.ToString());
                     document.ReplaceText("{StartDate}", policy.StartDate.ToString("dd.MM.yyyy"));
                     document.ReplaceText("{EndDate}", policy.EndDate.ToString("dd.MM.yyyy"));
                     document.ReplaceText("{ContractDate}", policy.StartDate.ToString("dd.MM.yyyy"));
 
-                    // Заполняем данные клиента
                     if (client != null)
                     {
                         string clientType = client.ClientTypeID == 1 ? "Физическое лицо" : "Юридическое лицо";
@@ -432,10 +428,8 @@ namespace Diplom.Pages.MainPage
                         document.ReplaceText("{PassportNumber}", client.PassportNumber ?? "Не указан");
                         document.ReplaceText("{Phone}", client.Phone ?? "Не указан");
 
-                        // Для полиса страхования жизни и здоровья
                         if (policy.PolicyTypes?.TypeName == "Страхование жизни")
                         {
-                            // Получаем возраст из LifeAndHealth
                             var lifeAndHealth = policy.LifeAndHealth?.FirstOrDefault();
                             int? age = lifeAndHealth?.Age;
                             if (age == null || age < 1 || age > 120)
@@ -445,29 +439,25 @@ namespace Diplom.Pages.MainPage
                             }
                             int year = DateTime.Today.Year - age.Value;
                             Random random = new Random();
-                            int month = random.Next(1, 13); // Месяц от 1 до 12
+                            int month = random.Next(1, 13); 
                             int maxDay = DateTime.DaysInMonth(year, month);
-                            int day = random.Next(1, maxDay + 1); // День от 1 до maxDay
+                            int day = random.Next(1, maxDay + 1); 
                             DateTime birthDate = new DateTime(year, month, day);
                             string birthDateStr = birthDate.ToString("dd.MM.yyyy");
                             document.ReplaceText("{DateTime.Today – Age}", birthDateStr);
                             document.ReplaceText("{DateOfBirth}", birthDateStr);
 
-                            // Конвертируем сумму в пропись
                             string amountInWords = ConvertToWords(policy.InsuranceAmount);
                             document.ReplaceText("{InsuranceAmount}", $"{policy.InsuranceAmount:N2} ({amountInWords}) рублей");
 
                         }
                     }
 
-                    // Заменяем дату оформления
                     string todayStr = DateTime.Today.ToString("dd.MM.yyyy");
                     document.ReplaceText("{DateTime.Today}", todayStr);
 
-                    // Для автострахования
                     if (policy.PolicyTypes?.TypeName == "ОСАГО" || policy.PolicyTypes?.TypeName == "КАСКО")
                     {
-                        // Заполняем данные автомобиля
                         var vehicle = policy.Vehicles.FirstOrDefault();
                         if (vehicle != null)
                         {
@@ -478,16 +468,13 @@ namespace Diplom.Pages.MainPage
                             document.ReplaceText("{VIN}", vehicle.VIN ?? "Не указан");
                         }
 
-                        // Заполняем тип доступа водителей
                         string driverAccessType = policy.Drivers.Any()
                             ? "лиц, допущенных к управлению транспортным средством"
                             : "неограниченного количества лиц, допущенных к управлению транспортным средством";
                         document.ReplaceText("{DriverAccessType}", driverAccessType);
 
-                        // Заполняем таблицу водителей
                         if (policy.Drivers.Any())
                         {
-                            // Находим таблицу водителей
                             Table driverTable = null;
                             foreach (var table in document.Tables)
                             {
@@ -508,7 +495,6 @@ namespace Diplom.Pages.MainPage
 
                             if (driverTable != null)
                             {
-                                // Находим шаблонную строку
                                 Row templateRow = null;
                                 int templateRowIndex = -1;
                                 for (int i = 0; i < driverTable.Rows.Count; i++)
@@ -521,22 +507,18 @@ namespace Diplom.Pages.MainPage
                                     }
                                 }
 
-                                // Удаляем шаблонную строку, если она найдена
                                 if (templateRow != null && templateRowIndex >= 0)
                                 {
                                     driverTable.RemoveRow(templateRowIndex);
                                 }
                                 else
                                 {
-                                    // Если шаблонная строка не найдена, используем последнюю строку
                                     templateRowIndex = driverTable.RowCount;
                                 }
 
-                                // Добавляем строки для каждого водителя
                                 int driverNumber = 1;
                                 foreach (var driver in policy.Drivers)
                                 {
-                                    // Получаем КБМ водителя
                                     var driverKbm = ClassFrame.ConnectDB.DriverInsuranceHistory
                                         .Where(h => h.DriverID == driver.DriverID)
                                         .OrderByDescending(h => h.LastUpdated)
@@ -546,12 +528,11 @@ namespace Diplom.Pages.MainPage
                                     string driverFullName = $"{driver.LastName} {driver.FirstName} {driver.MiddleName ?? ""}".Trim();
                                     string licenseNumber = driver.LicenseNumber ?? "Не указан";
 
-                                    // Создаем новую строку
                                     var newRow = driverTable.InsertRow(templateRowIndex);
-                                    newRow.Cells[0].Paragraphs.First().Append(driverNumber.ToString()); // № п/п
-                                    newRow.Cells[1].Paragraphs.First().Append(driverFullName); // ФИО
-                                    newRow.Cells[2].Paragraphs.First().Append(licenseNumber); // Водительское удостоверение
-                                    newRow.Cells[4].Paragraphs.First().Append(kbmValue); // КБМ
+                                    newRow.Cells[0].Paragraphs.First().Append(driverNumber.ToString());
+                                    newRow.Cells[1].Paragraphs.First().Append(driverFullName); 
+                                    newRow.Cells[2].Paragraphs.First().Append(licenseNumber); 
+                                    newRow.Cells[4].Paragraphs.First().Append(kbmValue);
 
                                     templateRowIndex++;
                                     driverNumber++;
@@ -565,7 +546,6 @@ namespace Diplom.Pages.MainPage
                         }
                         else
                         {
-                            // Если водителей нет, обрабатываем таблицу
                             Table driverTable = null;
                             foreach (var table in document.Tables)
                             {
@@ -586,7 +566,6 @@ namespace Diplom.Pages.MainPage
 
                             if (driverTable != null)
                             {
-                                // Находим и удаляем шаблонную строку
                                 Row templateRow = null;
                                 int templateRowIndex = -1;
                                 for (int i = 0; i < driverTable.Rows.Count; i++)
@@ -608,7 +587,6 @@ namespace Diplom.Pages.MainPage
                                     templateRowIndex = driverTable.RowCount;
                                 }
 
-                                // Добавляем пустую строку с текстом "Не указаны"
                                 var newRow = driverTable.InsertRow(templateRowIndex);
                                 newRow.Cells[0].Paragraphs.First().Append("1");
                                 newRow.Cells[1].Paragraphs.First().Append("Не указаны");
@@ -617,20 +595,18 @@ namespace Diplom.Pages.MainPage
                             }
                         }
 
-                        // Заполняем таблицу расчета премии
                         var calculator = new Diplom.Classes.Calculator.InsuranceCalculator(ClassFrame.ConnectDB);
                         double tb = 0, kt = 0, kbm = 0, kvs = 0, ko = 0, ks = 0, km = 0;
 
                         if (vehicle != null && policy.Drivers.Any())
                         {
-                            tb = (1646 + 7535) / 2.0; // базовый тариф
-                            kt = 1.8; // территориальный коэффициент
+                            tb = (1646 + 7535) / 2.0; 
+                            kt = 1.8; 
                             kvs = policy.Drivers.Min(d => calculator.CalculateKVS(d));
                             km = calculator.CalculateKM(vehicle.EnginePower ?? 100);
                             ks = calculator.CalculateKS(policy.StartDate, policy.EndDate);
                             ko = policy.Drivers.Count > 1 ? 2.32 : 1.0;
 
-                            // Получаем максимальный КБМ среди всех водителей
                             kbm = policy.Drivers.Max(d =>
                             {
                                 var driverKbm = ClassFrame.ConnectDB.DriverInsuranceHistory
@@ -642,10 +618,9 @@ namespace Diplom.Pages.MainPage
                         }
                         else
                         {
-                            kbm = 1.0; // Для неограниченного использования
+                            kbm = 1.0; 
                         }
 
-                        // Заполняем коэффициенты
                         document.ReplaceText("{tb}", tb.ToString("N2"));
                         document.ReplaceText("{kt}", kt.ToString("N2"));
                         document.ReplaceText("{KBM}", kbm.ToString("N2"));
@@ -659,7 +634,6 @@ namespace Diplom.Pages.MainPage
                     }
                     else if (policy.PolicyTypes?.TypeName == "Страхование имущества")
                     {
-                        // Используем уже объявленную выше переменную client
                         string clientType = client?.ClientTypeID == 1 ? "Физическое лицо" : "Юридическое лицо";
                         string clientName = client?.ClientTypeID == 1
                             ? $"{client.LastName} {client.FirstName} {client.MiddleName ?? ""}"
@@ -671,24 +645,20 @@ namespace Diplom.Pages.MainPage
                         document.ReplaceText("{StartDate}", policy.StartDate.ToString("dd.MM.yyyy"));
                         document.ReplaceText("{EndDate}", policy.EndDate.ToString("dd.MM.yyyy"));
 
-                        // Адрес объекта страхования
                         var property = policy.Properties?.FirstOrDefault();
                         document.ReplaceText("{Address}", property?.Address ?? "");
                         document.ReplaceText("{PropertyTypes.TypeName}", property?.PropertyTypes?.TypeName ?? "");
 
-                        // Страховая сумма и премия
                         string amountInWords = ConvertToWords(policy.InsuranceAmount);
                         document.ReplaceText("{InsuranceAmount}", $"{policy.InsuranceAmount:N2} ({amountInWords}) рублей");
 
-                        // Количество месяцев между датами
                         int months = ((policy.EndDate.Year - policy.StartDate.Year) * 12 + policy.EndDate.Month - policy.StartDate.Month);
                         if (policy.EndDate.Day < policy.StartDate.Day) months--;
-                        months = Math.Max(1, months); // минимум 1 месяц
+                        months = Math.Max(1, months); 
                         string monthsText = $"{months} ({ConvertToWords(months)}) календарный месяц";
                         document.ReplaceText("{EndDate-StartDate}", monthsText);
                     }
 
-                    // Сохраняем файл
                     var saveFileDialog = new Microsoft.Win32.SaveFileDialog
                     {
                         Filter = "Word Document (*.docx)|*.docx",
@@ -709,7 +679,6 @@ namespace Diplom.Pages.MainPage
             }
         }
 
-        // Метод для конвертации числа в пропись
         private string ConvertToWords(decimal number)
         {
             string[] units = { "", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять" };

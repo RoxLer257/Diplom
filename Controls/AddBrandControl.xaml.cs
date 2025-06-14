@@ -20,7 +20,6 @@ namespace Diplom.Controls
             InitializePlaceholders();
         }
 
-        // СДЕЛАТЬ ЛОГИ НА ВСЕХ КОНТРОЛКАХ!!!
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {

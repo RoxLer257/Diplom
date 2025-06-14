@@ -112,7 +112,7 @@ namespace Diplom.Classes.Validator
             var typeResult = ValidateClientType(clientType);
             if (!typeResult.IsValid) return typeResult;
 
-            if (clientType.ClientTypeID == 1) // Физическое лицо
+            if (clientType.ClientTypeID == 1) 
             {
                 var lastNameResult = ValidateLastName(lastName);
                 if (!lastNameResult.IsValid) return lastNameResult;
@@ -123,7 +123,7 @@ namespace Diplom.Classes.Validator
                 var middleNameResult = ValidateMiddleName(middleName);
                 if (!middleNameResult.IsValid) return middleNameResult;
             }
-            else if (clientType.ClientTypeID == 2) // Юридическое лицо
+            else if (clientType.ClientTypeID == 2) 
             {
                 var companyNameResult = ValidateCompanyName(companyName);
                 if (!companyNameResult.IsValid) return companyNameResult;
@@ -196,16 +196,13 @@ namespace Diplom.Classes.Validator
             if (!experience.HasValue || experience < 0 || experience > 100)
                 return new ValidationResult(false, "Стаж: от 0 до 100 лет.");
 
-            // Вычисляем возраст
             var today = DateTime.Today;
             int age = today.Year - dateOfBirth.Year;
             if (dateOfBirth.Date > today.AddYears(-age)) age--;
 
-            // Максимальный стаж — возраст минус 18 лет
             int maxExperience = age - 18;
             if (maxExperience < 0) maxExperience = 0;
 
-            // Проверка стажа
             if (experience > maxExperience)
             {
                 return new ValidationResult(false, $"Стаж: не может превышать {maxExperience} лет (ограничено возрастом и 18 годами).");
@@ -320,21 +317,17 @@ namespace Diplom.Classes.Validator
             if (string.IsNullOrWhiteSpace(vin))
                 return new ValidationResult(false, "VIN не может быть пустым");
             vin = vin.ToUpperInvariant();
-            // VIN: строго 17 символов, только латиница (A-H, J-N, P, R-Z, 0-9), без I, O, Q, без пробелов, только заглавные
             if (!Regex.IsMatch(vin, @"^[A-HJ-NPR-Z0-9]{17}$"))
                 return new ValidationResult(false, "VIN: строго 17 символов (только латиница, без I, O, Q, без пробелов, только заглавные)");
             
-            // Если это редактирование существующего автомобиля (есть vehicleId)
             if (vehicleId.HasValue)
             {
-                // Проверяем, существует ли VIN у другого автомобиля
                 var existingVehicle = _context.Vehicles.FirstOrDefault(v => v.VIN == vin && v.VehicleID != vehicleId.Value);
                 if (existingVehicle != null)
                     return new ValidationResult(false, "VIN уже зарегистрирован на другой автомобиль.");
             }
             else
             {
-                // При создании нового автомобиля проверяем уникальность VIN
                 if (_context.Vehicles.Any(v => v.VIN == vin))
                     return new ValidationResult(false, "VIN уже зарегистрирован.");
             }
@@ -346,7 +339,6 @@ namespace Diplom.Classes.Validator
             int currentYear = DateTime.Now.Year + 1;
             if (!year.HasValue || year < 1900 || year > currentYear)
                 return new ValidationResult(false, $"Год выпуска: от 1900 до {currentYear}.");
-            // Строго 4 цифры
             if (year.Value.ToString().Length != 4)
                 return new ValidationResult(false, "Год выпуска: строго 4 цифры.");
             return new ValidationResult(true);
@@ -357,7 +349,6 @@ namespace Diplom.Classes.Validator
             if (string.IsNullOrWhiteSpace(licensePlate))
                 return new ValidationResult(false, "Номер не может быть пустым");
             licensePlate = licensePlate.ToUpperInvariant();
-            // Формат: 1 буква, 3 цифры, 2 буквы, 2 или 3 цифры (например, Х123ХХ12 или Х123ХХ123), только кириллица, без пробелов
             if (!Regex.IsMatch(licensePlate, @"^[А-Я]{1}\d{3}[А-Я]{2}\d{2,3}$"))
                 return new ValidationResult(false, "Формат номера: Х123ХХ12 или Х123ХХ123 (строго: 1 буква, 3 цифры, 2 буквы, 2 или 3 цифры, только кириллица, без пробелов)");
             return new ValidationResult(true);
@@ -497,7 +488,7 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
     }
-    // СТРАХОВАНИЕ ЖИЗНИ
+
     public class LifeInsuranceValidator
     {
         private readonly VSK_DBEntities _context;
@@ -507,7 +498,6 @@ namespace Diplom.Classes.Validator
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        // Валидация возраста
         public ValidationResult ValidateAge(int? age)
         {
             if (!age.HasValue || age < 0 || age > 120)
@@ -515,7 +505,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация пола
         public ValidationResult ValidateGender(string gender)
         {
             if (string.IsNullOrWhiteSpace(gender))
@@ -525,7 +514,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация состояния здоровья
         public ValidationResult ValidateHealthCondition(HealthConditions healthCondition)
         {
             if (healthCondition == null)
@@ -533,7 +521,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация дат начала и окончания
         public ValidationResult ValidateDates(DateTime? startDate, DateTime? endDate)
         {
             if (!startDate.HasValue || !endDate.HasValue)
@@ -547,7 +534,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация рода занятий
         public ValidationResult ValidateOccupation(string occupation)
         {
             if (string.IsNullOrWhiteSpace(occupation))
@@ -557,7 +543,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация страховой суммы
         public ValidationResult ValidateInsuranceAmount(decimal? amount)
         {
             if (!amount.HasValue || amount <= 0)
@@ -565,7 +550,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация типа полиса
         public ValidationResult ValidatePolicyType(PolicyTypes policyType)
         {
             if (policyType == null)
@@ -573,7 +557,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация статуса
         public ValidationResult ValidateStatus(PolicyStatuses status)
         {
             if (status == null)
@@ -581,7 +564,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация клиентов
         public ValidationResult ValidateClients(ICollection<Clients> clients)
         {
             if (clients == null || !clients.Any())
@@ -589,7 +571,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Полная валидация для страхования жизни
         public ValidationResult ValidateLifeInsurance(
             int? age,
             string gender,
@@ -642,7 +623,6 @@ namespace Diplom.Classes.Validator
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        // Валидация типа имущества
         public ValidationResult ValidatePropertyType(PropertyTypes propertyType)
         {
             if (propertyType == null)
@@ -650,7 +630,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация адреса
         public ValidationResult ValidateAddress(string address)
         {
             if (string.IsNullOrWhiteSpace(address))
@@ -660,7 +639,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация площади
         public ValidationResult ValidateArea(decimal? area)
         {
             if (!area.HasValue || area <= 0)
@@ -670,7 +648,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация стоимости
         public ValidationResult ValidateValue(decimal? value)
         {
             if (!value.HasValue || value <= 0)
@@ -680,7 +657,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация дат
         public ValidationResult ValidateDates(DateTime? startDate, DateTime? endDate)
         {
             if (!startDate.HasValue || !endDate.HasValue)
@@ -694,7 +670,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация страховой суммы
         public ValidationResult ValidateInsuranceAmount(decimal? amount)
         {
             if (!amount.HasValue || amount <= 0)
@@ -704,7 +679,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация типа полиса
         public ValidationResult ValidatePolicyType(PolicyTypes policyType)
         {
             if (policyType == null)
@@ -712,7 +686,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация статуса
         public ValidationResult ValidateStatus(PolicyStatuses status)
         {
             if (status == null)
@@ -720,7 +693,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация клиентов
         public ValidationResult ValidateClients(ICollection<Clients> clients)
         {
             if (clients == null || !clients.Any())
@@ -728,7 +700,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация имущества
         public ValidationResult ValidateProperties(ICollection<Properties> properties)
         {
             if (properties == null || !properties.Any())
@@ -736,7 +707,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Валидация только данных полиса (без данных конкретного имущества)
         public ValidationResult ValidatePolicyData(
             DateTime? startDate,
             DateTime? endDate,
@@ -767,7 +737,6 @@ namespace Diplom.Classes.Validator
             return new ValidationResult(true);
         }
 
-        // Полная валидация для страхования имущества (для добавления нового имущества)
         public ValidationResult ValidatePropertyInsurance(
             PropertyTypes propertyType,
             string address,

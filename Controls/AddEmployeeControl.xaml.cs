@@ -43,7 +43,7 @@ namespace Diplom.Controls
 
         public void SetEmployeeForEdit(Employees employee)
         {
-            _editingEmployee = employee; // Это важно!
+            _editingEmployee = employee;
 
             LastNameBox.Text = employee.LastName;
             FirstNameBox.Text = employee.FirstName;
@@ -51,7 +51,6 @@ namespace Diplom.Controls
             EmailBox.Text = employee.Email;
             PhoneBox.Text = employee.Phone;
 
-            // Установка роли через RoleID
             RoleIdCmb.SelectedValue = employee.RoleID;
         }
 
@@ -72,11 +71,10 @@ namespace Diplom.Controls
                 RoleIdCmb.SelectedItem is Roles selectedRoleId)
             {
                 var db = ClassFrame.ConnectDB;
-                Employees employee; // Объявляем переменную employee
+                Employees employee; 
 
                 if (_editingEmployee == null)
                 {
-                    // Добавление нового сотрудника
                     employee = new Employees
                     {
                         LastName = EmpLastName,
@@ -91,7 +89,6 @@ namespace Diplom.Controls
                 }
                 else
                 {
-                    // Редактирование существующего сотрудника
                     employee = _editingEmployee;
                     employee.LastName = EmpLastName;
                     employee.FirstName = EmpFirstName;
@@ -105,7 +102,7 @@ namespace Diplom.Controls
                 }
 
                 db.SaveChanges();
-                // Передаем employee через событие
+                
                 EmployeeAdded?.Invoke(this, new EmployeeEventArgs(employee));
             }
             else
@@ -116,7 +113,7 @@ namespace Diplom.Controls
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             ClearForm();
-            Canceled?.Invoke(this, EventArgs.Empty); // Событие отмены
+            Canceled?.Invoke(this, EventArgs.Empty); 
         }
 
         private void InitializePlaceholders()

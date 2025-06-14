@@ -50,34 +50,10 @@ namespace Diplom.Controls
                 };
                 db.VehicleModels.Add(newModel);
                 db.SaveChanges();
-                // Передаем объект через событие
                 ModelAdded?.Invoke(this, new ModelEventArgs(newModel));
             }
         }
 
-        //private void SaveButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    string Modelname = ModelNameBox.Text.Trim();
-        //    string brandId = BrandIdBox.Text.Trim();
-
-        //    if (!string.IsNullOrWhiteSpace(Modelname) && BrandIdBox.SelectedItem is VehicleMakes selectedBrandId)
-        //    {
-        //        var db = VSK_DBEntities.GetContext();
-
-        //        db.VehicleModels.Add(new VehicleModels
-        //        {
-        //            ModelName = Modelname,
-        //            MakeID = selectedBrandId.MakeID
-        //        });
-
-        //        db.SaveChanges();
-
-        //        // Оповестим, что бренд добавлен
-        //        ModelAdded?.Invoke(this, EventArgs.Empty);
-
-        //        //LogAction("VehicleMakes", "Добавление", $"Добавлен автомобильный бренд {brandName}");
-        //    }
-        //}
 
         private void InitializePlaceholders()
         {

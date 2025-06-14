@@ -17,12 +17,12 @@ namespace Diplom.Classes
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Policies()
         {
+            this.DriverInsuranceHistory = new HashSet<DriverInsuranceHistory>();
             this.LifeAndHealth = new HashSet<LifeAndHealth>();
             this.Properties = new HashSet<Properties>();
             this.Vehicles = new HashSet<Vehicles>();
             this.Clients = new HashSet<Clients>();
             this.Drivers = new HashSet<Drivers>();
-            this.DriverInsuranceHistory = new HashSet<DriverInsuranceHistory>();
         }
     
         public int PolicyID { get; set; }
@@ -32,6 +32,8 @@ namespace Diplom.Classes
         public System.DateTime StartDate { get; set; }
         public System.DateTime EndDate { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DriverInsuranceHistory> DriverInsuranceHistory { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<LifeAndHealth> LifeAndHealth { get; set; }
         public virtual PolicyTypes PolicyTypes { get; set; }
@@ -44,7 +46,5 @@ namespace Diplom.Classes
         public virtual ICollection<Clients> Clients { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Drivers> Drivers { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<DriverInsuranceHistory> DriverInsuranceHistory { get; set; }
     }
 }

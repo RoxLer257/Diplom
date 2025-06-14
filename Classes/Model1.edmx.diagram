@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="5bab7517e2df453fa99eac22de3479ae" Name="Diagram1" ZoomLevel="64">
+        <EntityTypeShape EntityType="VSK_DiplomModel.Clients" Width="1.5" PointX="5.25" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.ClientTypes" Width="1.5" PointX="3" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.DriverInsuranceHistory" Width="1.5" PointX="9.75" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.Drivers" Width="1.5" PointX="7.5" PointY="8.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.Employees" Width="1.5" PointX="3" PointY="8" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.HealthConditions" Width="1.5" PointX="12.75" PointY="13" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.LifeAndHealth" Width="1.5" PointX="15" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.Logs" Width="1.5" PointX="5.25" PointY="13.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.Policies" Width="1.5" PointX="12.75" PointY="8" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.PolicyStatuses" Width="1.5" PointX="10.5" PointY="5.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.PolicyTypes" Width="1.5" PointX="10.5" PointY="12.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.Properties" Width="1.5" PointX="18" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.PropertyTypes" Width="1.5" PointX="15.75" PointY="12" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.Roles" Width="1.5" PointX="0.75" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.VehicleMakes" Width="1.5" PointX="10.5" PointY="3" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.VehicleModels" Width="1.5" PointX="12.75" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="VSK_DiplomModel.Vehicles" Width="1.5" PointX="15" PointY="4.375" IsExpanded="true" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Clients_Agent" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Clients_ClientType" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Drivers_Clients" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_DriverInsuranceHistory_Driver" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_DriverInsuranceHistory_Policy" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Employees_Manager" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Employees_Role" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Logs_Employees" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_LifeAndHealth_HealthCondition" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_LifeAndHealth_Policy" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Policies_PolicyType" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Policies_Status" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Properties_Policy" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Vehicles_Policy" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Properties_PropertyType" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_VehicleModels_Make" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.FK_Vehicles_Model" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.ClientDrivers" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.PolicyClients" ManuallyRouted="false" />
+        <AssociationConnector Association="VSK_DiplomModel.PolicyDrivers" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -46,7 +46,7 @@ namespace Diplom.Pages.Login
         {
             System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
             InitializeComponent();
-            DataContext = this; // Для привязки Visibility
+            DataContext = this; 
         }
 
         private async void BtnSendCode_Click(object sender, RoutedEventArgs e)
@@ -71,10 +71,8 @@ namespace Diplom.Pages.Login
 
                 _employeeEmail = email;
 
-                // Генерируем код
                 _generatedCode = new Random().Next(100000, 999999).ToString();
 
-                // Отправляем код на email
                 try
                 {
                     SendCodeToEmail(email, _generatedCode);
@@ -86,14 +84,12 @@ namespace Diplom.Pages.Login
                         "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
 
-                // Переключаемся на шаг ввода кода (только если отправка успешна)
-                if (string.IsNullOrEmpty(TxtCode.Text)) // Проверка, чтобы избежать случайного перехода
+                if (string.IsNullOrEmpty(TxtCode.Text)) 
                 {
                     EmailStepVisibility = Visibility.Collapsed;
                     CodeStepVisibility = Visibility.Visible;
                     PasswordStepVisibility = Visibility.Collapsed;
 
-                    // Логируем отправку кода
                     LogAction(context, "Employees", "Восстановление пароля",
                         $"Сотруднику {employee.FullName} (ID: {employee.EmployeeID}) отправлен код на {email}",
                         employee.EmployeeID);
@@ -105,7 +101,7 @@ namespace Diplom.Pages.Login
         {
             var fromAddress = new MailAddress("diplomtestvsk@yandex.ru", "САО ВСК");
             var toAddress = new MailAddress(recipientEmail);
-            const string fromPassword = "ucgejgipwdkfmyea"; // желательно использовать app-password
+            const string fromPassword = "ucgejgipwdkfmyea";
 
             const string subject = "Восстановление пароля — САО ВСК";
 
@@ -127,7 +123,6 @@ namespace Diplom.Pages.Login
                 message.Subject = subject;
                 message.IsBodyHtml = true;
 
-                // Добавим как HTML, так и обычный текст
                 var altViewPlain = AlternateView.CreateAlternateViewFromString(textBody, null, "text/plain");
                 var altViewHtml = AlternateView.CreateAlternateViewFromString(htmlBody, null, "text/html");
                 message.AlternateViews.Add(altViewPlain);
@@ -149,7 +144,6 @@ namespace Diplom.Pages.Login
 
             if (enteredCode == _generatedCode)
             {
-                // Код верный, переходим к вводу нового пароля
                 EmailStepVisibility = Visibility.Collapsed;
                 CodeStepVisibility = Visibility.Collapsed;
                 PasswordStepVisibility = Visibility.Visible;
@@ -182,30 +176,26 @@ namespace Diplom.Pages.Login
                 var employee = await context.Employees.FirstOrDefaultAsync(emp => emp.Email == _employeeEmail);
                 if (employee != null)
                 {
-                    // Обновляем пароль
                     employee.Password = newPassword;
                     await context.SaveChangesAsync();
 
-                    // Логируем изменение пароля
                     LogAction(context, "Employees", "Изменение пароля",
                         $"Сотрудник {employee.FullName} (ID: {employee.EmployeeID}) изменил пароль",
                         employee.EmployeeID);
 
                     MessageBox.Show("Пароль успешно изменен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                    // Сохраняем данные сотрудника в CurrentUser
                     CurrentUser.EmployeeID = employee.EmployeeID;
                     CurrentUser.FullName = employee.FullName;
                     CurrentUser.Email = employee.Email;
                     CurrentUser.Password = employee.Password;
                     CurrentUser.RoleName = context.Roles.FirstOrDefault(r => r.RoleID == employee.RoleID)?.RoleName;
 
-                    // Перенаправляем на соответствующую страницу
-                    if (employee.EmployeeID == 1) // Администратор
+                    if (employee.EmployeeID == 1) 
                     {
                         ClassFrame.frmObj.Navigate(new AdminPage());
                     }
-                    else // Обычный пользователь
+                    else 
                     {
                         ClassFrame.frmObj.Navigate(new MainPage.MainPage());
                     }
@@ -228,7 +218,6 @@ namespace Diplom.Pages.Login
             context.SaveChanges();
         }
 
-        // Обработчики для плейсхолдеров
         private void TxtEmail_GotFocus(object sender, RoutedEventArgs e) => UpdatePlaceholder(sender as TextBox, EmailPlaceholder);
         private void TxtEmail_LostFocus(object sender, RoutedEventArgs e) => UpdatePlaceholder(sender as TextBox, EmailPlaceholder);
         private void TxtEmail_TextChanged(object sender, TextChangedEventArgs e) => UpdatePlaceholder(sender as TextBox, EmailPlaceholder);

@@ -33,7 +33,6 @@ namespace Diplom.Pages
             HealthConditionsGrid.ItemsSource =  ClassFrame.ConnectDB.HealthConditions.ToList();
         }
 
-        // Метод для логирования действий
         private void LogAction(string tableName, string action, string changedData)
         {
             var log = new Logs
@@ -42,8 +41,8 @@ namespace Diplom.Pages
                 Action = action,
                 ChangedData = changedData,
                 ChangeDate = DateTime.Now,
-                UserName = CurrentUser.Email ?? "System", // Имя текущего пользователя
-                EmployeeID = CurrentUser.EmployeeID// ID сотрудника
+                UserName = CurrentUser.Email ?? "System", 
+                EmployeeID = CurrentUser.EmployeeID
             };
             ClassFrame.ConnectDB.Logs.Add(log);
             ClassFrame.ConnectDB.SaveChanges();
@@ -58,7 +57,7 @@ namespace Diplom.Pages
                 control.EmployeeAdded += (s, args) =>
                 {
                     EmployeesGrid.ItemsSource = ClassFrame.ConnectDB.Employees.ToList();
-                    RightPanel.Content = null; // Можно очистить панель после добавления
+                    RightPanel.Content = null; 
                     string fullName = DisplayHelper.GetFullName(args.Employee.LastName, args.Employee.FirstName, args.Employee.MiddleName);
                     LogAction("Employees", "Добавление", $"Добавлен сотрудник: {fullName}");
                     Load();
@@ -67,15 +66,13 @@ namespace Diplom.Pages
             }
             else if (MainTabControl.SelectedItem == InfoTab)
             {
-                // Вложенные вкладки в разделе "Справочники"
                 if (InfoTabControl.SelectedItem == BrandsTab)
                 {
-                    //RightPanel.Content = new AddBrandControl();
                     var control = new AddBrandControl();
                     control.BrandAdded += (s, args) =>
                     {
                         BrandsGrid.ItemsSource = ClassFrame.ConnectDB.VehicleMakes.ToList();
-                        RightPanel.Content = null; // Можно очистить панель после добавления
+                        RightPanel.Content = null; 
                         LogAction("VehicleMakes", "Добавление", $"Добавлен бренд: {args.Brand.MakeName}");
                         Load();
                     };
@@ -90,12 +87,10 @@ namespace Diplom.Pages
                         ModelsGrid.ItemsSource = ClassFrame.ConnectDB.VehicleModels.ToList();
                         RightPanel.Content = null;
 
-                        // Находим бренд по MakeID
                         var brand = ClassFrame.ConnectDB.VehicleMakes
                             .FirstOrDefault(b => b.MakeID == args.Model.MakeID);
                         string brandName = brand != null ? brand.MakeName : "Неизвестный бренд";
 
-                        // Обновляем строку лога
                         LogAction("VehicleModels", "Добавление",
                             $"Добавлена модель: {args.Model.ModelName} бренда {brandName}");
                         Load();
@@ -109,7 +104,7 @@ namespace Diplom.Pages
                     control.PropertyTypeAdded += (s, args) =>
                     {
                         PropertyTypesGrid.ItemsSource = ClassFrame.ConnectDB.PropertyTypes.ToList();
-                        RightPanel.Content = null; // Можно очистить панель после добавления
+                        RightPanel.Content = null; 
                         LogAction("PropertyTypes", "Добавление", $"Добавлен тип имущества: {args.PropertyType.TypeName}");
                         Load();
                     };
@@ -121,7 +116,7 @@ namespace Diplom.Pages
                     control.HealthConditionAdded += (s, args) =>
                     {
                         HealthConditionsGrid.ItemsSource = ClassFrame.ConnectDB.HealthConditions.ToList();
-                        RightPanel.Content = null; // Можно очистить панель после добавления
+                        RightPanel.Content = null; 
                         LogAction("HealthConditions", "Добавление", $"Добавлено состояние здоровья: {args.HealthCondition.ConditionName}");
                         Load();
                     };
@@ -132,7 +127,6 @@ namespace Diplom.Pages
 
         private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Очищаем правую панель при переключении главных вкладок
             if (RightPanel != null)
             {
                 RightPanel.Content = null;
@@ -141,7 +135,6 @@ namespace Diplom.Pages
 
         private void InfoTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Очищаем правую панель при переключении внутренних вкладок справочников
             if (RightPanel != null)
             {
                 RightPanel.Content = null;
@@ -152,14 +145,13 @@ namespace Diplom.Pages
         {
             if (EmployeesGrid.SelectedItem is Employees selectedEmployee)
             {
-                Debug.WriteLine("Выбран сотрудник: " + selectedEmployee.FullName); // Проверьте, что объект существует
-
+                Debug.WriteLine("Выбран сотрудник: " + selectedEmployee.FullName); 
                 var editControl = new AddEmployeeControl();
                 editControl.SetEmployeeForEdit(selectedEmployee);
 
                 editControl.EmployeeAdded += (s, args) =>
                 {
-                    Load(); // Обновление таблицы
+                    Load(); 
                     RightPanel.Content = null;
                 };
 
@@ -208,13 +200,11 @@ namespace Diplom.Pages
                         if (del != null)
                         {
                             ClassFrame.ConnectDB.Employees.Remove(del);
-                            // Логируем удаление каждого сотрудника
                             LogAction("Employees", "Удаление", $"Удалён сотрудник с ID: {del.EmployeeID}, ФИО: {del.LastName} {del.FirstName} {del.MiddleName}");
                         }
                     }
 
                     ClassFrame.ConnectDB.SaveChanges();
-                    // Логируем успешное завершение операции
                     LogAction("Employees", "Удаление (успешно)", $"Удалено {selectedUser.Count} сотрудника(ов) в {DateTime.Now}");
 
                     ClassFrame.ConnectDB.ChangeTracker.Entries().ToList().ForEach(ent => ent.Reload());
@@ -226,7 +216,6 @@ namespace Diplom.Pages
                 }
                 catch (Exception ex)
                 {
-                    // Логируем ошибку
                     LogAction("Employees", "Ошибка удаления", $"Ошибка при удалении сотрудников: {ex.Message}");
                     MessageBox.Show("Ошибка: " + ex.Message);
                 }
@@ -236,13 +225,11 @@ namespace Diplom.Pages
         {
             try
             {
-                // Определяем текущую вкладку
                 var selectedTab = InfoTabControl.SelectedItem as TabItem;
                 if (selectedTab == null) return;
 
                 if (selectedTab == BrandsTab)
                 {
-                    // Удаление брендов авто
                     var selectedBrands = BrandsGrid.SelectedItems.Cast<VehicleMakes>().ToList();
                     if (selectedBrands.Count == 0)
                     {
@@ -250,7 +237,6 @@ namespace Diplom.Pages
                         return;
                     }
 
-                    // Проверка зависимостей
                     foreach (var brand in selectedBrands)
                     {
                         var dependentModels = ClassFrame.ConnectDB.VehicleModels
@@ -281,7 +267,6 @@ namespace Diplom.Pages
                 }
                 else if (selectedTab == ModelsTab)
                 {
-                    // Удаление моделей авто
                     var selectedModels = ModelsGrid.SelectedItems.Cast<VehicleModels>().ToList();
                     if (selectedModels.Count == 0)
                     {
@@ -289,7 +274,6 @@ namespace Diplom.Pages
                         return;
                     }
 
-                    // Проверка зависимостей
                     foreach (var model in selectedModels)
                     {
                         var dependentVehicles = ClassFrame.ConnectDB.Vehicles
@@ -320,7 +304,6 @@ namespace Diplom.Pages
                 }
                 else if (selectedTab == PropertyTabs)
                 {
-                    // Удаление типов недвижимости
                     var selectedPropertyTypes = PropertyTypesGrid.SelectedItems.Cast<PropertyTypes>().ToList();
                     if (selectedPropertyTypes.Count == 0)
                     {
@@ -328,7 +311,6 @@ namespace Diplom.Pages
                         return;
                     }
 
-                    // Проверка зависимостей
                     foreach (var propertyType in selectedPropertyTypes)
                     {
                         var dependentProperties = ClassFrame.ConnectDB.Properties
@@ -359,7 +341,6 @@ namespace Diplom.Pages
                 }
                 else if (selectedTab == HelthTab)
                 {
-                    // Удаление состояний здоровья
                     var selectedHealthConditions = HealthConditionsGrid.SelectedItems.Cast<HealthConditions>().ToList();
                     if (selectedHealthConditions.Count == 0)
                     {
@@ -367,7 +348,6 @@ namespace Diplom.Pages
                         return;
                     }
 
-                    // Проверка зависимостей
                     foreach (var healthCondition in selectedHealthConditions)
                     {
                         var dependentRecords = ClassFrame.ConnectDB.LifeAndHealth
@@ -401,7 +381,6 @@ namespace Diplom.Pages
             }
             catch (Exception ex)
             {
-                // Логируем ошибку
                 var selectedTab = InfoTabControl.SelectedItem as TabItem;
                 string tableName = selectedTab == BrandsTab ? "VehicleMakes" :
                                    selectedTab == ModelsTab ? "VehicleModels" :
